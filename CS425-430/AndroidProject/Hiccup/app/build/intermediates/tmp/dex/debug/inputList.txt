@@ -1,7 +1,0 @@
-/Users/jaredpetersen/Documents/GitHub/ovidja/Hiccup/app/build/intermediates/classes/debug
-/Users/jaredpetersen/Documents/GitHub/ovidja/Hiccup/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-1ca83630527bc106eaecfb804c74b4d63c51212b.jar
-/Users/jaredpetersen/Documents/GitHub/ovidja/Hiccup/app/build/intermediates/pre-dexed/debug/android-async-http-1.4.4-48dc33580f26a60375dff79d0986dc2cc918cd29.jar
-/Users/jaredpetersen/Documents/GitHub/ovidja/Hiccup/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-1e3aee99ca93ccbf6191aa08a6769cf44dcae35a.jar
-/Users/jaredpetersen/Documents/GitHub/ovidja/Hiccup/app/build/intermediates/pre-dexed/debug/classes-62cbc16b1e94c1fdf0a981281fdde1f1e6d10738.jar
-/Users/jaredpetersen/Documents/GitHub/ovidja/Hiccup/app/build/intermediates/pre-dexed/debug/classes-4d508706d0f56a217b1eb35e57654cf14cbea33b.jar
-/Users/jaredpetersen/Documents/GitHub/ovidja/Hiccup/app/build/intermediates/pre-dexed/debug/classes-fd586f50882a08e583a3b7feed95fcabeadca72f.jar
