@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Ovidja</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_logout">Log Out</string>
+    <string name="search_database_hint">Search Database</string>
+    <string name="search_button">Search</string>
+    <string name="hello_world">Videogame Details</string>
+    <string name="consoleHead">Console:</string>
+    <string name="releaseDateHead">Release Date:</string>
+    <string name="esrbHead">ESRB Rating:</string>
+
+</resources>

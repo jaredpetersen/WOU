@@ -1,0 +1,13 @@
+<resources>
+    <string name="title_activity_login">Welcome to Ovidja</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_username">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_log_in">Log in</string>
+
+    <string name="error_invalid_username">Invalid username</string>
+    <string name="error_invalid_password">Password is too short</string>
+    <string name="error_incorrect_password">Incorrect username/password</string>
+    <string name="error_field_required">Required field</string>
+</resources>

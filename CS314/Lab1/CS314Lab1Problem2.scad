@@ -1,0 +1,1 @@
+module randomShape(input1, input2) { union() { polyhedron(input1, center = true); % multmatrix(3) cylinder(input2, center = false); }} scale(4) square(input2/4); randomShape(40,30);

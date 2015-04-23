@@ -1,0 +1,288 @@
+// Lab3.c
+// Jared Petersen
+
+/*  C-Language starter and example implementation of the audio filter program Lab3.java
+
+    Compile and run like this:
+
+        gcc -Wall Lab3.c -lm -o Lab3.out
+        ./Lab3.out in.raw out.raw 44100 1250 101
+
+    The -lm causes the resulting executable to be linked with the math library, which is needed
+    for the math.h below.  Run
+        man gcc
+    for help on any other options.
+*/
+
+// This is a list of preprocessor directives:
+// All the preprocessor directives are replaced at compile time with their associated headers
+
+// stdio.h defines standard buffered input/output
+#include <stdio.h>
+// stdlib.h defines various general purpose functions like
+// random number generation, memory management, integer arithmetics, etc.
+#include <stdlib.h>
+// sys/stat.h defines the structure of data returned by
+// functions fstat(), lstat(), and stat()
+#include <sys/stat.h>
+// math.h defines various math functions (particularly the sin function used in filter function)
+#include <math.h>
+
+// Replace the string PI with the numerical value listed here before compilation
+#define PI 3.1415926535897931
+
+// Structs are a way of physically grouping variables
+// An instance of this struct is used throughout the program
+/* ..... Structure definition ......*/
+struct run_info
+{
+	FILE * in;		// Pointer to input file
+	FILE * out;		// Pointer to output file
+	off_t file_size;    // Size of input file in bytes
+	double fs;		// Audio file sample rate
+	double fc;		// Cutoff frequency for the low pass filter
+	int M;			// Filter length
+};
+
+// Function prototypes are used so that the compiler knows all the functions that are defined
+// If the functions are not defined here, they may not be able to be called
+/* .....  Function prototypes .......*/
+void print_usage( void );
+struct run_info get_arguments_files( int, char** );
+double *createLowPassFilter( int, double, double );
+
+
+/*************************************
+ *	Main entry point
+ *************************************/
+// argc is the number of arguments
+// argv is an array of the strings -- the value of the arguments
+int main( int argc, char * argv[] )
+{
+	if( argc < 6 )
+	{
+		print_usage();
+		exit(EXIT_FAILURE);
+	}
+
+     // Create an instance of the previousely mentioned struct based on the values of the arguments
+	// Parse command line arguments and open files.  Return values of arguments
+	struct run_info info = get_arguments_files( argc, argv );
+
+	// Print run information to the user
+     // Printf prints information and replaces the %[charactergoeshere] with the other values in
+     // the statement seperated by commas. The character used specifies the type of variable that
+     // is being being taken and printed out. For example, an %d can only be replaced by int
+	printf( "Input file \"%s\" has size %d bytes\n", argv[1], (int)info.file_size );
+	printf( "  corresponding to %d data values.\n", (int)info.file_size/2 );
+	printf( "Filtering with fs = %f, fc = %f, M = %d\noutput to \"%s\"\n",
+							info.fs, info.fc, info.M, argv[2] );
+
+	// This is the kind of comment I'm requesting --
+	// Make sure a short int is 16 bits. sizeof() is an operator in C and is
+	// built-in.  It is not a library function so doesn't need to be included
+	// It returns a value of type size_t, which ....(fill in here)
+	printf( "sizeof( short int ) = %lu\n",sizeof(short int) );
+
+	/* .............. Create filter .................*/
+     // createLowPassFilter takes in values from the struct and returns an array pointer
+     // *filter is a pointer that is set to the returned array pointer which points to an array
+     // which is really just an abstracted pointer system... Pointers are very complex, so 
+     // definitely research this on your own.
+	double *filter = createLowPassFilter(info.M, info.fs, info.fc);
+
+	/* ........ Read file, filter and write file ....*/
+	/* .. This starter version only just reads in the input
+	      and writes it directly to the output, in blocks of 1000,
+		  with no filtering   */
+	// Allocate storage on the heap for an array for work
+     // Work is a pointer of type short int (smaller range of integer values) that is initizialized
+     // to the section of memory that is allocated by malloc
+	short int *work = (short int *) malloc(1000*16);
+
+     // If the malloc command was not actually able to allocate memory for the *work pointer, the
+     // pointer would be null. Malloc does not guarantee that memory will be allocated.
+	if( work == NULL )
+	{
+		printf( "Memory allocation failed. Fatal error.\n" );
+		// Must clean up manually
+          // fclose closes out the file writing system.
+		if( fclose(info.in) != 0 || fclose(info.out) != 0 )
+			printf( "Error closing one or both files." );
+          // Exit closes the program immediately and takes in an exit state. EXIT_FAILURE closes the
+          // program with a failed status. EXIT_SUCCESS closes the program with a successful status.
+		exit(EXIT_FAILURE);
+	}
+
+     int n;
+	// dividing by 2 because we have 2 bytes per data value
+	n = info.file_size/2;
+	int pos = info.M - 1;
+	int i;
+	for( i = 0; i < n; i++ )
+	{
+		/* fread reads in the file and returns the number of
+		   items read successfully
+		   Takes an input of work (array that data is being
+		   put out), the size of bytes in each element to be read
+		   (2), the number of elements to be read (1), and the
+		   file that is being read (info.in)
+		   Once the file is read by fread, a marker is put in
+		   place to indicate where it left off so that fread can
+		   be called again and pick everything back up. */
+		int v = fread(work, 2, 1, info.in);
+		if( v != 1 )
+		{
+			/* Since v did not equal 1, the file reading did
+			   not work... Quit the program. */
+			printf("A fatal file reading error has occured");
+			exit(EXIT_FAILURE);
+		}
+
+		double calc = 0.0;
+
+		int j;
+		for( j = 0; j < info.M; j++ )
+		{
+			calc += filter[j] * work[( pos - j + info.M ) % info.M];
+		}
+          // Sets the original value to the newly filtered one
+		work[pos] = calc;
+		pos = ( pos + 1 ) % info.M;
+          // Writes from the work array to info.out
+          /* Takes an input of work (array of data that is being
+             written out), size in bytes of the data that is being
+             written, number of elements to be written, and the file
+             that is to be written */
+          /* When the file writing stops, it leaves a marker so that
+             it knows where to pick up again */
+		fwrite( work, 2, 1, info.out );
+	}
+
+	/* ................. Clean up ....................*/
+	// Free frees up the memory taken up by a call to malloc, calloc,
+	// or realloc
+     // Freeing work results in an error:
+	//	free(): invalid next size (normal): <INSERT MEMORY ADDRESS HERE> *** Aborted (core dumped)
+	// Not sure why...
+	// free( work );
+	free( filter );
+
+	// fclose is a file closing command that takes in the file that
+	// is to be closed
+	if( fclose(info.in) != 0 || fclose(info.out) != 0 )
+		printf( "Error closing one or both files." );
+	printf( "Program Finished" );
+	exit(EXIT_SUCCESS);
+}
+
+/* ......... Filter Function ........... */
+// Function that returns a double pointer (in this specific case, an
+// array of double
+double* createLowPassFilter( int length, double sampleRate, double cutoffFreq)
+{
+	// Malloc allocates some space for the array
+	// pointer filter is being declared and set to the first space
+	// in memory that has been allocated by malloc
+	double *filter = malloc(length);
+
+	// Check to see if we were able to allocate enough memory
+	// Malloc does not always succeed at allocating memory on request
+	if(filter == NULL)
+	{
+		printf( "Memory allocation failed. Fatal Error." );
+		exit(EXIT_FAILURE);
+	}
+
+	int mid = ( length - 1) / 2;
+	double lam = cutoffFreq * PI / sampleRate;
+
+	// Have to declare the counter before the For loop in Ansi C
+	int i;
+	for(i = 0; i < mid; i++)
+	{
+		filter[i] = sin( (i - mid) * lam ) / ( (i - mid) * PI);
+		filter[length - 1 - i] = filter[i];
+	}
+
+	return filter;
+};
+
+/* ......... Print usage statement ......... */
+// Void parameter means that the function does not take any parameters
+void print_usage( void )
+{
+	printf( "Problem with input arguments. Use like this:\n" );
+	printf( "$ ./a.out in.raw out.raw 44100 1250 101" );
+}
+
+/* ......... Parse command line arguments into data.  Place
+			 parameters into a struct. */
+// Function has a return type of struct run_info
+// Parameters are the same as the main function
+struct run_info get_arguments_files( int argc, char * argv[] )
+{
+	struct run_info info;
+	struct stat file_status;
+	if ( stat(argv[1], &file_status) != 0) 
+	{
+		printf( "System could not get file status information." );
+		exit(EXIT_FAILURE);
+	}
+
+     /* st_size is super confusing and from my understanding, there's little
+        to no documentation on it.
+	info.file_size = file_status.st_size;
+
+	if( (info.in = fopen( argv[1], "rb" )) == NULL )
+	{
+		printf( "Could not open input file \"%s\" for reading.", argv[1] );
+		exit(EXIT_FAILURE);
+	}
+
+	if( (info.out = fopen( argv[2], "wb" )) == NULL )
+	{
+		printf( "Could not open or create output file \"%s\" for writing.", argv[2] );
+		exit(EXIT_FAILURE);
+	}
+
+	// Pointer end is being declared, currently doesn't point to
+	// anything 
+	char * end;
+
+	// Pointers are located all over this program, but this is
+	// a good time as any.
+	// Pointers are a very weird concept for those not coming from a
+	// C or C++ background. It's kind of akin to driving a manual
+	// transmission vehicle; you have to tell the program how to do
+	// everything. And just like a manual transmission vehicle, 
+	// languages like C are more efficient than languages like Java,
+	// the automatic transmission vehicle in this example.
+
+	// To declare a pointer, you put an asterisk (*) in front of the
+	// name of the pointer along with the type of the variable that
+	// the pointer is pointing to. See the "char * end" line above.
+
+	// To get the value of the pointer, just put the asterisk in
+	// front of the pointer ("*end" in this case).
+
+	// To get the address of variable that the pointer is pointing
+	// to, just use the name of the pointer ("end" in this case).
+
+	if( (info.fs = strtod( argv[3], &end )) == 0 )
+	{
+		printf( "Could not parse fs parameter." );
+		exit(EXIT_FAILURE);
+	}
+	if( (info.fc = strtod( argv[4], &end )) == 0 )
+	{
+		printf( "Could not parse fs parameter." );
+		exit(EXIT_FAILURE);
+	}
+	if( (info.M = strtod( argv[5], &end )) == 0 )
+	{
+		printf( "Could not parse fs parameter." );
+		exit(EXIT_FAILURE);
+	}
+	return info;
+}
