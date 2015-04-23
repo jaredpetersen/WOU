@@ -1,0 +1,52 @@
+﻿@model TentsNTrails.Models.User
+
+@{
+    ViewBag.Title = Model.UserName;
+}
+
+<h2>@ViewBag.Title</h2>
+
+ <!-- USER'S LOCATION IMAGES -->
+<dl class="dl-horizontal">
+    <dt>
+        All Uploaded Images:
+    </dt>
+
+    <!-- BEGIN IMAGES -->
+    <dd>
+        @if (ViewBag.ImagesCount == 0)
+        {
+            <p>@Model.UserName has not uploaded any images.</p>
+        }
+        else
+        {
+
+            <table class="table-responsive">
+                <tr>
+                    <td class="thumbnail">
+                        @foreach (var item in Model.UserLocationImages)
+                        {
+                    <!-- DETAILS ACTION LINK-->
+                            <a href="@Url.Action("Details", "LocationImage", new { id = item.ImageID })">
+
+                                <!-- IMAGE-->
+                                <img id="@item.ImageID"
+                                     src="@Url.Content(item.ImageUrl)"
+                                     title="@item.Title"
+                                     alt="@item.AltText"
+                                     height="100"
+                                     width="100" />
+                            </a>
+                        }
+                    </td>
+                </tr>
+            </table>
+        }
+    </dd>
+</dl>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+
+

@@ -1,0 +1,347 @@
+﻿@model TentsNTrails.Models.User
+
+@{
+    ViewBag.Title = "Profile";
+}
+
+<!--CONNECTIONS-->
+<table class="table-fill">
+    <tr>
+        <td align="left"><h2>@Html.DisplayFor(model => model.UserName)</h2></td>
+        @if (!ViewBag.IsOnOwnProfile)
+        {
+            if (ViewBag.IsConnected)
+            {
+                <td align="right">
+                    <div class=" col-md-10">
+                        <button class="btn btn-primary" disabled>
+                            You Are Connected
+                        </button>
+                    </div>
+                </td>
+            }
+            else if (ViewBag.HasConnectionRequest)
+            {
+                <td align="right">
+                    <div class=" col-md-10">
+                        <h4>@Model.UserName would like to connect with you.</h4>
+                        <button class="btn btn-success active" onclick="location.href='@Url.Action("ConfirmConnect",
+                            "Profile", new { username = Model.UserName })'">
+                            Confirm
+                        </button>
+                        <button class="btn btn-danger active" onclick="location.href='@Url.Action("DenyConnect",
+                            "Profile", new { username = Model.UserName })'">
+                            Deny
+                        </button>
+                    </div>
+                </td>
+            }
+            else if (ViewBag.HasSentRequest)
+            {
+                <td align="right">
+                    <div class=" col-md-10">
+                        <button class="btn btn-primary" disabled>
+                            Request Pending
+                        </button>
+                    </div>
+                </td>
+            }
+            else
+            {
+                using (Html.BeginForm("RequestConnection", "Profile", new { username = Model.UserName }))
+                {
+                    @Html.AntiForgeryToken();
+                    <td align="right">
+                        <div class=" col-md-10">
+                            <input class="btn btn-primary" type="submit" value="Connect" />
+                        </div>
+                    </td>
+                }
+            }
+        }
+        else // This is their own profile
+        {
+            if (ViewBag.HasRequests)
+            {
+                <td align="right">
+                    <div class=" col-md-10">
+                        <button class="btn btn-primary" onclick="location.href='@Url.Action("RequestList", "Profile")'">
+                            See Connection Requests
+                        </button>
+                    </div>
+                </td>
+            }
+            else {
+                <td align="right">
+                    <div class=" col-md-10">
+                        <button class="btn btn-primary disabled">
+                            You Have No Connection Requests
+                        </button>
+                    </div>
+                </td>
+            }
+        }
+    </tr>
+</table>
+
+<p style="color: green;">@ViewBag.SuccessMessage</p>
+<hr />
+
+<!--PROFILE-->
+@if (!ViewBag.IsPrivate || (ViewBag.IsPrivate && ViewBag.IsConnected))
+{
+    <div class="row">
+        <dl class="dl-horizontal">
+            <dt>
+                <label>First Name:</label>
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.FirstName)
+            </dd>
+
+            <dt>
+                <label>Last Name:</label>
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.LastName)
+            </dd>
+
+            <dt>
+                <label>Enrollment Date:</label>
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.EnrollmentDate)
+            </dd>
+
+            <dt>
+                <label>Activities:</label>
+            </dt>
+            @if (Model.UserActivities.Count > 0)
+            {
+                foreach (var item in Model.UserActivities)
+                {
+                    <dd> @Html.DisplayFor(m => item.RecreationLabel) </dd>
+                }
+            }
+            else
+            {
+                <dd></dd>
+            }
+
+            <dt>
+                <label>About Me:</label>
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.About)
+            </dd>
+            @if (Request.IsAuthenticated && (User.Identity.Name == Model.UserName || User.IsInRole("Admin")))
+            {
+                <dd class="dl-horizontal">
+                    [
+                    @Html.ActionLink("Update About Me", "Edit", new { id = Model.Id })
+                    ]
+                </dd>
+            }
+        </dl>
+
+        <!-- USER REVIEWS-->
+        <dl class="dl-horizontal">
+            @if (Model.UserReviews.Count > 0)
+            {
+                <dt>
+                    Reviews:
+                </dt>
+                <dd>
+                    <table class="reviews">
+                        @foreach (var item in Model.UserReviews)
+                        {
+                            if (item.Comment != null)
+                            {
+                                <tr class="review-row">
+                                    <td>
+                                        <div id="review">
+                                            <p>
+                                                @Html.ActionLink(item.Location.Label, "Details", "Location", new { id = item.LocationID }, null)
+                                            </p>
+                                            @if (item.Rating)
+                                            {
+                                                <span class="glyphicon glyphicon-thumbs-up green" aria-hidden="true"></span>
+                                            }
+                                            else
+                                            {
+                                                <span class="glyphicon glyphicon-thumbs-down red" aria-hidden="true"></span>
+                                            }
+
+                                            <b>@Html.DisplayFor(modelItem => item.Comment)</b>
+                                            <br />
+                                            By @Html.ActionLink(item.User.UserName, "Index", "Profile", new { Username = item.User.UserName }, null) on @Html.DisplayFor(modelItem => item.ReviewDate)
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                </dd>
+            }
+            else
+            {
+                <dt>
+                    Reviews:
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.UserName) has not made any reviews.
+                </dd>
+            }
+        </dl>
+
+        <!-- USER BOOKMARKS-->
+        <dl class="dl-horizontal">
+            @if (Model.BeenThereLocations.Count > 0 || Model.WantToGoLocations.Count > 0 || Model.GoAgainLocations.Count > 0)
+            {
+                <dt>
+                    Bookmarked Locations:
+                </dt>
+                <dd>
+                    <table class="table">
+                        <tr>
+                            <th>
+                                Been There
+                            </th>
+                            <th>
+                                Want to Go
+                            </th>
+                            <th>
+                                Want to Go Again
+                            </th>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                @foreach (var item in Model.BeenThereLocations)
+                                {
+                                    @Html.DisplayFor(modelItem => item.Location.Label)
+                                    <br />
+                                }
+                            </td>
+                            <td>
+                                @foreach (var item in Model.WantToGoLocations)
+                                {
+                                    @Html.DisplayFor(modelItem => item.Location.Label)
+                                    <br />
+                                }
+                            </td>
+                            <td>
+                                @foreach (var item in Model.GoAgainLocations)
+                                {
+                                    @Html.DisplayFor(modelItem => item.Location.Label)
+                                    <br />
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </dd>
+            }
+            else
+            {
+                <dt>
+                    Bookmarked Locations:
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.UserName) has no bookmarked locations.
+                </dd>
+            }
+        </dl>
+
+        <!-- USER'S LOCATION IMAGES -->
+        <dl class="dl-horizontal">
+            <dt>
+                Uploaded Images:
+            </dt>
+
+            <!-- BEGIN IMAGES -->
+            <dd>
+                @if (ViewBag.ImagesCount == 0)
+                {
+                    <p>@Model.UserName has not uploaded any images.</p>
+                }
+                else if (ViewBag.ImagesCount > 5)
+                {
+                    <p>@Html.ActionLink("[See More]", "SeeMoreImages", "Profile", new { Username = Model.UserName, redirect = true }, null)</p>
+                    
+                <table class="table-responsive">
+                    <tr>
+                        <td class="thumbnail">
+                            @foreach (var item in Model.UserLocationImages)
+                            {
+                    <!-- DETAILS ACTION LINK-->
+                                <a href="@Url.Action("Details", "LocationImage", new { id = item.ImageID })">
+
+                                    <!-- IMAGE-->
+                                    <img id="@item.ImageID"
+                                         src="@Url.Content(item.ImageUrl)"
+                                         title="@item.Title"
+                                         alt="@item.AltText"
+                                         height="100"
+                                         width="100" />
+                                </a>
+                            }
+                        </td>
+                    </tr>
+                </table>
+                }
+                else
+                {
+
+                    <table class="table-responsive">
+                        <tr>
+                            <td class="thumbnail">
+                                @foreach (var item in Model.UserLocationImages)
+                                {
+                                    
+                                    <!-- DETAILS ACTION LINK-->
+                                    <a href="@Url.Action("Details", "LocationImage", new { id = item.ImageID })">
+
+                                        <!-- IMAGE-->
+                                        <img id="@item.ImageID"
+                                             src="@Url.Content(item.ImageUrl)"
+                                             title="@item.Title"
+                                             alt="@item.AltText"
+                                             height="100"
+                                             width="100" />
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                }
+            </dd>
+        </dl>
+</div>
+}
+else
+{
+    <h4>This user has set their profile to private.</h4>
+    <div class="row">
+        <dl class="dl-horizontal">
+            <dt>
+                <label>Activities:</label>
+            </dt>
+            @if (Model.UserActivities.Count > 0)
+            {
+                foreach (var item in Model.UserActivities)
+                {
+                    <dd> @Html.DisplayFor(m => item.RecreationLabel) </dd>
+                }
+            }
+            else
+            {
+                <dd></dd>
+            }
+        </dl>
+    </div>
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

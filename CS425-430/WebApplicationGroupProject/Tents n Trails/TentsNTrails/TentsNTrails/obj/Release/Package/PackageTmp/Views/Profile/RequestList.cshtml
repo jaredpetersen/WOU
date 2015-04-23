@@ -1,0 +1,57 @@
+﻿@model TentsNTrails.Models.RequestListViewModel
+
+@{
+    ViewBag.Title = "Your Connection Requests";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<h4>Here are the people who have requested to connect with you.</h4>
+
+<table class="reviews">
+    <tr class="review-row">
+        <td>
+            <div id="review">
+                @Html.Raw(Model.RowCount)@Html.Raw(" Requests")
+            </div>
+        </td>
+    </tr>
+
+    @foreach (var item in Model.Requests)
+    {
+        <tr class="review-row">
+            <td>
+                <div id="review">
+                    <div style="float: left; overflow: hidden">
+                        <img id="@item.Sender.UserName"
+                             src="http://eraser2.heidi.ie/wp-content/plugins/all-in-one-seo-pack-pro/images/default-user-image.png"
+                             title="@item.Sender.UserName"
+                             alt="@item.Sender.UserName"
+                             style="width: 75px; height: auto;" />
+                    </div>
+                    <div style="padding-left: 20px; height: 75px; overflow: hidden;">
+                        <b>@Html.ActionLink((string) item.Sender.UserName, "Index", "Profile", new { Username = item.Sender.UserName }, null)</b>
+
+                        @if (item.Sender.Private == false)
+                        {
+                            @Html.Raw(" ( ")@Html.DisplayFor(modelItem => item.Sender.FirstName)@Html.Raw(" ")@Html.DisplayFor(modelItem => item.Sender.LastName)@Html.Raw(" )")
+                        }
+                        
+                        <br />
+
+                        <button class="btn btn-success active" onclick="location.href='@Url.Action("ConfirmConnect",
+                            "Profile", new { username = item.Sender.UserName })'">
+                            Confirm
+                        </button>
+                        <button class="btn btn-danger active" onclick="location.href='@Url.Action("DenyConnect",
+                            "Profile", new { username = item.Sender.UserName })'">
+                            Deny
+                        </button>
+                    </div>
+                </div>
+            <div style="clear: both;"></div>
+        </td>
+    </tr>
+    }
+</table>
+

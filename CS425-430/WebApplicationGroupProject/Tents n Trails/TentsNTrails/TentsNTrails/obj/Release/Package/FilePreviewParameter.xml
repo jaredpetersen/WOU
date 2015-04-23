@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="IIS Web Application Name" description="" value="tentsntrailsdebug" tags="IisApp">
+    <parameterEntry kind="ProviderPath" scope="IisApp" match="^C:\\Users\\jaredpetersen\\Source\\Workspaces\\Tents\ n\ Trails\\TentsNTrails\\TentsNTrails\\obj\\Release\\Package\\PackageTmp$" />
+    <parameterEntry kind="ProviderPath" scope="setAcl" match="^C:\\Users\\jaredpetersen\\Source\\Workspaces\\Tents\ n\ Trails\\TentsNTrails\\TentsNTrails\\obj\\Release\\Package\\PackageTmp$" />
+  </parameter>
+  <parameter name="DefaultConnection-Web.config Connection String" description="" value="Data Source=tcp:px8ubb7psp.database.windows.net,1433;Initial Catalog=tentsntrailsdebug_db;User Id=cookiecomputing@px8ubb7psp;Password=C00kieMonster!" tags="">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\jaredpetersen\\Source\\Workspaces\\Tents\ n\ Trails\\TentsNTrails\\TentsNTrails\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='DefaultConnection']/@connectionString" />
+  </parameter>
+</parameters>
