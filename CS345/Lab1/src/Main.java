@@ -19,51 +19,101 @@ public class Main
 		Integer[] initialPuzzle = {4, 1, 2, 3, 5, 6, 10, 7, 8, 0, 9, 11, 12, 13, 14, 15};
 		State state = new State(initialPuzzle, 9, "");
 		
+		// Add the initial state
 		queue.add(state);
 		
-		int i = 1;
+		//System.out.println("start:");
+		//state.printState();
+		
 		while(!queue.isEmpty() && !puzzleSolved)
 		{
 			// Remove the state from the queue
 			State queueState = queue.remove();
-			State queueStateClone = queueState;
-			queueStateClone.printState();
 			
 			// Check if the space can be moved
 			if (queueState.upValid())
 			{
+				State queueStateClone = new State(queueState.puzzle.clone(), queueState.getSpaceIndex(), queueState.getMoves());
 				queueStateClone.up();
+				//queueStateClone.printState();
+				
+				// Check if the new move results in the goal state
+				if (queueStateClone.isGoalState())
+				{
+					// A solution has been found
+					puzzleSolution = queueStateClone;
+					puzzleSolved = true;
+				}
+				else
+				{
+					// A solution has not been found
+					// Add the state to the queue for further processing
+					queue.add(queueStateClone);
+				}
 			}
-			else if (queueState.downValid())
+			
+			if (queueState.downValid())
 			{
+				State queueStateClone = new State(queueState.puzzle.clone(), queueState.getSpaceIndex(), queueState.getMoves());
 				queueStateClone.down();
+				//queueStateClone.printState();
+				
+				// Check if the new move results in the goal state
+				if (queueStateClone.isGoalState())
+				{
+					// A solution has been found
+					puzzleSolution = queueStateClone;
+					puzzleSolved = true;
+				}
+				else
+				{
+					// A solution has not been found
+					// Add the state to the queue for further processing
+					queue.add(queueStateClone);
+				}
 			}
-			else if (queueState.leftValid())
+			
+			if (queueState.leftValid())
 			{
+				State queueStateClone = new State(queueState.puzzle.clone(), queueState.spaceIndex, queueState.moves);
 				queueStateClone.left();
+				//queueStateClone.printState();
+				
+				// Check if the new move results in the goal state
+				if (queueStateClone.isGoalState())
+				{
+					// A solution has been found
+					puzzleSolution = queueStateClone;
+					puzzleSolved = true;
+				}
+				else
+				{
+					// A solution has not been found
+					// Add the state to the queue for further processing
+					queue.add(queueStateClone);
+				}
 			}
-			else
+			
+			if (queueState.rightValid())
 			{
-				// Right must be a valid move
+				State queueStateClone = new State(queueState.puzzle.clone(), queueState.spaceIndex, queueState.moves);
 				queueStateClone.right();
+				//queueStateClone.printState();
+				
+				// Check if the new move results in the goal state
+				if (queueStateClone.isGoalState())
+				{
+					// A solution has been found
+					puzzleSolution = queueStateClone;
+					puzzleSolved = true;
+				}
+				else
+				{
+					// A solution has not been found
+					// Add the state to the queue for further processing
+					queue.add(queueStateClone);
+				}
 			}
-			
-			// Check if the new move results in the goal state
-			if (queueStateClone.isGoalState())
-			{
-				// A solution has been found
-				puzzleSolution = queueStateClone;
-				puzzleSolved = true;
-			}
-			else
-			{
-				// A solution has not been found
-				// Add the state to the queue for further processing
-				queue.add(queueStateClone);
-			}
-			
-			System.out.print("Queues: " + i + '\r');
-			i++;
 		}
 		
 		puzzleSolution.printMoves();

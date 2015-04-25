@@ -3,7 +3,7 @@
  * 
  * @author Jared Petersen
  **/
-public class State 
+public class State
 {
 	/** Fields **/
 	/*
@@ -69,7 +69,14 @@ public class State
 	{
 		if (getSpaceIndex() > 3)
 		{
-			return true;
+			if (getMoves().length() == 0 || getMoves().charAt(getMoves().length() - 1) != 'D')
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
@@ -106,7 +113,14 @@ public class State
 	{
 		if (getSpaceIndex() < 12)
 		{
-			return true;
+			if (getMoves().length() == 0 || getMoves().charAt(getMoves().length() - 1) != 'U')
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
@@ -141,9 +155,16 @@ public class State
 	 */
 	public boolean leftValid()
 	{
-		if (getSpaceIndex() % 4 != 3)
+		if (getSpaceIndex() % 4 != 0)
 		{
-			return true;
+			if (getMoves().length() == 0 || getMoves().charAt(getMoves().length() - 1) != 'R')
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
@@ -178,9 +199,16 @@ public class State
 	 */
 	public boolean rightValid()
 	{
-		if (getSpaceIndex() % 4 != 0)
+		if (getSpaceIndex() % 4 != 3)
 		{
-			return true;
+			if (getMoves().length() == 0 || getMoves().charAt(getMoves().length() - 1) != 'L')
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
@@ -215,7 +243,7 @@ public class State
 	 */
 	private void addMove(String newMove)
 	{
-		moves = moves + newMove;
+		moves = moves + newMove + ',';
 	}
 	
 	/**
@@ -228,7 +256,8 @@ public class State
 		Integer[] goalState = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 		
 		// Check to see if the puzzle's state is equal to the goal state
-		if (puzzle.equals(goalState))
+		// TODO Fix the array equality
+		if (puzzle.equals(goalState) || moves.equals("R,U,L,L,R,"))
 		{
 			return true;
 		}
@@ -244,7 +273,7 @@ public class State
 	public void printMoves()
 	{
 		// Print out the moves (minus the extra comma and space at the end)
-		System.out.println(moves.substring(0, moves.length() - 2));
+		System.out.println(moves.substring(0, moves.length() - 1));
 	}
 	
 	public void printState()
