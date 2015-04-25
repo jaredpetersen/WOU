@@ -14,16 +14,16 @@ public class Queue
 	
 	/**
 	 * Add an item to the back of the queue
-	 * @param val The value that is being stored at the new queue location
+	 * @param state The value that is being stored at the new queue location
 	 **/
-	public void add(int val)
+	public void add(State state)
 	{
 		if (size == 0)
 		{
 			// The queue is empty
 			// Make the new node the head and the tail
 			head = new Node();
-			head.value = val;
+			head.value = state;
 			tail = head;
 		}
 		else if (size == 1)
@@ -31,7 +31,7 @@ public class Queue
 			// The queue only has one item in it
 			// Make the new node the tail
 			tail = new Node();
-			tail.value = val;
+			tail.value = state;
 			tail.next = head;
 			head.prev = tail;
 		}
@@ -44,7 +44,7 @@ public class Queue
 			
 			// Set the tail equal to the new node that is being inserted
 			tail = new Node();
-			tail.value = val;
+			tail.value = state;
 			
 			// Update the pointers
 			tempNode.prev = tail;
@@ -59,12 +59,17 @@ public class Queue
 	 * Remove the item located at the front of the queue
 	 * @return The value of the queue item being removed
 	 **/
-	public int remove()
+	public State remove()
 	{
 		// Store the value of the head for output
-		int headVal = head.value;
+		State headVal = head.value;
 		// Set the head to equal the previous node
 		head = head.prev;
+		
+		if (size == 1)
+		{
+			tail = null;
+		}
 		
 		// Update the queue size
 		size--;
@@ -108,6 +113,6 @@ public class Queue
 	{
 		Node next;
 		Node prev;
-		int value;
+		State value;
 	}
 }
