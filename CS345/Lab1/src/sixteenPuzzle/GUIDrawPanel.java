@@ -16,7 +16,7 @@ public class GUIDrawPanel extends JPanel
 {
 	/**
 	 * Main method of sorts for the GUI
-	 **/
+	 */
 	@Override
     public void paintComponent(Graphics g) {
         
@@ -46,7 +46,7 @@ public class GUIDrawPanel extends JPanel
 	
 	/**
 	 * Draw a square in the window
-	 **/
+	 */
 	private void drawSquare(Graphics g, int numberSquare, boolean zeroSpace, int xCor, int yCor)
 	{
 		// Determine what color should be used for the squares

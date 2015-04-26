@@ -2,9 +2,8 @@ package sixteenPuzzle;
 
 /**
  * 16 Puzzle Solver
- * 
  * @author Jared Petersen
- **/
+ */
 public class PuzzleSolver 
 {
 	// Puzzle setup variables
@@ -42,7 +41,9 @@ public class PuzzleSolver
 			// Check if the space can be moved
 			if (queueState.upValid())
 			{
-				State queueStateClone = new State(queueState.getPuzzle().clone(), queueState.getSpaceIndex(), queueState.getMoves());
+				State queueStateClone = new State(queueState.getPuzzle().clone(), 
+												  queueState.getSpaceIndex(),
+												  queueState.getMoves());
 				queueStateClone.up();
 				
 				// Check if the new move results in the goal state
@@ -62,7 +63,9 @@ public class PuzzleSolver
 			
 			if (queueState.downValid())
 			{
-				State queueStateClone = new State(queueState.getPuzzle().clone(), queueState.getSpaceIndex(), queueState.getMoves());
+				State queueStateClone = new State(queueState.getPuzzle().clone(), 
+												  queueState.getSpaceIndex(),
+												  queueState.getMoves());
 				queueStateClone.down();
 				
 				// Check if the new move results in the goal state
@@ -82,7 +85,9 @@ public class PuzzleSolver
 			
 			if (queueState.leftValid())
 			{
-				State queueStateClone = new State(queueState.getPuzzle().clone(), queueState.getSpaceIndex(), queueState.getMoves());
+				State queueStateClone = new State(queueState.getPuzzle().clone(), 
+												  queueState.getSpaceIndex(), 
+												  queueState.getMoves());
 				queueStateClone.left();
 				
 				// Check if the new move results in the goal state
@@ -102,7 +107,9 @@ public class PuzzleSolver
 			
 			if (queueState.rightValid())
 			{
-				State queueStateClone = new State(queueState.getPuzzle().clone(), queueState.getSpaceIndex(), queueState.getMoves());
+				State queueStateClone = new State(queueState.getPuzzle().clone(), 
+												  queueState.getSpaceIndex(), 
+												  queueState.getMoves());
 				queueStateClone.right();
 				
 				// Check if the new move results in the goal state
@@ -129,6 +136,8 @@ public class PuzzleSolver
 	
 	public String getMoves()
 	{
-		return puzzleSolution.getMoves();
+		return puzzleSolution.getMoves()
+				.substring(0, puzzleSolution.getMoves()
+				.length() - 1);
 	}
 }

@@ -8,7 +8,6 @@ import sixteenPuzzle.PuzzleSolver;
 
 /**
  * Test the cases listed in the lab assignment
- * 
  * @author Jared Petersen
  */
 public class LabTests {
@@ -21,7 +20,8 @@ public class LabTests {
 		PuzzleSolver puzzleSolver = new PuzzleSolver(initialPuzzle, 9);
 		
 		// Solve the puzzle and make sure that the moves used is the desired solution
-		if (puzzleSolver.solvePuzzle() == false || !puzzleSolver.getMoves().equals("R,U,L,L,U,"))
+		if (puzzleSolver.solvePuzzle() == false || 
+			!puzzleSolver.getMoves().equals("R,U,L,L,U"))
 		{
 			fail();
 		}
@@ -36,7 +36,8 @@ public class LabTests {
 		PuzzleSolver puzzleSolver = new PuzzleSolver(initialPuzzle, 5);
 		
 		// Solve the puzzle
-		if (puzzleSolver.solvePuzzle() == false || !puzzleSolver.getMoves().equals("D,R,U,U,L,L,"))
+		if (puzzleSolver.solvePuzzle() == false || 
+			!puzzleSolver.getMoves().equals("D,R,U,U,L,L"))
 		{
 			fail();
 		}
@@ -51,7 +52,8 @@ public class LabTests {
 		PuzzleSolver puzzleSolver = new PuzzleSolver(initialPuzzle, 5);
 		
 		// Solve the puzzle
-		if (puzzleSolver.solvePuzzle() == false || !puzzleSolver.getMoves().equals("R,D,L,L,U,U,"))
+		if (puzzleSolver.solvePuzzle() == false || 
+			!puzzleSolver.getMoves().equals("R,D,L,L,U,U"))
 		{
 			fail();
 		}
@@ -66,7 +68,8 @@ public class LabTests {
 		PuzzleSolver puzzleSolver = new PuzzleSolver(initialPuzzle, 6);
 		
 		// Solve the puzzle
-		if (puzzleSolver.solvePuzzle() == false || !puzzleSolver.getMoves().equals("D,D,L,L,U,R,R,U,U,L,L,"))
+		if (puzzleSolver.solvePuzzle() == false || 
+			!puzzleSolver.getMoves().equals("D,D,L,L,U,R,R,U,U,L,L"))
 		{
 			fail();
 		}

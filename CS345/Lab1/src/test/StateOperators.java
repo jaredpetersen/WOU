@@ -10,7 +10,6 @@ import sixteenPuzzle.State;
 
 /**
  * Confirm the operators move the squares around as expected
- * 
  * @author Jared Petersen
  */
 public class StateOperators 
