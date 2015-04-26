@@ -1,24 +1,27 @@
+package sixteenPuzzle;
+
+import java.util.Arrays;
+
 /**
  * 16 Puzzle States
+ * 
+ * The puzzle is a 16 integer array
+ * { 0   1   2   3
+ *   4   5   6   7
+ *   8   9   10  11
+ *   12  13  14  15 }
+ * where 0 represents the blank space in the puzzle
  * 
  * @author Jared Petersen
  **/
 public class State
 {
-	/** Fields **/
-	/*
-	 * The puzzle goes like this:
-	 * { 0   1   2   3
-	 *   4   5   6   7
-	 *   8   9   10  11
-	 *   12  13  14  15 }
-	 * where 0 represents the blank space in the puzzle
-	 */
-	Integer[] puzzle = new Integer[16];
-	// The location of the 0 in the puzzle
-	int spaceIndex;
+	// Puzzle state
+	private int[] puzzle = new int[16];
+	// Location of the 0 in the puzzle
+	private int spaceIndex;
 	// Moves that have been executed
-	String moves = "";
+	private String moves = "";
 	
 	/**
 	 * State constructor
@@ -28,11 +31,20 @@ public class State
 	 * @param spaceIndex Index of the empty space in the puzzle array
 	 * @param moves The moves that have been executed
 	 */
-	public State(Integer[] puzzle, int spaceIndex, String moves)
+	public State(int[] puzzle, int spaceIndex, String moves)
 	{
 		this.puzzle = puzzle;
 		this.spaceIndex = spaceIndex;
 		this.moves = moves;
+	}
+	
+	/**
+	 * Get the current puzzle
+	 * @return The current puzzle
+	 **/
+	public int[] getPuzzle()
+	{
+		return puzzle;
 	}
 	
 	/**
@@ -69,7 +81,11 @@ public class State
 	{
 		if (getSpaceIndex() > 3)
 		{
-			if (getMoves().length() == 0 || getMoves().charAt(getMoves().length() - 1) != 'D')
+			if (getMoves().length() == 0)
+			{
+				return true;
+			}
+			else if (getMoves().charAt(getMoves().length() - 2) != 'D')
 			{
 				return true;
 			}
@@ -113,7 +129,11 @@ public class State
 	{
 		if (getSpaceIndex() < 12)
 		{
-			if (getMoves().length() == 0 || getMoves().charAt(getMoves().length() - 1) != 'U')
+			if (getMoves().length() == 0)
+			{
+				return true;
+			}
+			else if (getMoves().charAt(getMoves().length() - 2) != 'U')
 			{
 				return true;
 			}
@@ -157,7 +177,11 @@ public class State
 	{
 		if (getSpaceIndex() % 4 != 0)
 		{
-			if (getMoves().length() == 0 || getMoves().charAt(getMoves().length() - 1) != 'R')
+			if (getMoves().length() == 0)
+			{
+				return true;
+			}
+			else if (getMoves().charAt(getMoves().length() - 2) != 'R')
 			{
 				return true;
 			}
@@ -201,7 +225,11 @@ public class State
 	{
 		if (getSpaceIndex() % 4 != 3)
 		{
-			if (getMoves().length() == 0 || getMoves().charAt(getMoves().length() - 1) != 'L')
+			if (getMoves().length() == 0)
+			{
+				return true;
+			}
+			else if (getMoves().charAt(getMoves().length() - 2) != 'L')
 			{
 				return true;
 			}
@@ -248,16 +276,16 @@ public class State
 	
 	/**
 	 * Check to see if the puzzle has reached a goal state
-	 * @return
+	 * @return True if the puzzle has been solved
 	 **/
 	public boolean isGoalState()
 	{
 		// Puzzle goal state
-		Integer[] goalState = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+		int[] goalState = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 		
 		// Check to see if the puzzle's state is equal to the goal state
-		// TODO Fix the array equality
-		if (puzzle.equals(goalState) || moves.equals("R,U,L,L,R,"))
+		//if (Arrays.deepEquals(puzzle, goalState))
+		if (Arrays.equals(puzzle, goalState))
 		{
 			return true;
 		}
@@ -273,9 +301,12 @@ public class State
 	public void printMoves()
 	{
 		// Print out the moves (minus the extra comma and space at the end)
-		System.out.println(moves.substring(0, moves.length() - 1));
+		System.out.println(getMoves().substring(0, getMoves().length() - 1));
 	}
 	
+	/**
+	 * Print out the puzzle state
+	 */
 	public void printState()
 	{
 		System.out.println("{ " + puzzle[0] + " " + puzzle[1] + " " + puzzle[2] + " " + puzzle[3]);

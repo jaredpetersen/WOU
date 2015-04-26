@@ -1,30 +1,40 @@
+package sixteenPuzzle;
+
 /**
  * 16 Puzzle Solver
- * Uses state-based search to solve the 16 puzzle
  * 
  * @author Jared Petersen
  **/
-public class Main 
+public class PuzzleSolver 
 {
-	// Fields
-	static State puzzleSolution;
-	static boolean puzzleSolved = false;
-
+	// Puzzle setup variables
+	Queue queue = new Queue();
+	int[] initialPuzzle;
+	State state;
+	// Puzzle solution variables
+	State puzzleSolution;
+	boolean puzzleSolved = false;
+	
 	/**
-	 * Main method, entry point to the application
-	 **/
-	public static void main(String[] args) {
-		
-		Queue queue = new Queue();
-		Integer[] initialPuzzle = {4, 1, 2, 3, 5, 6, 10, 7, 8, 0, 9, 11, 12, 13, 14, 15};
-		State state = new State(initialPuzzle, 9, "");
-		
+	 * Constructor
+	 */
+	public PuzzleSolver(int[] initialPuzzle)
+	{
+		// Set up the puzzle
+		queue = new Queue();
+		this.initialPuzzle = initialPuzzle;
 		// Add the initial state
+		state = new State(this.initialPuzzle, 9, "");
 		queue.add(state);
-		
-		//System.out.println("start:");
-		//state.printState();
-		
+	}
+	
+	/**
+	 * Solve the puzzle
+	 */
+	public boolean solvePuzzle()
+	{
+		int i = 0;
+		// Begin Solving Puzzle
 		while(!queue.isEmpty() && !puzzleSolved)
 		{
 			// Remove the state from the queue
@@ -33,8 +43,10 @@ public class Main
 			// Check if the space can be moved
 			if (queueState.upValid())
 			{
-				State queueStateClone = new State(queueState.puzzle.clone(), queueState.getSpaceIndex(), queueState.getMoves());
+				State queueStateClone = new State(queueState.getPuzzle().clone(), queueState.getSpaceIndex(), queueState.getMoves());
 				queueStateClone.up();
+				i++;
+				System.out.println(i);
 				//queueStateClone.printState();
 				
 				// Check if the new move results in the goal state
@@ -54,9 +66,11 @@ public class Main
 			
 			if (queueState.downValid())
 			{
-				State queueStateClone = new State(queueState.puzzle.clone(), queueState.getSpaceIndex(), queueState.getMoves());
+				State queueStateClone = new State(queueState.getPuzzle().clone(), queueState.getSpaceIndex(), queueState.getMoves());
 				queueStateClone.down();
 				//queueStateClone.printState();
+				i++;
+				System.out.println(i);
 				
 				// Check if the new move results in the goal state
 				if (queueStateClone.isGoalState())
@@ -75,9 +89,11 @@ public class Main
 			
 			if (queueState.leftValid())
 			{
-				State queueStateClone = new State(queueState.puzzle.clone(), queueState.spaceIndex, queueState.moves);
+				State queueStateClone = new State(queueState.getPuzzle().clone(), queueState.getSpaceIndex(), queueState.getMoves());
 				queueStateClone.left();
 				//queueStateClone.printState();
+				i++;
+				System.out.println(i);
 				
 				// Check if the new move results in the goal state
 				if (queueStateClone.isGoalState())
@@ -96,9 +112,11 @@ public class Main
 			
 			if (queueState.rightValid())
 			{
-				State queueStateClone = new State(queueState.puzzle.clone(), queueState.spaceIndex, queueState.moves);
+				State queueStateClone = new State(queueState.getPuzzle().clone(), queueState.getSpaceIndex(), queueState.getMoves());
 				queueStateClone.right();
 				//queueStateClone.printState();
+				i++;
+				System.out.println(i);
 				
 				// Check if the new move results in the goal state
 				if (queueStateClone.isGoalState())
@@ -116,7 +134,14 @@ public class Main
 			}
 		}
 		
+		System.out.println("Puzzle Solved: ");
 		puzzleSolution.printMoves();
+		
+		return puzzleSolved;
 	}
-
+	
+	public String getMoves()
+	{
+		return puzzleSolution.getMoves();
+	}
 }
