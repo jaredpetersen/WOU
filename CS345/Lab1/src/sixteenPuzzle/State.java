@@ -284,7 +284,6 @@ public class State
 		int[] goalState = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 		
 		// Check to see if the puzzle's state is equal to the goal state
-		//if (Arrays.deepEquals(puzzle, goalState))
 		if (Arrays.equals(puzzle, goalState))
 		{
 			return true;

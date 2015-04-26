@@ -33,7 +33,6 @@ public class PuzzleSolver
 	 */
 	public boolean solvePuzzle()
 	{
-		int i = 0;
 		// Begin Solving Puzzle
 		while(!queue.isEmpty() && !puzzleSolved)
 		{
@@ -45,9 +44,6 @@ public class PuzzleSolver
 			{
 				State queueStateClone = new State(queueState.getPuzzle().clone(), queueState.getSpaceIndex(), queueState.getMoves());
 				queueStateClone.up();
-				i++;
-				System.out.println(i);
-				//queueStateClone.printState();
 				
 				// Check if the new move results in the goal state
 				if (queueStateClone.isGoalState())
@@ -68,9 +64,6 @@ public class PuzzleSolver
 			{
 				State queueStateClone = new State(queueState.getPuzzle().clone(), queueState.getSpaceIndex(), queueState.getMoves());
 				queueStateClone.down();
-				//queueStateClone.printState();
-				i++;
-				System.out.println(i);
 				
 				// Check if the new move results in the goal state
 				if (queueStateClone.isGoalState())
@@ -91,9 +84,6 @@ public class PuzzleSolver
 			{
 				State queueStateClone = new State(queueState.getPuzzle().clone(), queueState.getSpaceIndex(), queueState.getMoves());
 				queueStateClone.left();
-				//queueStateClone.printState();
-				i++;
-				System.out.println(i);
 				
 				// Check if the new move results in the goal state
 				if (queueStateClone.isGoalState())
@@ -114,9 +104,6 @@ public class PuzzleSolver
 			{
 				State queueStateClone = new State(queueState.getPuzzle().clone(), queueState.getSpaceIndex(), queueState.getMoves());
 				queueStateClone.right();
-				//queueStateClone.printState();
-				i++;
-				System.out.println(i);
 				
 				// Check if the new move results in the goal state
 				if (queueStateClone.isGoalState())
