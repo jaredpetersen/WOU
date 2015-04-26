@@ -18,13 +18,13 @@ public class PuzzleSolver
 	/**
 	 * Constructor
 	 */
-	public PuzzleSolver(int[] initialPuzzle)
+	public PuzzleSolver(int[] initialPuzzle, int zeroIndex)
 	{
 		// Set up the puzzle
 		queue = new Queue();
 		this.initialPuzzle = initialPuzzle;
 		// Add the initial state
-		state = new State(this.initialPuzzle, 9, "");
+		state = new State(this.initialPuzzle, zeroIndex, "");
 		queue.add(state);
 	}
 	

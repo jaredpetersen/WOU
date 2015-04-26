@@ -8,8 +8,14 @@ import org.junit.Test;
 
 import sixteenPuzzle.State;
 
-public class StateOperators {
-
+/**
+ * Confirm the operators move the squares around as expected
+ * 
+ * @author Jared Petersen
+ */
+public class StateOperators 
+{
+	// Set up the initial testing states
 	State upState;
 	State downState;
 	State leftState;
@@ -18,6 +24,7 @@ public class StateOperators {
 	State downValid;
 	State leftValid;
 	State rightValid;
+	// Set up the initial puzzle
 	int[] initialPuzzle = {4, 1, 2, 3, 5, 6, 10, 7, 8, 0, 9, 11, 12, 13, 14, 15};
 	
 	@Before
@@ -35,7 +42,8 @@ public class StateOperators {
 	}
 
 	@Test
-	public void moveUp() {
+	public void moveUp()
+	{
 		// Desired result
 		int[] solutionState = {4, 1, 2, 3, 5, 0, 10, 7, 8, 6, 9, 11, 12, 13, 14, 15};
 		
@@ -50,7 +58,8 @@ public class StateOperators {
 	}
 	
 	@Test
-	public void moveDown() {
+	public void moveDown()
+	{
 		// Desired result
 		int[] solutionState = {4, 1, 2, 3, 5, 6, 10, 7, 8, 13, 9, 11, 12, 0, 14, 15};
 		
@@ -65,7 +74,8 @@ public class StateOperators {
 	}
 	
 	@Test
-	public void moveLeft() {
+	public void moveLeft() 
+	{
 		// Desired result
 		int[] solutionState = {4, 1, 2, 3, 5, 6, 10, 7, 0, 8, 9, 11, 12, 13, 14, 15};
 		
@@ -80,7 +90,8 @@ public class StateOperators {
 	}
 	
 	@Test
-	public void moveRight() {
+	public void moveRight() 
+	{
 		// Desired result
 		int[] solutionState = {4, 1, 2, 3, 5, 6, 10, 7, 8, 9, 0, 11, 12, 13, 14, 15};
 		
@@ -95,8 +106,11 @@ public class StateOperators {
 	}
 	
 	@Test
-	public void validUp() {
+	public void validUp() 
+	{
+		// Move the zero space down
 		upValid.down();
+		// Check if moving it back is valid
 		if (upValid.upValid())
 		{
 			fail();
@@ -104,8 +118,11 @@ public class StateOperators {
 	}
 	
 	@Test
-	public void validDown() {
+	public void validDown() 
+	{
+		// Move the zero space up
 		downValid.up();
+		// Check if moving it back is valid
 		if (downValid.downValid())
 		{
 			fail();
@@ -113,8 +130,11 @@ public class StateOperators {
 	}
 	
 	@Test
-	public void validLeft() {
+	public void validLeft() 
+	{
+		// Move the zero space right
 		leftValid.right();
+		// Check if moving it back is valid
 		if (leftValid.leftValid())
 		{
 			fail();
@@ -122,8 +142,11 @@ public class StateOperators {
 	}
 	
 	@Test
-	public void validRight() {
+	public void validRight() 
+	{
+		// Move the zero space left
 		rightValid.left();
+		// Check if moving it back is valid
 		if (rightValid.rightValid())
 		{
 			fail();

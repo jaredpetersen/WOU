@@ -16,13 +16,13 @@ public class Main
 	public static void main(String[] args)
 	{
 		int[] initialPuzzle = {1, 2, 6, 3, 4, 0, 10, 7, 8, 5, 9, 11, 12, 13, 14, 15};
+		int zeroIndex = 5;
 		// Initialize GUI
 		JFrame f = new GUI();
 	    f.setVisible(true);
 		// Initialize back-end puzzle solver
 	    // TODO Have the gui start the puzzle solver
-		PuzzleSolver puzzleSolver = new PuzzleSolver(initialPuzzle);
-		// TODO Make sure the program is accurately checking the goal state
+		PuzzleSolver puzzleSolver = new PuzzleSolver(initialPuzzle, zeroIndex);
 		puzzleSolver.solvePuzzle();
 		puzzleSolver.getMoves();
 	}

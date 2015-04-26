@@ -3,6 +3,7 @@ package sixteenPuzzle;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+
 import javax.swing.JPanel;
 
 /**
@@ -10,6 +11,7 @@ import javax.swing.JPanel;
  * 
  * @author Jared Petersen
  */
+@SuppressWarnings("serial")
 public class GUIDrawPanel extends JPanel
 {
 	/**
@@ -50,7 +52,7 @@ public class GUIDrawPanel extends JPanel
 		// Determine what color should be used for the squares
 		if (zeroSpace)
 		{
-			// Set the zero space to blue
+			// Set the zero space to gray
 			g.setColor(Color.gray);
 		}
 		else
@@ -58,23 +60,30 @@ public class GUIDrawPanel extends JPanel
 			// Set the regular block to red
 			g.setColor(Color.red);
 		}
+		
 		// Draw the outline
 		g.drawRect(xCor, yCor, 80, 80);
+		
 		// Fill the shape
 		g.fillRect(xCor, yCor, 80, 80);
-		// Write the proper number
+		
+		// Write the proper number in white
 		g.setColor(Color.white);
 		g.setFont(new Font("Arial", Font.PLAIN, 32));
-		//TODO Number formatting
 		String outputNumber;
+		// Two digit numbers and one digit numbers look wonky
 		if (numberSquare < 10)
 		{
+			// One digit number, add an additional space to make it a "two digit" number
 			outputNumber = " " + numberSquare;
 		}
 		else
 		{
+			// Two digit number, just make it a string
 			outputNumber = "" + numberSquare;
 		}
+		// Draw the actual string in the center of the square
+		// Specific coordinates found through trial and error
 		g.drawString(outputNumber, xCor + 20, yCor + 47);
 	}
 }

@@ -10,6 +10,7 @@ import javax.swing.*;
  * @author Jared Petersen
  *
  */
+@SuppressWarnings("serial")
 public class GUI extends JFrame
 {
 	/**
@@ -19,13 +20,13 @@ public class GUI extends JFrame
 	{
 		// Create window with title
 		setTitle("16 Puzzle");
-		//setSize(290, 340);
 		setSize(370, 420);
 		
 		// Set the location of the window to the center of the screen
         setLocationRelativeTo(null);
         
         // Do not allow the user to resize the window
+        // We don't want to have to worry about resizing everything else for now
         setResizable(false);
         
         // Close the application completely when the user hits "X"
