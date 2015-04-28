@@ -2,6 +2,8 @@ package com.jaredpetersen.hiccup;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,11 +17,13 @@ import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 
 /**
  * Created by jaredpetersen on 4/12/15.
@@ -31,7 +35,7 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
     Globals g = Globals.getInstance();
     String userID = g.getData();
     String gameID;
-    private static final String QUERY_URL = "http://www.wou.edu/~jpetersen11/api/ownership.php?&key=R@inDr0psOnro53s?&user=";
+    private static final String QUERY_URL = "http://www.wou.edu/~jpetersen11/api/ownershiptwo.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +47,7 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
         // Enable the "Up" button for more navigation options
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        String gameID = this.getIntent().getExtras().getString("videogameID");
+        gameID = this.getIntent().getExtras().getString("gameID");
         String gameTitle = this.getIntent().getExtras().getString("title");
         String consoleName = this.getIntent().getExtras().getString("consoleName");
         String releaseDate = this.getIntent().getExtras().getString("releaseDate");
@@ -115,31 +119,35 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-
+        addToCollection();
+        // Refresh the collection
+        g.getCollection().loadCollection();
+        addToCollection.setEnabled(false);
+        /*final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.detach(g.getCollection());
+        ft.attach(g.getCollection());
+        ft.commit();*/
     }
 
-    private void loadCollection()
+    private void addToCollection()
     {
         // Create a client to perform networking
         AsyncHttpClient client = new AsyncHttpClient();
 
+        RequestParams params = new RequestParams();
+        params.put("game", gameID);
+        params.put("user", userID);
+        params.put("key", "R@inDr0psOnro53s?");
+
         // Have the client post data to the site
-        client.post(QUERY_URL + userID,
+        client.post(QUERY_URL, params,
                 new JsonHttpResponseHandler() {
                     @Override
-                    public void onSuccess(JSONObject jsonObject) {
-
-                    }
+                    public void onSuccess(JSONObject jsonObject) { }
 
                     @Override
                     public void onFailure(int statusCode, Throwable throwable, JSONObject error) {
-                        // Display a "Toast" message
-                        // to announce the failure
-                        Toast.makeText(getApplicationContext(), "Error: " + statusCode + " " + throwable.getMessage(), Toast.LENGTH_LONG).show();
-
-                        // Log error message
-                        // to help solve any problems
-                        Log.e("tag", statusCode + " " + throwable.getMessage());
+                        Log.e("hookamooka", "This was fail ");
                     }
                 });
     }

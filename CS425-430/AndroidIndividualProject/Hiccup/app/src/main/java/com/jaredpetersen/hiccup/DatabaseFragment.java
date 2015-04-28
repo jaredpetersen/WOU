@@ -37,6 +37,7 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener, 
     ListView mainListView;
     JSONAdapter mJSONAdapter;
     ArrayList mGameList = new ArrayList();
+    Globals g = Globals.getInstance();
     private static final String QUERY_URL = "http://www.wou.edu/~jpetersen11/api/videogame.php?key=R@inDr0psOnro53s?&search=";
 
     @Override
@@ -95,7 +96,7 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener, 
 
         // pack away the data about the cover
         // into your Intent before you head out
-        detailIntent.putExtra("videogameID", gameID);
+        detailIntent.putExtra("gameID", gameID);
         detailIntent.putExtra("title", title);
         detailIntent.putExtra("releaseDate", releaseDate);
         detailIntent.putExtra("consoleName", consoleName);
@@ -105,6 +106,7 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener, 
 
         // start the next Activity using your prepared Intent
         startActivity(detailIntent);
+        g.getCollection().loadCollection();
     }
 
     private void searchDatabase(String searchString) {

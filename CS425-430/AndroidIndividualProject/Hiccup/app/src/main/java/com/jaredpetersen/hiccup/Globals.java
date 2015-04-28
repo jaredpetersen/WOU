@@ -1,5 +1,9 @@
 package com.jaredpetersen.hiccup;
 
+import android.app.Fragment;
+
+import java.util.Collection;
+
 /**
  * Created by jaredpetersen on 4/27/15.
  */
@@ -8,6 +12,7 @@ public class Globals{
 
     // Global variable
     private String userID;
+    private CollectionFragment collectionFragment;
 
     // Restrict the constructor from being instantiated
     private Globals(){}
@@ -17,6 +22,14 @@ public class Globals{
     }
     public String getData(){
         return this.userID;
+    }
+    public void setCollection(CollectionFragment fragment)
+    {
+        collectionFragment = fragment;
+    }
+    public CollectionFragment getCollection()
+    {
+        return collectionFragment;
     }
 
     public static synchronized Globals getInstance(){

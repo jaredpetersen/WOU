@@ -69,7 +69,7 @@ public class CollectionFragment extends Fragment implements AdapterView.OnItemCl
         return f;
     }
 
-    private void loadCollection()
+    public void loadCollection()
     {
         // Create a client to perform networking
         AsyncHttpClient client = new AsyncHttpClient();

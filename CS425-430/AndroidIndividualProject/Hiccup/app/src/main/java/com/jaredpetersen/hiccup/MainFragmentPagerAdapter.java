@@ -17,6 +17,7 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter
     final int PAGE_COUNT = 4;
     private String tabTitles[] = new String[] { "Database", "Collection", "Wishlist", "Metrics" };
     private Context context;
+    Globals g = Globals.getInstance();
 
     private int[] imageResId = {
             R.drawable.ic_action_cloud,
@@ -43,7 +44,10 @@ public class MainFragmentPagerAdapter extends FragmentPagerAdapter
         //return PageFragment.newInstance(position + 1);
         switch (position) {
             case 0: return DatabaseFragment.newInstance();
-            case 1: return CollectionFragment.newInstance("My Collection");
+            case 1:
+                CollectionFragment collectionFragment= CollectionFragment.newInstance("My Collection");
+                g.setCollection(collectionFragment);
+                return collectionFragment;
             case 2: return WishlistFragment.newInstance("My Wishlist");
             case 3: return MetricsFragment.newInstance("Collection Metrics");
             default: return DatabaseFragment.newInstance();
