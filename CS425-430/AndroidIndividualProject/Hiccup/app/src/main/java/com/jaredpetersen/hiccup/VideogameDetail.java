@@ -9,7 +9,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,7 +25,13 @@ import java.text.SimpleDateFormat;
  * Created by jaredpetersen on 4/12/15.
  */
 
-public class VideogameDetail extends ActionBarActivity {
+public class VideogameDetail extends ActionBarActivity implements View.OnClickListener {
+
+    Button addToCollection;
+    Globals g = Globals.getInstance();
+    String userID = g.getData();
+    String gameID;
+    private static final String QUERY_URL = "http://www.wou.edu/~jpetersen11/api/ownership.php?&key=R@inDr0psOnro53s?&user=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +43,7 @@ public class VideogameDetail extends ActionBarActivity {
         // Enable the "Up" button for more navigation options
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        String gameID = this.getIntent().getExtras().getString("videogameID");
         String gameTitle = this.getIntent().getExtras().getString("title");
         String consoleName = this.getIntent().getExtras().getString("consoleName");
         String releaseDate = this.getIntent().getExtras().getString("releaseDate");
@@ -60,6 +74,9 @@ public class VideogameDetail extends ActionBarActivity {
 
         TextView esrbTV = (TextView) findViewById(R.id.esrb);
         esrbTV.setText(esrb);
+
+        addToCollection = (Button) findViewById(R.id.add_collection_button);
+        addToCollection.setOnClickListener(this);
 
         // Access the imageview from XML
         //ImageView imageView = (ImageView) findViewById(R.id.img_cover);
@@ -96,4 +113,34 @@ public class VideogameDetail extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onClick(View v) {
+
+    }
+
+    private void loadCollection()
+    {
+        // Create a client to perform networking
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        // Have the client post data to the site
+        client.post(QUERY_URL + userID,
+                new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(JSONObject jsonObject) {
+
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Throwable throwable, JSONObject error) {
+                        // Display a "Toast" message
+                        // to announce the failure
+                        Toast.makeText(getApplicationContext(), "Error: " + statusCode + " " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+
+                        // Log error message
+                        // to help solve any problems
+                        Log.e("tag", statusCode + " " + throwable.getMessage());
+                    }
+                });
+    }
 }

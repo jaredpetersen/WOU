@@ -13,6 +13,7 @@ import android.view.MenuItem;
 public class MainActivity extends ActionBarActivity
 {
     public static String userID;
+    Globals g = Globals.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,6 +48,7 @@ public class MainActivity extends ActionBarActivity
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             userID = extras.getString("userID");
+            g.setData(userID);
         }
     }
 

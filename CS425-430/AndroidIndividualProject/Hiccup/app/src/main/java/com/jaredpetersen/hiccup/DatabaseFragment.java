@@ -84,6 +84,7 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         JSONObject jsonObject = (JSONObject) mJSONAdapter.getItem(position);
+        String gameID = jsonObject.optString("videogameID","");
         String title = jsonObject.optString("title","");
         String releaseDate = jsonObject.optString("releaseDate","");
         String consoleName = jsonObject.optString("consoleName","");
@@ -94,10 +95,13 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener, 
 
         // pack away the data about the cover
         // into your Intent before you head out
+        detailIntent.putExtra("videogameID", gameID);
         detailIntent.putExtra("title", title);
         detailIntent.putExtra("releaseDate", releaseDate);
         detailIntent.putExtra("consoleName", consoleName);
         detailIntent.putExtra("esrb", esrb);
+
+
 
         // start the next Activity using your prepared Intent
         startActivity(detailIntent);

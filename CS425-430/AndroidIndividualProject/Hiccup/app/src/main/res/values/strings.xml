@@ -10,5 +10,6 @@
     <string name="consoleHead">Console:</string>
     <string name="releaseDateHead">Release Date:</string>
     <string name="esrbHead">ESRB Rating:</string>
+    <string name="add_collection_button">Add to Collection</string>
 
 </resources>
