@@ -8,6 +8,8 @@ import sixteenPuzzle.PuzzleSolver;
 
 /**
  * Test the cases listed in the lab assignment
+ * 
+ * Archive File Name: JTPL1
  * @author Jared Petersen
  */
 public class LabTests {

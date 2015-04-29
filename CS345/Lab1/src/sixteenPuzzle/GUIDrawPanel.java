@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 /**
  * Draws the squares in the GUI window
  * 
+ * Archive File Name: JTPL1
  * @author Jared Petersen
  */
 @SuppressWarnings("serial")

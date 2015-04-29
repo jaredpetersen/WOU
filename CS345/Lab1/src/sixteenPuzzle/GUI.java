@@ -9,6 +9,8 @@ import javax.swing.*;
 
 /**
  * User interface for the 16 Puzzle Solver
+ * 
+ * Archive File Name: JTPL1
  * @author Jared Petersen
  */
 @SuppressWarnings("serial")

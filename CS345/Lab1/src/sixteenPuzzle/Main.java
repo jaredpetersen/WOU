@@ -5,6 +5,8 @@ import javax.swing.*;
 /**
  * 16 Puzzle Solver
  * Uses state-based search to solve the 16 puzzle
+ * 
+ * Archive File Name: JTPL1
  * @author Jared Petersen
  */
 public class Main 

@@ -2,6 +2,8 @@ package sixteenPuzzle;
 
 /**
  * 16 Puzzle Solver
+ * 
+ * Archive File Name: JTPL1
  * @author Jared Petersen
  */
 public class PuzzleSolver 

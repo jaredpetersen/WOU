@@ -12,6 +12,7 @@ import java.util.Arrays;
  *   12  13  14  15 }
  * where 0 represents the blank space in the puzzle
  * 
+ * Archive File Name: JTPL1
  * @author Jared Petersen
  **/
 public class State
