@@ -136,13 +136,19 @@ public class Lab2P4 extends JFrame implements ActionListener
 			
 			client = new Client(ipAddress, portNum);
 			
+			if (client.error)
+			{
+				resultTextField.setText("Connection failed");
+				client.error = false;
+			}
+			
 		}
 		else if ("query".equals(e.getActionCommand()))
 		{
 			if (client != null)
 			{
 				serverQuery = queryTextField.getText().toString();
-				client.sendMessage(serverQuery);
+				resultTextField.setText(client.sendMessage(serverQuery));
 			}
 		}
 	}

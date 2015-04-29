@@ -15,6 +15,7 @@ import java.io.*;
 public class Client 
 {
 	Socket socket;
+	boolean error;
 	
 	public Client(String ipAddress, int port) 
 	{
@@ -22,7 +23,7 @@ public class Client
 			socket = new Socket(ipAddress,port);
 		}
 		catch (IOException ioe) {
-				System.err.println(ioe);
+			error = true;
 		}
 	}
 	
@@ -62,7 +63,7 @@ public class Client
 		}
 		catch (Exception e)
 		{
-			System.out.println(e);
+			return "Connection failed";
 		}
 
 		return response;
