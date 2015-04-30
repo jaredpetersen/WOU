@@ -13,7 +13,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TentsNTrails</RootNamespace>
     <AssemblyName>TentsNTrails</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
@@ -24,6 +24,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,27 +44,86 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.ApplicationServer.Caching.AzureClientHelper">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.5.1.0\lib\net40-full\Microsoft.ApplicationServer.Caching.AzureClientHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationServer.Caching.AzureCommon">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.5.1.0\lib\net40-full\Microsoft.ApplicationServer.Caching.AzureCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationServer.Caching.Client">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.5.1.0\lib\net40-full\Microsoft.ApplicationServer.Caching.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ApplicationServer.Caching.Core">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.5.1.0\lib\net40-full\Microsoft.ApplicationServer.Caching.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Data.Edm, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.Edm.5.6.2\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.OData, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.OData.5.6.2\lib\net40\Microsoft.Data.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.Services.Client, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.Services.Client.5.6.2\lib\net40\Microsoft.Data.Services.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ServiceBus">
+      <HintPath>..\packages\WindowsAzure.ServiceBus.2.5.0.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.DistributedCache">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.5.1.0\lib\net40-full\Microsoft.Web.DistributedCache.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Configuration, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.3.1.0\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Storage, Version=4.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\WindowsAzure.Storage.4.3.0\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsFabric.Common">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.5.1.0\lib\net40-full\Microsoft.WindowsFabric.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsFabric.Data.Common">
+      <HintPath>..\packages\Microsoft.WindowsAzure.Caching.2.5.1.0\lib\net40-full\Microsoft.WindowsFabric.Data.Common.dll</HintPath>
+    </Reference>
     <Reference Include="PagedList">
       <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
     </Reference>
     <Reference Include="PagedList.Mvc">
       <HintPath>..\packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Presentation" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Spatial, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\System.Spatial.5.6.2\lib\net40\System.Spatial.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Workflow.Activities" />
+    <Reference Include="System.Workflow.ComponentModel" />
+    <Reference Include="System.Workflow.Runtime" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
@@ -103,6 +163,7 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.0\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WebGrease">
       <Private>True</Private>
       <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
@@ -168,7 +229,13 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="Azure\ExceptionUtils.cs" />
+    <Compile Include="Azure\Logger.cs" />
+    <Compile Include="Azure\PhotoService.cs" />
+    <Compile Include="Azure\StorageUtils.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\EventParticipantsController.cs" />
+    <Compile Include="Controllers\EventsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LocationController.cs" />
     <Compile Include="Controllers\LocationFlagController.cs" />
@@ -187,16 +254,39 @@
     <Compile Include="Migrations\201504182351580_FixAll.Designer.cs">
       <DependentUpon>201504182351580_FixAll.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201504201743081_AddedStateToLocation.cs" />
-    <Compile Include="Migrations\201504201743081_AddedStateToLocation.Designer.cs">
-      <DependentUpon>201504201743081_AddedStateToLocation.cs</DependentUpon>
+    <Compile Include="Migrations\201504200427312_AddProfilePicture.cs" />
+    <Compile Include="Migrations\201504200427312_AddProfilePicture.Designer.cs">
+      <DependentUpon>201504200427312_AddProfilePicture.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504211957589_sprint7.cs" />
+    <Compile Include="Migrations\201504211957589_sprint7.Designer.cs">
+      <DependentUpon>201504211957589_sprint7.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504271611363_participationpt2.cs" />
+    <Compile Include="Migrations\201504271611363_participationpt2.Designer.cs">
+      <DependentUpon>201504271611363_participationpt2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504280247071_aaronbrokeeverything.cs" />
+    <Compile Include="Migrations\201504280247071_aaronbrokeeverything.Designer.cs">
+      <DependentUpon>201504280247071_aaronbrokeeverything.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201504300211421_fix.cs" />
+    <Compile Include="Migrations\201504300211421_fix.Designer.cs">
+      <DependentUpon>201504300211421_fix.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\FriendNotification.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
+    <Compile Include="Models\Notification.cs" />
+    <Compile Include="Models\ProfilePicture.cs" />
     <Compile Include="Models\Connection.cs" />
     <Compile Include="Models\ConnectionRequest.cs" />
+    <Compile Include="Models\EventComments.cs" />
+    <Compile Include="Models\EventParticipants.cs" />
+    <Compile Include="Models\Events.cs" />
     <Compile Include="Models\Image.cs" />
+    <Compile Include="Models\ImageViewModel.cs" />
     <Compile Include="Models\Location.cs" />
     <Compile Include="Models\LocationFlag.cs" />
     <Compile Include="Models\LocationFlagViewModel.cs" />
@@ -218,26 +308,59 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\default-user-image.png" />
     <Content Include="Content\green_forest.jpg" />
     <Content Include="Content\home_page.jpg" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\ImagePreview.png" />
     <Content Include="Content\jquery.nailthumb.1.1.css" />
     <Content Include="Content\jquery.nailthumb.1.1.min.css" />
+    <Content Include="Content\no-image-available.png" />
     <Content Include="Content\PagedList.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\AzureMemcacheService.exe" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\CacheDumpGenerator.exe" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\ClientPerfCountersInstaller.exe" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\MemcacheShimEmulator.exe" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\MemcacheShimInstaller.exe" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\MemcacheShimInstallerIaaS.exe" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.ApplicationServer.Caching.AzureClientHelper.dll" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.ApplicationServer.Caching.AzureCommon.dll" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.ApplicationServer.Caching.AzureServerCommon.dll" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.ApplicationServer.Caching.Client.dll" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.ApplicationServer.Caching.Core.dll" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.ApplicationServer.Caching.MemcacheShim.dll" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.Web.DistributedCache.dll" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.WindowsAzure.Diagnostics.dll" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.WindowsAzure.Diagnostics.StorageUtility.dll" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.WindowsFabric.Common.dll" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.WindowsFabric.Data.Common.dll" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\PerformanceCounters.xml" />
+    <None Include="Microsoft.WindowsAzure.Caching\ClientPerfCountersInstaller.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Microsoft.WindowsAzure.Caching\PerformanceCounters.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <None Include="Microsoft.WindowsAzure.Caching\ClientPerfCountersInstaller.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="Performance\Microsoft.ServiceBus.MessagingPerformanceCounters.man" />
     <None Include="Properties\PublishProfiles\tents-n-trails.pubxml" />
     <None Include="Properties\PublishProfiles\tentsntrails %282%29.pubxml" />
+    <None Include="Properties\PublishProfiles\tentsntrails-sprint7.pubxml" />
+    <None Include="Properties\PublishProfiles\tentsntrails-sprint8.pubxml" />
     <None Include="Properties\PublishProfiles\tentsntrails.pubxml" />
     <None Include="Properties\PublishProfiles\tentsntrailsaaroncarson.pubxml" />
     <None Include="Properties\PublishProfiles\tentsntrailssprint6.pubxml" />
     <None Include="Properties\PublishProfiles\tentsntrailssprint6a.pubxml" />
-    <None Include="Properties\PublishProfiles\tentsntrailssprint7.pubxml" />
+    <Content Include="RegisterMessagingPerfCounter.cmd" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -324,7 +447,6 @@
     <Content Include="Views\Shared\_LayoutHome.cshtml" />
     <Content Include="Views\Profile\Edit.cshtml" />
     <Content Include="Views\Profile\Index.cshtml" />
-    <Content Include="Views\LocationImage\Create.cshtml" />
     <Content Include="Views\LocationImage\Details.cshtml" />
     <Content Include="Views\LocationImage\Index.cshtml" />
     <Content Include="Views\LocationImage\CreateByUrl.cshtml" />
@@ -341,6 +463,24 @@
     <Content Include="Views\Users\AdminControl.cshtml" />
     <Content Include="Views\Profile\RequestList.cshtml" />
     <Content Include="Views\Profile\SeeMoreImages.cshtml" />
+    <Content Include="Views\EventParticipants\Create.cshtml" />
+    <Content Include="Views\EventParticipants\Delete.cshtml" />
+    <Content Include="Views\EventParticipants\Details.cshtml" />
+    <Content Include="Views\EventParticipants\Edit.cshtml" />
+    <Content Include="Views\EventParticipants\Index.cshtml" />
+    <Content Include="Views\Events\Create.cshtml" />
+    <Content Include="Views\Events\Delete.cshtml" />
+    <Content Include="Views\Events\Details.cshtml" />
+    <Content Include="Views\Events\Edit.cshtml" />
+    <Content Include="Views\Events\Index.cshtml" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\MemcacheShimInstaller.exe.config" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\MemcacheShimEmulator.exe.config" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\ClientPerfCountersInstaller.exe.config" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\CacheDumpGenerator.exe.config" />
+    <Content Include="WindowsAzure.Caching.MemcacheShim\AzureMemcacheService.exe.config" />
+    <Content Include="Tracing\Microsoft.ServiceBus.EventDefinitions.man" />
+    <Content Include="Views\Profile\UploadProfilePicture.cshtml" />
+    <Content Include="Views\LocationImage\Upload.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -357,8 +497,20 @@
     <EmbeddedResource Include="Migrations\201504182351580_FixAll.resx">
       <DependentUpon>201504182351580_FixAll.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201504201743081_AddedStateToLocation.resx">
-      <DependentUpon>201504201743081_AddedStateToLocation.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201504200427312_AddProfilePicture.resx">
+      <DependentUpon>201504200427312_AddProfilePicture.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504211957589_sprint7.resx">
+      <DependentUpon>201504211957589_sprint7.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504271611363_participationpt2.resx">
+      <DependentUpon>201504271611363_participationpt2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504280247071_aaronbrokeeverything.resx">
+      <DependentUpon>201504280247071_aaronbrokeeverything.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201504300211421_fix.resx">
+      <DependentUpon>201504300211421_fix.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -20,18 +20,26 @@ namespace TentsNTrails.Models
         }
         
         // accessible DbSets
+        public DbSet<Connection> Connections { get; set; }
+        public DbSet<ConnectionRequest> ConnectionRequests { get; set; }
+
+        public DbSet<Image> Images { get; set; }
+        
         public DbSet<Location> Locations { get; set; }
+        public DbSet<LocationRecreation> LocationRecreations { get; set; }
         public DbSet<LocationFlag> LocationFlags { get; set; }
         public DbSet<LocationImage> LocationImages { get; set; }
         public DbSet<LocationVideo> LocationVideos { get; set; }
-        public DbSet<Image> Images { get; set; }
+
+        //public DbSet<ProfilePicture> ProfilePictures { get; set; }
+        
         public DbSet<Recreation> Recreations { get; set; }
         public DbSet<Review> Reviews { get; set; }
-        public DbSet<Video> Videos { get; set; }
+        
         public DbSet<UserRecreation> UserRecreations { get; set; }
-        public DbSet<LocationRecreation> LocationRecreations { get; set; }
-        public DbSet<Connection> Connections { get; set; }
-        public DbSet<ConnectionRequest> ConnectionRequests { get; set; }
+        
+        public DbSet<Video> Videos { get; set; }
+        
         
 
 
@@ -54,6 +62,10 @@ namespace TentsNTrails.Models
 
             LocationRecreations.Add(locRec);
         }
+
+        public System.Data.Entity.DbSet<TentsNTrails.Models.Events> Events { get; set; }
+
+        public System.Data.Entity.DbSet<TentsNTrails.Models.EventParticipants> EventParticipants { get; set; }
 
         /*
         public void AddOrUpdateLocationFlag(string flag, int locationID)

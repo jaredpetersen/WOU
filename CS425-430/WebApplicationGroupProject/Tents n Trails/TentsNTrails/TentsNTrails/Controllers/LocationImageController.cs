@@ -10,6 +10,8 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using TentsNTrails.Models;
+using System.Threading.Tasks;
+using TentsNTrails.Azure;
 
 namespace TentsNTrails.Controllers
 {
@@ -21,6 +23,7 @@ namespace TentsNTrails.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
         private UserManager<User> manager;
+         private PhotoService photoService = new PhotoService();
 
         public LocationImageController()
         {
@@ -148,7 +151,7 @@ namespace TentsNTrails.Controllers
             // 1. check if a valid image was uploaded
             if (model.ImageUrl == null || model.ImageUrl.Length == 0)
             {
-                Console.WriteLine("Image is null or empty");
+                System.Diagnostics.Debug.WriteLine("Image is null or empty");
                 ModelState.AddModelError("ImageUpload", "This field is required");
             }
 
@@ -167,7 +170,7 @@ namespace TentsNTrails.Controllers
 
                 if (!hasValidExtension)
                 {
-                    Console.WriteLine("Invalid Image Type");
+                    System.Diagnostics.Debug.WriteLine("Invalid Image Type");
                     ModelState.AddModelError("ImageUpload", "Please choose either a GIF, JPG or PNG image.");
                 }
             }
@@ -175,7 +178,7 @@ namespace TentsNTrails.Controllers
             // 3. create the Image entry to save to the database
             if (ModelState.IsValid)
             {
-                Console.WriteLine("Model state is valid");
+                System.Diagnostics.Debug.WriteLine("Model state is valid");
                 // initialize image model to store in database
                 var locationImage = new LocationImage
                 {
@@ -196,7 +199,7 @@ namespace TentsNTrails.Controllers
             }
 
             // otherwise, go back to create view.
-            Console.WriteLine("Model state is invalid.");
+            System.Diagnostics.Debug.WriteLine("Model state is invalid.");
 
             ViewBag.LocationID = model.LocationID;
             ViewBag.LocationLabel = db.Locations.Find(model.LocationID).Label;
@@ -206,64 +209,25 @@ namespace TentsNTrails.Controllers
         }
 
 
-        // *******************************************************************************************************************
-        // CREATE (via File Uploader)
-        // *******************************************************************************************************************
-        // Does not work on azure.
-        // These are being saved for now, but temporarily replaced with a new set of methods.
-
-
-        // **************************************
-        // EDITED (Non-Standard Scaffolded Code)
-        // **************************************
-        // GET: LocationImage/Create
-        //
-        // Shows a new Image Upload Page.  It takes an optional locationID field, which if specified limits the selectlist to a single
-        // value, and the subsequent view will redirect to that Location's Details page.  Otherwise, the user can select any Location to
-        // associate with the Image and they will be redirected to the Location index page.
+         // GET LocationImage/Upload
         [Authorize]
-        public ActionResult Create(int? locationID)
-        {
-            IQueryable<Location> locations;
-            string cancelAction;
-
-            // if a location is specified, only return a single value.
-            if (locationID.HasValue)
-            {
-                locations = db.Locations.Where(l => l.LocationID == locationID);
-                cancelAction = "Details/" + locationID;
-            }
-
-            // otherwise, all locations are available.
-            else
-            {
-                locations = db.Locations.Where(l => true);
-                cancelAction = "Index";
-            }
-
-            // make viewbag variables
-            ViewBag.LocationID = new SelectList(locations, "LocationID", "Label");
+        public ActionResult Upload(int locationID)
+        {         
             ViewBag.PlaceholderUrl = "~/Content/ImagePreview.png";
-            ViewBag.CancelAction = cancelAction;
-
-            return View(new LocationImageViewModel());
+            ViewBag.LocationLabel = db.Locations.Find(locationID).Label;
+            LocationImageViewModel viewModel = new LocationImageViewModel();
+            viewModel.LocationID = locationID;
+            return View(viewModel);
         }
 
-        // **************************************
-        // EDITED (Non-Standard Scaffolded Code)
-        // **************************************
-        // POST: Recreation/Edit/5
-        //
-        // Creates a new Image from the data input from the LocationImageViewModel.
-        //
-        // This is done in two steps: 
-        //     1.) Saving the image to the website folder structure,
-        //     2.) Saving the LocationImage model with a string url to that image in the database.
+        // POST: LocationImage/Upload
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(LocationImageViewModel model)
+        public async Task<ActionResult> Upload(LocationImageViewModel viewModel)
         {
+            System.Diagnostics.Debug.WriteLine("----------------------------------------");
+            System.Diagnostics.Debug.WriteLine("LocationImageController.Upload()");
             // List of allowed image types (for hosting on web)
             var validImageTypes = new string[]
             {
@@ -273,59 +237,60 @@ namespace TentsNTrails.Controllers
                 "image/png"
             };
 
-
-            // 1. check if a valid image was uploaded
-            if (model.ImageUpload == null || model.ImageUpload.ContentLength == 0)
+            // 1. check if file is null, or of zero length
+            if (viewModel.ImageUpload == null || viewModel.ImageUpload.ContentLength == 0)
             {
-                Console.WriteLine("Image is null or empty");
-                ModelState.AddModelError("ImageUpload", "This field is required");
+                System.Diagnostics.Trace.WriteLine("Image is null");
+                ModelState.AddModelError("ImageUpload", "This field is required.");
             }
 
-            // 2. check that image is of a valid filetype
-            else if (!validImageTypes.Contains(model.ImageUpload.ContentType))
+            // 2. check if file is null, or of zero length
+            else if (viewModel.ImageUpload == null || viewModel.ImageUpload.ContentLength == 0)
             {
-                Console.WriteLine("Invalid Image Type");
+                System.Diagnostics.Trace.WriteLine("Uploaded file is empty");
+                ModelState.AddModelError("ImageUpload", "Image file cannot be empty.");
+            }
+
+            // 3. check that image is of a valid filetype
+            else if (!validImageTypes.Contains(viewModel.ImageUpload.ContentType))
+            {
+                System.Diagnostics.Trace.WriteLine("Invalid Image Type");
                 ModelState.AddModelError("ImageUpload", "Please choose either a GIF, JPG or PNG image.");
             }
 
-            // 3. create the Image entry to save to the database
             if (ModelState.IsValid)
             {
-                Console.WriteLine("Model state is valid");
-                // initialize image model to store in database
+                System.Diagnostics.Debug.WriteLine("ModelState is valid!");
+
+                // Upload Image to Blob Storage
+                string imageUrl = await photoService.UploadPhotoAsync(viewModel.ImageUpload);
+                System.Diagnostics.Debug.WriteLine("Uploaded image to URL: {1}", imageUrl);
+
+                // create 
                 var locationImage = new LocationImage
                 {
-                    LocationID = model.LocationID,
-                    Title = model.Title,
-                    AltText = model.ImageUpload.FileName,
-                    DateTaken = model.DateTaken,
+                    LocationID = viewModel.LocationID,
+                    Title = viewModel.Title,
+                    AltText = "Image from " + db.Locations.Find(viewModel.LocationID).Label,
+                    DateTaken = viewModel.DateTaken,
                     DateCreated = DateTime.UtcNow,
                     DateModified = DateTime.UtcNow,
-                    ImageUrl = Path.Combine(LocationImage.UPLOAD_DIRECTORY, model.ImageUpload.FileName),
+                    ImageUrl = imageUrl,
                     User = manager.FindById(User.Identity.GetUserId())
                 };
-
-                //save image to local storage
-                model.ImageUpload.SaveAs(Path.Combine(Server.MapPath(LocationImage.UPLOAD_DIRECTORY), model.ImageUpload.FileName));
 
                 // save LocationImage model in database
                 db.LocationImages.Add(locationImage);
                 db.SaveChanges();
-                return RedirectToAction("Index", "LocationImage", new { locationID = model.LocationID });
+                System.Diagnostics.Debug.WriteLine("Saved {0} '{1}' to the database.", locationImage.AltText, locationImage.Title);
+
+                return RedirectToAction("Media", "Location", new { locationID = viewModel.LocationID });
             }
 
-            // otherwise, go back to create view.
-            Console.WriteLine("Model state is invalid.");
-
-            ViewBag.LocationID = new SelectList(db.Locations, "LocationID", "Label", model.LocationID);
             ViewBag.PlaceholderUrl = "~/Content/ImagePreview.png";
-            ViewBag.LocationCount = db.Locations.Count();
-            return View(model);
+            ViewBag.LocationLabel = db.Locations.Find(viewModel.LocationID).Label;
+            return View(viewModel);
         }
-
-
-
-
 
         // GET: LocationImage/Edit/5
         public ActionResult Edit(int? id)

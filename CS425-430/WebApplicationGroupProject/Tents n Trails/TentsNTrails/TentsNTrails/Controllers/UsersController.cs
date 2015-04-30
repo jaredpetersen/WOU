@@ -371,14 +371,5 @@ namespace TentsNTrails.Controllers
             }
             base.Dispose(disposing);
         }
-
-        //displays a dialog to create a profile picture.
-        [Authorize]
-        public ActionResult AddProfilePicture()
-        {
-            ProfilePictureViewModel viewModel = new ProfilePictureViewModel();
-            viewModel.User = UserManager.FindById(User.Identity.GetUserId());
-            return View(viewModel);
-        }
     }
 }

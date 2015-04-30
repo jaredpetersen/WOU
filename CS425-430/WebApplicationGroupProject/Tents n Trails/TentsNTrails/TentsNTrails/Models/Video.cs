@@ -47,6 +47,8 @@ namespace TentsNTrails.Models
         [StringLength(2000, MinimumLength=(20))]
         public string EmbedCode { get; set; }
 
+        public User User { get; set; }
+
         // if the embed code is from a known website (youtube), 
         //it retrieves an image thumbnail; else, it just returns a the video embed code.
         public string GetThumbnailUrl()
@@ -78,6 +80,12 @@ namespace TentsNTrails.Models
             // if an error happens, just return the EmbedCode.
             catch (NullReferenceException e)
             {
+                System.Diagnostics.Debug.WriteLine(String.Format("Null reference caught"));
+                return EmbedCode;
+            }
+            catch (IndexOutOfRangeException e)
+            {
+                System.Diagnostics.Debug.WriteLine(String.Format("Index out of range caught"));
                 return EmbedCode;
             }
 

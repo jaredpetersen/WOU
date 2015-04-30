@@ -6,6 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using TentsNTrails.Models;
 
 namespace TentsNTrails.Controllers
@@ -13,11 +15,19 @@ namespace TentsNTrails.Controllers
     public class LocationVideoController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+        private UserManager<User> manager;
+
+        public LocationVideoController()
+        {
+            db = new ApplicationDbContext();
+            manager = new UserManager<User>(new UserStore<User>(db));
+        }
 
         // GET: LocationVideo
         public ActionResult Index()
         {
             var videos = db.LocationVideos.Include(l => l.Location);
+
             return View(videos.ToList());
         }
 
@@ -28,7 +38,7 @@ namespace TentsNTrails.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            LocationVideo locationVideo = db.LocationVideos.Find(id);
+            LocationVideo locationVideo = db.LocationVideos.Include(v => v.User).Where(v => v.VideoID == id).Single();
             if (locationVideo == null)
             {
                 return HttpNotFound();
@@ -52,12 +62,17 @@ namespace TentsNTrails.Controllers
         // POST: LocationVideo/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "VideoID,Description,EmbedCode,LocationID")] LocationVideo locationVideo)
         {
             if (ModelState.IsValid)
             {
+                User profileUser = manager.FindById(User.Identity.GetUserId());
+
+                locationVideo.User = profileUser;
+
                 db.Videos.Add(locationVideo);
                 db.SaveChanges();
                 return RedirectToAction("Media", "Location", new { locationID = locationVideo.LocationID});

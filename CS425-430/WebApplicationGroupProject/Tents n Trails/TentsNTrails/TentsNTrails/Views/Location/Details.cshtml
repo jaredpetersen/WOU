@@ -21,6 +21,9 @@
 
         // add a marker to the map
         var marker = new google.maps.Marker({position: reportLocation, map: map});
+        var infowindow = new google.maps.InfoWindow({content: 'Loading...'});
+        marker.html='<div class="label"  ><a>@Model.Label</a></div>';
+        google.maps.event.addListener(marker, 'click', function() {infowindow.setContent(this.html); infowindow.open(map,this);});
     }
 
     // display the map
@@ -270,20 +273,34 @@
                 {
                     if (item.Comment != null) {
                         <tr class="review-row">
+                            
                             <td>
                                 <div id="review">
-                                    @if (item.Rating)
-                                    {
-                                        <span class="glyphicon glyphicon-thumbs-up green" aria-hidden="true"></span> 
-                                    }
-                                    else
-                                    {
-                                        <span class="glyphicon glyphicon-thumbs-down red" aria-hidden="true"></span> 
-                                    }
 
-                                    <b>@Html.DisplayFor(modelItem => item.Comment)</b>
-                                    <br />
-                                    By @Html.ActionLink(item.User.UserName, "Index", "Profile", new { Username = item.User.UserName }, null) on @Html.DisplayFor(modelItem => item.ReviewDate)
+                                    <!-- PROFILE PICTURE -->
+                                    <div style="float: left; min-width:60px; max-width:60px; overflow: hidden">
+                                        <img id="profile-picture"
+                                             src="@Url.Content(item.User.ProfilePictureUrl)"
+                                             title="Profile Picture"
+                                             alt="Image of @item.User.UserName"
+                                             style="width: auto; height: 60px; margin: 0 auto" />
+                                    </div>
+
+                                    <!--REVIEW-->
+                                    <div style="padding-left: 75px; height: 60px; max-width: 600px">
+                                        @if (item.Rating)
+                                        {
+                                            <span class="glyphicon glyphicon-thumbs-up green" aria-hidden="true"></span>
+                                        }
+                                        else
+                                        {
+                                            <span class="glyphicon glyphicon-thumbs-down red" aria-hidden="true"></span>
+                                        }
+
+                                        <b>@Html.DisplayFor(modelItem => item.Comment)</b>
+                                        <br />
+                                        By @Html.ActionLink(item.User.UserName, "Index", "Profile", new { Username = item.User.UserName }, null) on @Html.DisplayFor(modelItem => item.ReviewDate)
+                                    </div>
                                 </div>
                             </td>
                         </tr>

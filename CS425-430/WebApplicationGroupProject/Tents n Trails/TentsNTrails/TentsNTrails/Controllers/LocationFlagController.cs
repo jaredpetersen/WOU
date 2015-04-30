@@ -45,6 +45,8 @@ namespace TentsNTrails.Controllers
                 viewModel.WantToGoLocations = locationFlags.Where(l => l.Flag == Flag.WantToGo).ToList();
                 viewModel.GoAgainLocations = locationFlags.Where(l => l.Flag == Flag.GoAgain).ToList();
                 viewModel.HasSavedLocations = true;
+                ViewBag.centerLatitude = 39.8282;
+                ViewBag.centerLongitude = -98.5795;
             }
 
             return View(viewModel);

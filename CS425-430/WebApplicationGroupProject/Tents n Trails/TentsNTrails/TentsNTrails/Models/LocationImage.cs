@@ -21,6 +21,9 @@ namespace TentsNTrails.Models
         [Display(Name = "Location")]        
         public int LocationID { get; set; }
         public virtual Location Location { get; set; }
+
+        // each image is associated with a user
+        public virtual User User { get; set; }
     }
 
 }

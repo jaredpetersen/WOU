@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TentsNTrails.Models
 {
@@ -12,6 +13,10 @@ namespace TentsNTrails.Models
     /// </summary>
     public class Image
     {
+        public const string DEFAULT_PROFILE_PICTURE_URL = "~/Content/default-user-image.png";
+        public const string NO_IMAGE_AVAILABLE_URL = "~/Content/no-image-available.png";
+
+
         [Key]
         public int ImageID { get; set; }
 
@@ -46,9 +51,6 @@ namespace TentsNTrails.Models
         [Display(Name = "Date Modified")]
         [Editable(false)]
         public DateTime? DateModified { get; set; }
-
-        /// each image is associated with a user
-        public virtual User User { get; set; }
     }
 
 }

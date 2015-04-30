@@ -1,0 +1,82 @@
+﻿@model TentsNTrails.Models.User
+
+@{
+    ViewBag.Title = Model.UserName;
+}
+
+<h2>@ViewBag.Title</h2>
+
+<!-- FORMATTING -->
+<script type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="~/Scripts/jquery.nailthumb.1.1.js"></script>
+<link href="~/Content/jquery.nailthumb.1.1.css" type="text/css" rel="stylesheet" />
+<style type="text/css" media="screen">
+    .square-thumb {
+        width: 150px;
+        height: 150px;
+        margin: 5px;
+    }
+
+    .video-thumb {
+        width: 200px;
+        height: 150px;
+        margin: 5px;
+    }
+</style>
+
+ <!-- USER'S LOCATION VIDEOS -->
+<dl class="dl-horizontal">
+    <dt>
+        All Uploaded Videos:
+    </dt>
+
+    <!-- BEGIN VIDEOS -->
+    <dd>
+        @if (ViewBag.VideosCount == 0)
+        {
+            <p>@Model.UserName has not uploaded any videos.</p>
+        }
+        else
+        {
+            <!-- VIDEO GRID -->
+            <div class="row" align="center">
+                <div class="col-xs-12">
+                    @foreach (var item in Model.UserLocationVideos)
+                    {
+                        string videoThumbnailUrl = item.GetThumbnailUrl();
+
+                        // Embedded Video (If imageUrl was not found)
+                        if (videoThumbnailUrl == item.EmbedCode)
+                        {
+                            <div class="col-xs-2">
+                                <div class="video-container">
+                                    @Html.Raw(item.EmbedCode)
+                                </div>
+                            </div>
+                        }
+
+            // otherwise, show video thumbnail image
+                        else
+                        {
+                            <div class="nailthumb-container video-thumb col-xs-3">
+                                <a href="@Url.Action("Details", "LocationVideo", new { id = item.VideoID })">
+                                    <img id="@item.VideoID"
+                                         src="@Url.Content(videoThumbnailUrl)"
+                                         title="@((item.Description.Length > 100) ? item.Description.Substring(0,100) : item.Description)"
+                                         alt="@("Video thumbnail of " + Model.UserName)" />
+                                </a>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </dd>
+
+</dl>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+
+

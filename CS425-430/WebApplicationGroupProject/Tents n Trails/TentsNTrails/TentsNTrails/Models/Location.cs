@@ -81,6 +81,16 @@ namespace TentsNTrails.Models
         public virtual ICollection<LocationVideo> Videos { get; set; }
         public virtual String State { get; set; }
 
+        // a convenience preview image url.
+        public virtual String PreviewImageURL
+        { 
+            get
+            {
+                LocationImage image = Images.FirstOrDefault();
+                return image == null ? Image.NO_IMAGE_AVAILABLE_URL : image.ImageUrl;
+            
+            }
+        }
 
         // calculate the overall rating of this Location, based off of its Reviews.
         public virtual double Rating() {

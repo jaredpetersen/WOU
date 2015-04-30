@@ -6,6 +6,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TentsNTrails.Models
 {
+   
+
     /// <summary>
     /// Used to display images in video in the Media page.
     /// </summary>
@@ -65,9 +67,6 @@ namespace TentsNTrails.Models
         [Required]
         public string Title { get; set; }
 
-        // html alt text
-        public string AltText { get; set; }
-
         // The date the user took the photograph (optional)
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
@@ -79,9 +78,6 @@ namespace TentsNTrails.Models
         [DataType(DataType.Upload)]
         [Display(Name = "Image")]
         public HttpPostedFileBase ImageUpload { get; set; }
-
-        // User
-        public virtual User User { get; set; }
     }
 
     

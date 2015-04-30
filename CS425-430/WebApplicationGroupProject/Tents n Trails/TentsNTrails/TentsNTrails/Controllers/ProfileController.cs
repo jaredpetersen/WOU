@@ -9,6 +9,8 @@ using System.Web.Mvc;
 using TentsNTrails.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.Threading.Tasks;
+using TentsNTrails.Azure;
 
 namespace TentsNTrails.Controllers
 {
@@ -16,6 +18,7 @@ namespace TentsNTrails.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
         private UserManager<User> manager;
+        private PhotoService photoService = new PhotoService();
             
         public ProfileController () 
         {
@@ -25,6 +28,8 @@ namespace TentsNTrails.Controllers
         // GET: Profile
         public ActionResult Index(String username, ProfileMessageId? message)
         {
+            System.Diagnostics.Trace.WriteLine("Profile.Index");
+            System.Diagnostics.Debug.WriteLine("Profile.Index");
             User profileUser = manager.FindById(User.Identity.GetUserId());
             ViewBag.IsConnected = false;
             ViewBag.HasConnectionRequest = false;
@@ -94,6 +99,8 @@ namespace TentsNTrails.Controllers
                 profileUser.BeenThereLocations = locationFlags.Where(l => l.Flag == Flag.HaveBeen).ToList();
                 profileUser.WantToGoLocations = locationFlags.Where(l => l.Flag == Flag.WantToGo).ToList();
                 profileUser.GoAgainLocations = locationFlags.Where(l => l.Flag == Flag.GoAgain).ToList();
+                ViewBag.centerLatitude = 39.8282;
+                ViewBag.centerLongitude = -98.5795;
             }
             else
             {
@@ -101,8 +108,8 @@ namespace TentsNTrails.Controllers
             }
 
             //add user's location images
-            List<Image> images = db.Images.Where(i => i.User.Id == profileUser.Id).ToList();
-            List<Image> smallImage = new List<Image>();
+            List<LocationImage> images = db.LocationImages.Where(i => i.User.Id == profileUser.Id).ToList();
+            List<LocationImage> smallImage = new List<LocationImage>();
             int count = 0;
             while (smallImage.Count < 5 && count < images.Count)
             {
@@ -111,6 +118,18 @@ namespace TentsNTrails.Controllers
             }
             ViewBag.ImagesCount = images.Count();
             profileUser.UserLocationImages = smallImage;
+
+            //add user's location videos
+            List<Video> videos = db.Videos.Where(i => i.User.Id == profileUser.Id).ToList();
+            List<Video> smallVideo = new List<Video>();
+            int countVid = 0;
+            while (smallVideo.Count < 4 && countVid < videos.Count)
+            {
+                smallVideo.Add(videos.ElementAt(countVid));
+                countVid++;
+            }
+            ViewBag.VideosCount = videos.Count();
+            profileUser.UserLocationVideos = smallVideo;
 
 
             ViewBag.SuccessMessage =
@@ -138,8 +157,30 @@ namespace TentsNTrails.Controllers
             }
 
             //add user's location images
-            List<Image> images = db.Images.Where(i => i.User.Id == profileUser.Id).ToList();
+            List<LocationImage> images = db.LocationImages.Where(i => i.User.Id == profileUser.Id).ToList();
             profileUser.UserLocationImages = images;
+
+            return View(profileUser);
+        }
+
+        // GET: Profile/SeeMoreVideos
+        public ActionResult SeeMoreVideos(string username)
+        {
+            User profileUser = manager.FindById(User.Identity.GetUserId());
+
+            if (username != null) //Traveling to another user's profile
+            {
+                profileUser = db.Users.Where(user => user.UserName == username).First();
+            }
+            else //Traveling to personal profile page
+            {
+
+            }
+
+            //add user's location images
+            List<Video> videos = db.Videos.Where(i => i.User.Id == profileUser.Id).ToList();
+            ViewBag.VideosCount = videos.Count();
+            profileUser.UserLocationVideos = videos;
 
             return View(profileUser);
         }
@@ -355,6 +396,95 @@ namespace TentsNTrails.Controllers
             base.Dispose(disposing);
         }
 
+        // GET Profile/UploadProfilePicture
+        [Authorize]
+        public ActionResult UploadProfilePicture()
+        {
+            return View(new ProfilePictureViewModel());
+        }
+
+        // POST: Profile/UploadProfilePicture
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UploadProfilePicture(ProfilePictureViewModel viewModel)
+        {
+            System.Diagnostics.Debug.WriteLine("----------------------------------------");
+            System.Diagnostics.Debug.WriteLine("ProfileController.UploadProfilePicture()");
+
+            // List of allowed image types (for hosting on web)
+            var validImageTypes = new string[]
+            {
+                "image/gif",
+                "image/jpeg",
+                "image/pjpeg", // needed for compatability with some older jpegs
+                "image/png"
+            };
+
+            // 1. check if file is null, or of zero length
+            if (viewModel.ImageUpload == null || viewModel.ImageUpload.ContentLength == 0)
+            {
+                System.Diagnostics.Trace.WriteLine("Image is null");
+                ModelState.AddModelError("ImageUpload", "This field is required.");
+            }
+
+            // 2. check if file is null, or of zero length
+            else if (viewModel.ImageUpload == null || viewModel.ImageUpload.ContentLength == 0)
+            {
+                System.Diagnostics.Trace.WriteLine("Uploaded file is empty");
+                ModelState.AddModelError("ImageUpload", "Image file cannot be empty.");
+            }
+
+            // 3. check that image is of a valid filetype
+            else if (!validImageTypes.Contains(viewModel.ImageUpload.ContentType))
+            {
+                System.Diagnostics.Trace.WriteLine("Invalid Image Type");
+                ModelState.AddModelError("ImageUpload", "Please choose either a GIF, JPG or PNG image.");
+            }
+
+
+            if (ModelState.IsValid)
+            {
+                System.Diagnostics.Debug.WriteLine("ModelState is valid!");
+                User user = manager.FindById(User.Identity.GetUserId());
+                System.Diagnostics.Debug.WriteLine("Loaded User: " + user.UserName);
+
+                /*
+                // add profile picture to db.
+                ProfilePicture picture = new ProfilePicture();
+                picture.User = user;
+                picture.Title = "Profile Picture";
+                picture.AltText = "Image of " + picture.User.UserName;
+                picture.DateCreated = picture.DateModified = picture.DateTaken = DateTime.UtcNow;
+                picture.IsSelected = true;
+                //picture.ImageUrl = await photoService.UploadPhotoAsync(viewModel.ImageUpload);
+                picture.ImageUrl = await photoService.UploadProfilePictureAsync(viewModel.ImageUpload, user.UserName);
+
+                System.Diagnostics.Debug.WriteLine("----------------------------------------");
+                System.Diagnostics.Debug.WriteLine("Uploading new ProfilePicture.");
+                System.Diagnostics.Debug.WriteLine("picture.User:       " + picture.User.Id);
+                System.Diagnostics.Debug.WriteLine("picture.Title:      " + picture.Title);
+                System.Diagnostics.Debug.WriteLine("picture.AltText:    " + picture.AltText);
+                System.Diagnostics.Debug.WriteLine("picture.IsSelected: " + picture.IsSelected);
+                System.Diagnostics.Debug.WriteLine("picture.ImageUrl:   " + picture.ImageUrl);
+                db.ProfilePictures.Add(picture);
+                await db.SaveChangesAsync();
+                 * */
+                
+                // update user's profile picture reference
+                //user.ProfilePicture = db.ProfilePictures.Where(i => i.ImageUrl.Equals(picture.ImageUrl)).Single();
+               //ystem.Diagnostics.Debug.WriteLine("user.ProfilePicture.ImageUrl: " + user.ProfilePicture.ImageUrl);
+                user.ProfilePictureUrl = await photoService.UploadProfilePictureAsync(viewModel.ImageUpload, user);
+                
+
+                var result = await manager.UpdateAsync(user);
+                System.Diagnostics.Debug.WriteLine("result.Succeeded: " + result.Succeeded);
+
+                return RedirectToAction("Index");
+            }
+
+            return View(viewModel);
+        }
         
     }
 

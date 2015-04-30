@@ -22,14 +22,18 @@
         <tr class="review-row">
             <td>
                 <div id="review">
-                    <div style="float: left; overflow: hidden">
+
+                    <!-- PROFILE PICTURE -->
+                    <div style="float: left; min-width:75px; max-width:75px; overflow: hidden">
                         <img id="@item.Sender.UserName"
-                             src="http://eraser2.heidi.ie/wp-content/plugins/all-in-one-seo-pack-pro/images/default-user-image.png"
+                             src="@Url.Content(item.Sender.ProfilePictureUrl)"
                              title="@item.Sender.UserName"
                              alt="@item.Sender.UserName"
-                             style="width: 75px; height: auto;" />
+                             style="width: auto; height: 75px; margin: 0 auto" />
                     </div>
-                    <div style="padding-left: 20px; height: 75px; overflow: hidden;">
+
+                    <!-- CONFIRMATION -->
+                    <div style="padding-left: 90px; height: 75px;">
                         <b>@Html.ActionLink((string) item.Sender.UserName, "Index", "Profile", new { Username = item.Sender.UserName }, null)</b>
 
                         @if (item.Sender.Private == false)
@@ -39,12 +43,10 @@
                         
                         <br />
 
-                        <button class="btn btn-success active" onclick="location.href='@Url.Action("ConfirmConnect",
-                            "Profile", new { username = item.Sender.UserName })'">
+                        <button class="btn btn-success active" onclick="location.href='@Url.Action("ConfirmConnect", "Profile", new { username = item.Sender.UserName })'">
                             Confirm
                         </button>
-                        <button class="btn btn-danger active" onclick="location.href='@Url.Action("DenyConnect",
-                            "Profile", new { username = item.Sender.UserName })'">
+                        <button class="btn btn-danger active" onclick="location.href='@Url.Action("DenyConnect", "Profile", new { username = item.Sender.UserName })'">
                             Deny
                         </button>
                     </div>

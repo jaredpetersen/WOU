@@ -7,6 +7,7 @@ namespace TentsNTrails.Migrations
     {
         public override void Up()
         {
+            
             CreateTable(
                 "dbo.ConnectionRequests",
                 c => new
@@ -256,6 +257,7 @@ namespace TentsNTrails.Migrations
         
         public override void Down()
         {
+            
             DropForeignKey("dbo.AspNetUserRoles", "RoleId", "dbo.AspNetRoles");
             DropForeignKey("dbo.Connections", "User2_Id", "dbo.AspNetUsers");
             DropForeignKey("dbo.Connections", "User1_Id", "dbo.AspNetUsers");
@@ -320,6 +322,7 @@ namespace TentsNTrails.Migrations
             DropTable("dbo.LocationFlags");
             DropTable("dbo.AspNetUsers");
             DropTable("dbo.ConnectionRequests");
+            
         }
     }
 }

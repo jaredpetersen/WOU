@@ -6,6 +6,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TentsNTrails.Models
 {
@@ -28,12 +29,27 @@ namespace TentsNTrails.Models
         public String LastName { get; set; }
         public bool Private { get; set; }
         public string About { get; set; }
+        private string profilePictureUrl;
+        public string ProfilePictureUrl
+        { 
+            get
+            {
+                return profilePictureUrl == null ? Image.DEFAULT_PROFILE_PICTURE_URL : profilePictureUrl;
+            }
+            set
+            {
+                profilePictureUrl = value;
+            }
+        }
+
         public List<UserRecreation> UserActivities { get; set; }
         public virtual List<Review> UserReviews { get; set; }
         public virtual List<LocationFlag> BeenThereLocations { get; set; }
         public virtual List<LocationFlag> WantToGoLocations { get; set; }
         public virtual List<LocationFlag> GoAgainLocations { get; set; }
-        public virtual List<Image> UserLocationImages { get; set; }
+        public virtual List<LocationImage> UserLocationImages { get; set; }
+        public virtual List<Video> UserLocationVideos { get; set; }
+        public virtual List<Notification> Notifications { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<User> manager)
         {
@@ -42,6 +58,5 @@ namespace TentsNTrails.Models
             // Add custom user claims here
             return userIdentity;
         }
-
     }
 }
