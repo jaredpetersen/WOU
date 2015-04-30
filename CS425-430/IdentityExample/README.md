@@ -10,7 +10,7 @@ http://blogs.msdn.com/b/webdev/archive/2013/10/20/building-a-simple-todo-applica
 
 Short Tutorial
 ==============
-All of this information is located in the above linked tutorial, but it requires some digging to get through. I've reproduced a shortened version that relates to this specific project. It should be enough to get you going. For more in-depth information, please go read through their full tutorial. 
+All of this information is located in the above linked tutorial, but it requires some digging to get through. I've reproduced a shortened version that relates to what we're doing and it should be enough to get you going. For more in-depth information, please go read through their full tutorial.
 
 Please note that you will need to add additional `using` statements at the top of the various files that we are creating/editing. They will not be mentioned here, but Visual Studio will correct these issues if you right click the section of code that is having issues.
 
