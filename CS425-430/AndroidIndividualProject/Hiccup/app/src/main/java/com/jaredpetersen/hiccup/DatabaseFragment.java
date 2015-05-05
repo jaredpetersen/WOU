@@ -103,9 +103,9 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener, 
         detailIntent.putExtra("esrb", esrb);
 
 
-
         // start the next Activity using your prepared Intent
         startActivity(detailIntent);
+
         g.getCollection().loadCollection();
     }
 

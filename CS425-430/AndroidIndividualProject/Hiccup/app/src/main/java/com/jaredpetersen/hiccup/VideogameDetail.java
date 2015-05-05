@@ -35,6 +35,10 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
     Globals g = Globals.getInstance();
     String userID = g.getData();
     String gameID;
+    String consoleName;
+    String gameTitle;
+    String releaseDate;
+    String esrb;
     private static final String QUERY_URL = "http://www.wou.edu/~jpetersen11/api/ownershiptwo.php";
 
     @Override
@@ -47,25 +51,27 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
         // Enable the "Up" button for more navigation options
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        gameID = this.getIntent().getExtras().getString("gameID");
-        String gameTitle = this.getIntent().getExtras().getString("title");
-        String consoleName = this.getIntent().getExtras().getString("consoleName");
-        String releaseDate = this.getIntent().getExtras().getString("releaseDate");
+        // Only checking if gameID is null because the others will be null also if gameID is null
+        // Have to use this check because hitting the back button on AddCollection will call
+        // onCreate, which will break everything if it does all of this stuff
+        if (gameID == null) {
+            gameID = this.getIntent().getExtras().getString("gameID");
+            gameTitle = this.getIntent().getExtras().getString("title");
+            consoleName = this.getIntent().getExtras().getString("consoleName");
+            releaseDate = this.getIntent().getExtras().getString("releaseDate");
 
-        // Need to convert release date format
-        SimpleDateFormat databaseFormat = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat displayFormat = new SimpleDateFormat("MM/dd/yyyy");
+            // Need to convert release date format
+            SimpleDateFormat databaseFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat displayFormat = new SimpleDateFormat("MM/dd/yyyy");
 
-        try
-        {
-            releaseDate = displayFormat.format(databaseFormat.parse(releaseDate));
+            try {
+                releaseDate = displayFormat.format(databaseFormat.parse(releaseDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            esrb = this.getIntent().getExtras().getString("esrb");
         }
-        catch (ParseException e)
-        {
-            e.printStackTrace();
-        }
-
-        String esrb = this.getIntent().getExtras().getString("esrb");
 
         TextView titleTV = (TextView) findViewById(R.id.game_title);
         titleTV.setText(gameTitle);
@@ -81,6 +87,7 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
 
         addToCollection = (Button) findViewById(R.id.add_collection_button);
         addToCollection.setOnClickListener(this);
+
 
         // Access the imageview from XML
         //ImageView imageView = (ImageView) findViewById(R.id.img_cover);
@@ -119,14 +126,15 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-        addToCollection();
+        // create an Intent to take you over to a new AddCollection activity
+        Intent collectionIntent = new Intent(this, AddCollection.class);
+        collectionIntent.putExtra("gameID", gameID);
+        startActivity(collectionIntent);
+
+        //addToCollection();
         // Refresh the collection
-        g.getCollection().loadCollection();
-        addToCollection.setEnabled(false);
-        /*final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.detach(g.getCollection());
-        ft.attach(g.getCollection());
-        ft.commit();*/
+        //g.getCollection().loadCollection();
+        //addToCollection.setEnabled(false);
     }
 
     private void addToCollection()
@@ -147,7 +155,7 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
 
                     @Override
                     public void onFailure(int statusCode, Throwable throwable, JSONObject error) {
-                        Log.e("hookamooka", "This was fail ");
+                        Log.e("hookamooka", "This was fail");
                     }
                 });
     }

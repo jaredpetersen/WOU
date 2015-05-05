@@ -11,5 +11,15 @@
     <string name="releaseDateHead">Release Date:</string>
     <string name="esrbHead">ESRB Rating:</string>
     <string name="add_collection_button">Add to Collection</string>
+    <string name="title_activity_add_collection">Add to Collection</string>
+    <string name="incomplete_def_head">Incomplete</string>
+    <string name="incomplete_def_body">You have not reached the game\'s ending credits</string>
+    <string name="beat_def_head">Beat</string>
+    <string name="beat_def_body">You have reached the game\'s ending credits</string>
+    <string name="complete_def_head">Complete</string>
+    <string name="complete_def_body">You have done everything that can be done</string>
+    <string name="incomplete_button">Mark Incomplete</string>
+    <string name="beat_button">Mark Beat</string>
+    <string name="complete_button">Mark Complete</string>
 
 </resources>

@@ -45,9 +45,6 @@ public class CollectionFragment extends Fragment implements AdapterView.OnItemCl
         // Access the ListView
         mainListView = (ListView) v.findViewById(R.id.collection_listview);
 
-        // Access the TextView
-        //resultsTextView = (TextView) v.findViewById(R.id.collection_no_results);
-
         mJSONAdapter = new JSONAdapter(getActivity(), getActivity().getLayoutInflater());
         mainListView.setAdapter(mJSONAdapter);
 
