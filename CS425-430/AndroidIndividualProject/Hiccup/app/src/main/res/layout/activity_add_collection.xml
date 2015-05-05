@@ -84,9 +84,25 @@
         android:id="@+id/complete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="20dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:text="@string/complete_button" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15dp"
+        android:textStyle="bold"
+        android:textColor="@color/actionbargray"
+        android:text="@string/status_head"/>
+    <TextView
+        android:id="@+id/completion_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:textColor="@color/actionbargray"
+        android:textSize="15dp"
+        />
 
 </LinearLayout>

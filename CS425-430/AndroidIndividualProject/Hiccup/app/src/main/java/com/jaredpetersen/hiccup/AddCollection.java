@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -24,6 +25,8 @@ public class AddCollection extends ActionBarActivity implements View.OnClickList
     Globals g = Globals.getInstance();
     String userID = g.getData();
     String gameID;
+    String status;
+    TextView statusTV;
     private static final String QUERY_URL = "http://www.wou.edu/~jpetersen11/api/ownershiptwo.php";
 
     @Override
@@ -32,6 +35,7 @@ public class AddCollection extends ActionBarActivity implements View.OnClickList
         setContentView(R.layout.activity_add_collection);
 
         gameID = this.getIntent().getExtras().getString("gameID");
+        status = this.getIntent().getExtras().getString("status");
 
         markIncomplete = (Button) findViewById(R.id.incomplete_button);
         markIncomplete.setOnClickListener(this);
@@ -41,6 +45,9 @@ public class AddCollection extends ActionBarActivity implements View.OnClickList
 
         markComplete = (Button) findViewById(R.id.complete_button);
         markComplete.setOnClickListener(this);
+
+        statusTV = (TextView) findViewById(R.id.completion_status);
+        statusTV.setText(status);
     }
 
     @Override
@@ -66,11 +73,32 @@ public class AddCollection extends ActionBarActivity implements View.OnClickList
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(View v)
+    {
+        switch (v.getId()) {
 
+            case R.id.incomplete_button:
+                addToCollection("1");
+                statusTV.setText("Incomplete");
+                break;
+
+            case R.id.beat_button:
+                addToCollection("2");
+                statusTV.setText("Beat");
+                break;
+
+            case R.id.complete_button:
+                addToCollection("3");
+                statusTV.setText("Complete");
+                break;
+
+            default:
+                statusTV.setText("Unowned");
+                break;
+        }
     }
 
-    private void addToCollection()
+    private void addToCollection(String collectionStatus)
     {
         // Create a client to perform networking
         AsyncHttpClient client = new AsyncHttpClient();
@@ -78,6 +106,7 @@ public class AddCollection extends ActionBarActivity implements View.OnClickList
         RequestParams params = new RequestParams();
         params.put("game", gameID);
         params.put("user", userID);
+        params.put("status", collectionStatus);
         params.put("key", "R@inDr0psOnro53s?");
 
         // Have the client post data to the site

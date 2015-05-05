@@ -32,6 +32,7 @@ public class CollectionFragment extends Fragment implements AdapterView.OnItemCl
     JSONAdapter mJSONAdapter;
     ArrayList mGameList = new ArrayList();
     String userID = ((MainActivity)getActivity()).userID;
+    Globals g = Globals.getInstance();
     private static final String QUERY_URL = "http://www.wou.edu/~jpetersen11/api/ownership.php?&key=R@inDr0psOnro53s?&user=";
 
     @Override
@@ -51,6 +52,8 @@ public class CollectionFragment extends Fragment implements AdapterView.OnItemCl
         mainListView.setOnItemClickListener(this);
 
         loadCollection();
+
+        g.setCollection(this);
 
         return v;
     }

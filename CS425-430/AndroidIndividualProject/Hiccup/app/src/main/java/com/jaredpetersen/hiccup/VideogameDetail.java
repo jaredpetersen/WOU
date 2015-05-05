@@ -19,8 +19,11 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -39,7 +42,8 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
     String gameTitle;
     String releaseDate;
     String esrb;
-    private static final String QUERY_URL = "http://www.wou.edu/~jpetersen11/api/ownershiptwo.php";
+    TextView completionStatusTV;
+    private static final String QUERY_URL = "http://www.wou.edu/~jpetersen11/api/ownershipthree.php?key=R@inDr0psOnro53s?&user=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +77,8 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
             esrb = this.getIntent().getExtras().getString("esrb");
         }
 
+        Log.e("hookamooka", "Videogame Detail gameID = " + gameID);
+
         TextView titleTV = (TextView) findViewById(R.id.game_title);
         titleTV.setText(gameTitle);
 
@@ -85,9 +91,12 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
         TextView esrbTV = (TextView) findViewById(R.id.esrb);
         esrbTV.setText(esrb);
 
+        getCompletionStatus();
+
+        completionStatusTV = (TextView) findViewById(R.id.completion_status);
+
         addToCollection = (Button) findViewById(R.id.add_collection_button);
         addToCollection.setOnClickListener(this);
-
 
         // Access the imageview from XML
         //ImageView imageView = (ImageView) findViewById(R.id.img_cover);
@@ -116,6 +125,7 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
         else if (id == R.id.action_logout) {
             // This will delete the stored credentials and return to the login activity
             finish();
+            //getParent().finish();
             Intent i = new Intent(VideogameDetail.this, LoginActivity.class);
             startActivity(i);
             return true;
@@ -129,33 +139,44 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
         // create an Intent to take you over to a new AddCollection activity
         Intent collectionIntent = new Intent(this, AddCollection.class);
         collectionIntent.putExtra("gameID", gameID);
+        // Definitely not the best practice, but it's 2:39 AM on a Monday, so...
+        collectionIntent.putExtra("status", completionStatusTV.getText());
         startActivity(collectionIntent);
 
         //addToCollection();
         // Refresh the collection
-        //g.getCollection().loadCollection();
-        //addToCollection.setEnabled(false);
+        g.getCollection().loadCollection();
     }
 
-    private void addToCollection()
-    {
+    private void getCompletionStatus() {
+
         // Create a client to perform networking
         AsyncHttpClient client = new AsyncHttpClient();
 
-        RequestParams params = new RequestParams();
-        params.put("game", gameID);
-        params.put("user", userID);
-        params.put("key", "R@inDr0psOnro53s?");
+        Log.e("hookamooka", QUERY_URL + userID + "&game=" + gameID);
 
-        // Have the client post data to the site
-        client.post(QUERY_URL, params,
+        // Have the client get a JSONArray of data
+        // and define how to respond
+        client.get(QUERY_URL + userID + "&game=" + gameID,
                 new JsonHttpResponseHandler() {
+
                     @Override
-                    public void onSuccess(JSONObject jsonObject) { }
+                    public void onSuccess(JSONObject jsonObject) {
+                        // Check if the JSON has items in it
+                        if (jsonObject.optJSONArray("results") != null)
+                        {
+                            completionStatusTV.setText(jsonObject.optJSONArray("results").optJSONObject(0).optString("status"));
+                        }
+                        else
+                        {
+                            completionStatusTV.setText("Unowned");
+                        }
+                    }
 
                     @Override
                     public void onFailure(int statusCode, Throwable throwable, JSONObject error) {
-                        Log.e("hookamooka", "This was fail");
+                        // Log error message
+                        Log.e("hookamooka", statusCode + " " + throwable.getMessage());
                     }
                 });
     }

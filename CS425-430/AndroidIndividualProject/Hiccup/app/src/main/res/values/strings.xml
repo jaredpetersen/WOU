@@ -21,5 +21,6 @@
     <string name="incomplete_button">Mark Incomplete</string>
     <string name="beat_button">Mark Beat</string>
     <string name="complete_button">Mark Complete</string>
+    <string name="status_head">Completion Status:</string>
 
 </resources>

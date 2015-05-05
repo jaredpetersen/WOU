@@ -90,6 +90,8 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener, 
         String releaseDate = jsonObject.optString("releaseDate","");
         String consoleName = jsonObject.optString("consoleName","");
         String esrb = jsonObject.optString("esrb","");
+        String completionStatusID = jsonObject.optString("completionStatusID","");
+        Log.e("hookamooka", completionStatusID);
 
         // create an Intent to take you over to a new DetailActivity
         Intent detailIntent = new Intent(getActivity(), VideogameDetail.class);
@@ -125,6 +127,8 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener, 
 
         // Create a client to perform networking
         AsyncHttpClient client = new AsyncHttpClient();
+
+        Log.e("hookamooka", QUERY_URL + urlString);
 
         // Have the client get a JSONArray of data
         // and define how to respond
