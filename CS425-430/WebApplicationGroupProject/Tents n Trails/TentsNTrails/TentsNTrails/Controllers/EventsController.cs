@@ -59,6 +59,17 @@ namespace TentsNTrails.Controllers
             {
                 ViewBag.Join = true;
             }
+
+            var commentList = db.EventComments.Where(e => e.EventID == id).ToList();
+            if (commentList.Count == 0)
+            {
+                ViewBag.HasComments = false;
+            }
+            else
+            {
+                ViewBag.HasComments = true;
+            }
+
             return View(events);
         }
 
@@ -78,6 +89,11 @@ namespace TentsNTrails.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "EventID,Name,Description,Date,LocationID")] Events events)
         {
+            if (events.Date < DateTime.Now)
+            {
+                ModelState.AddModelError("", "The date must be in the future.");
+            }
+
             if (ModelState.IsValid)
             {
                 events.Organizer = manager.FindById(User.Identity.GetUserId());

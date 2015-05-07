@@ -27,156 +27,383 @@ namespace TentsNTrails.Controllers
             manager = new UserManager<User>(new UserStore<User>(db));
         }
 
+        // ************************************************************************************************************
+        // INDEX
+        // ************************************************************************************************************
 
         // GET: Location
-        public ActionResult Index(int? recreationID, string sortOrder, string currentFilter, string searchString, int? page)
+        public ActionResult Index(int? recreationID, string sortOrder, string currentFilter)
         {
             // *************************************************
             // sorting by rating functionality
             // *************************************************
 
-            // calculate lat/long centerpoint for map
-            double centerLatitude = 0;
-            double centerLongitude = 0;
-
-
             // ViewModel
-            LocationViewModel viewModel = new LocationViewModel();
+            LocationIndexViewModel viewModel = new LocationIndexViewModel();
             viewModel.Recreations = db.Recreations.ToList();
-            var locations = new List<Location>();
 
             // *************************************************
             // filter by Recreation
             // *************************************************            
             if (recreationID.HasValue)
             {
-                List<LocationRecreation> locationRecreations = db.LocationRecreations
-                    .Include(lr => lr.Location)
+                viewModel.Locations = db.LocationRecreations
                     .Where(lr => lr.RecreationID == recreationID)
-                    .ToList();
-                foreach(LocationRecreation lr in locationRecreations)
-                {
-                    locations.Add(lr.Location);
-                }
+                    .Select(lr => lr.Location).ToList();
             }
             else
             {
-                locations = db.Locations
+                viewModel.Locations = db.Locations
                     .Include(l => l.Recreations)
                     .ToList();
             }
 
-
-            // *************************************************
-            // calculate center of map display
-            // *************************************************            
-            //safety check for if no coordinates (default to Center of USA)
-            int count = locations.Count();
-
-            // TODO: center calculation is wrong.  http://www.geomidpoint.com/calculation.html
-            /*
-            if (count == 0)
-            {
-                centerLatitude = 39.8282;
-                centerLongitude = -98.5795;
-            }
-            // find center of coordinates
-            
-            else
-            {
-                // count them up
-                foreach (var location in db.Locations)
-                {
-                    centerLatitude += location.Latitude;
-                    centerLongitude += location.Longitude;
-                }
-
-                // average them
-                centerLatitude /= count;
-                centerLongitude /= count;
-            }
-            
-            //set values to viewbag
-            ViewBag.centerLatitude = centerLatitude;
-            ViewBag.centerLongitude = centerLongitude;
-
-            */
-
-            ViewBag.centerLatitude = 39.8282;
-            ViewBag.centerLongitude = -98.5795;
             // *************************************************
             // sort by name, rating, and difficulty
             // *************************************************
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewBag.RatingSortParm = sortOrder == "Rating" ? "rating_desc" : "Rating";
             ViewBag.DifficultySortParm = sortOrder == "difficulty_desc" ? "Difficulty" : "difficulty_desc";
-            
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                page = 1;
-                locations = locations.Where(l => l.Label.ToLower().Contains(searchString.ToLower()) || l.State == searchString.ToUpper()).ToList();
-                // If the search returns only one result, just go to the details page automatically
-                if (locations.Count == 1)
-                {
-                    return RedirectToAction("Details/" + locations.ElementAt(0).LocationID, "Location");
-                }
-            }
-            switch (sortOrder)
-            {
-                case "name_desc":
-                    locations = locations.OrderByDescending(l => l.Label).ToList();
-                    break;
-                case "Rating":
-                    locations = locations.OrderBy(l => l.Rating()).ToList();
-                    break;
-                case "rating_desc":
-                    locations = locations.OrderByDescending(l => l.Rating()).ToList();
-                    break;
-                case "Difficulty":
-                    locations = locations.OrderBy(l => l.Difficulty).ToList();
-                    break;
-                case "difficulty_desc":
-                    locations = locations.OrderByDescending(l => l.Difficulty).ToList();
-                    break;
-                default:
-                    locations = locations.OrderBy(l => l.Label).ToList();
-                    break;
-            }
 
-            //TOP RATED LOCATIONS LIST
-            int topRatingCount = 5;
-            // Divide the total number of ratings by the number of locations to get
-            // We decided that the top rated locations have to have at least half as many votes as average
-            int avgRatingsPerLocation = -1;
-            if (locations.Count() != 0)
+            // *************************************************
+            // LOCATION LISTS
+            // *************************************************
+            viewModel.TopRatedLocations = GetTopRatedLocations(5);
+            viewModel.MostRecentLocations = GetMostRecentLocations(5);
+            if (User.Identity.IsAuthenticated)
             {
-                avgRatingsPerLocation = db.Reviews.Count() / locations.Count();
+                viewModel.PersonalRecommendations = GetPersonalRecommendations(5);
+                viewModel.FriendRecommendations = GetFriendRecommendations(5);
             }
-            else
-            {
-                avgRatingsPerLocation = 1;
-            }
-            int minRatings = (int) (.5 * avgRatingsPerLocation);
-            foreach (var l in locations)
-            {
-
-            }
-            viewModel.TopRatedLocations = locations.Where(l => (l.UpVotes() + l.DownVotes()) > minRatings)
-                .OrderByDescending(l => l.Rating()).Take(topRatingCount).ToList();
-
-            // PAGING
-            int pageSize = 10;
-            int pageNumber = (page ?? 1);
-            viewModel.Locations = locations.ToPagedList(pageNumber, pageSize);
-
-            //Find if current user is an admin
-            ViewBag.IsAdmin = User.IsInRole("Admin");
-
-            // FOR RATING THUMB COLORS
-            viewModel.Ratings = getRatingsForLocations(locations);
+            // *************************************************
+            // calculate center of map display
+            // *************************************************    
+            Location center = GetLatLongCenter(viewModel.Locations);
+            System.Diagnostics.Debug.WriteLine("centerLatitude:  " + center.Latitude);
+            System.Diagnostics.Debug.WriteLine("centerLongitude: " + center.Longitude);
+            ViewBag.centerLatitude = center.Latitude;
+            ViewBag.centerLongitude = center.Longitude;
 
             return View(viewModel);
         }
+
+
+        // ************************************************************************************************************
+        // LIST HELPER METHODS
+        // ************************************************************************************************************
+
+        /// <summary>
+        /// Get the specified amount of Top-Rated Locations.
+        /// </summary>
+        /// <param name="amount">The amount to get.</param>
+        /// <returns>A list of Locations.</returns>
+        public List<Location> GetTopRatedLocations(int amount)
+        {
+            // Divide the total number of ratings by the number of locations to get
+            // We decided that the top rated locations have to have at least half as many votes as average
+            int LocationCount = db.Locations.Count();
+            int avgRatingsPerLocation = -1;
+
+            if (LocationCount != 0)avgRatingsPerLocation = db.Reviews.Count() / LocationCount;
+            else avgRatingsPerLocation = 1;
+            
+            int minRatings = (int)(.5 * avgRatingsPerLocation);
+            var locations =  db.Locations.Where(l => l.Reviews.Count() > minRatings);
+            return SortByRatingAndTake(locations, amount);
+
+            /*
+            int minRatings = (int)(.5 * avgRatingsPerLocation);
+            return db.Locations
+                .Where(l => l.Reviews.Count() > minRatings)
+                .OrderByDescending(l => 
+                    l.Reviews.Where(r => r.Rating).Count()
+                    /l.Reviews.Count()
+                ).Take(amount).ToList();
+             */
+        }
+
+        /// <summary>
+        /// Get the specified amount of most recently added Locations.
+        /// </summary>
+        /// <param name="amount">The amount to get.</param>
+        /// <returns>A list of Locations.</returns>
+        public List<Location> GetMostRecentLocations(int amount)
+        {
+            return db.Locations
+                .OrderByDescending(l => l.DateCreated)
+                .ThenByDescending(l =>
+                    l.Reviews.Where(r => r.Rating).Count()
+                    / ( (double) (l.Reviews.Count() == 0 ? 1 : l.Reviews.Count()) )
+                )
+                .Take(amount).ToList();
+        }
+
+        /// <summary>
+        /// Get a list of locations that are recommended by the website based on your personal interests.
+        /// </summary>
+        /// <returns>A list of Locations.</returns>
+        public List<Location> GetPersonalRecommendations(int amount)
+        {
+            System.Diagnostics.Debug.WriteLine(String.Format("GetPersonalRecommendations({0}", amount));
+            // ensure user is logged in.
+            if (!User.Identity.IsAuthenticated)
+            {
+                System.Diagnostics.Debug.WriteLine("User not authenticated.");
+                return new List<Location>();
+            }
+
+            User user = db.Users.Find(User.Identity.GetUserId());
+
+            // get all Recreations the user partakes in.
+            var userActivities = db.UserRecreations.Where(r =>
+                    r.User.Equals(user.Id)
+                    && r.IsChecked
+                ).Select(r => r.Recreation);
+            //if (userActivities.Count() == 0) userActivities = db.Recreations;
+            
+            // get all positively reviewed Locations by the user
+            var reviews = db.Reviews.Where(r =>
+                    r.User.Id.Equals(user.Id)
+                );
+
+            // get all matching bookmarked Locations by the user
+            var bookmarkedLocations = db.LocationFlags.Where(f =>
+                    f.User.Id.Equals(user.Id)
+                    && f.Flag == Flag.HaveBeen
+                    || f.Flag == Flag.WantToGo
+                ).Select(f => f.Location);
+
+            System.Diagnostics.Debug.WriteLine(String.Format("userActivities.Count(): {0}", userActivities.Count()));
+            foreach (Recreation r in userActivities)
+            {
+                System.Diagnostics.Debug.WriteLine(String.Format("Recreation: {0}", r.Label));
+            }
+            System.Diagnostics.Debug.WriteLineIf(userActivities.Count() > 0, "");
+
+
+
+            System.Diagnostics.Debug.WriteLine(String.Format("reviews.Count(): {0}", reviews.Count()));
+            foreach (Review r in reviews)
+            {
+                System.Diagnostics.Debug.WriteLine(String.Format("Location: {0}    Vote: {1}    Review: {2}", r.Location.Label, (r.Rating ? "Up":"Down"), (r.Comment ?? "NULL")));
+            }
+            System.Diagnostics.Debug.WriteLineIf(reviews.Count() > 0, "");
+
+
+
+            System.Diagnostics.Debug.WriteLine(String.Format("bookmarkedLocations.Count(): {0}", bookmarkedLocations.Count()));
+            foreach (Location l in bookmarkedLocations)
+            {
+                System.Diagnostics.Debug.WriteLine(String.Format("State: {0}    Location: {1}", l.StateID, l.Label));
+            }
+            System.Diagnostics.Debug.WriteLineIf(bookmarkedLocations.Count() > 0, "");
+
+
+
+            // union the locations.
+            IQueryable<Location> locations = null;
+
+            // case 1: use has bookmarks and reviews
+            if (bookmarkedLocations.Count() != 0 && reviews.Count() != 0)
+            {
+                System.Diagnostics.Debug.WriteLine("case 1: use has bookmarks and reviews");
+                if (userActivities.Count() > 0)
+                {
+                    locations = reviews
+                        .Where(r => r.Rating)
+                        .Select(r=> r.Location)
+                        .Union(bookmarkedLocations)
+                        .Where(l => l.Recreations.Intersect(userActivities).Count() > 0);
+                }
+                else
+                {
+                    locations = reviews
+                        .Where(r => r.Rating)
+                        .Select(r => r.Location)
+                        .Union(bookmarkedLocations);
+                }
+                
+            }
+            // case 2: user has no bookmarks
+            else if (bookmarkedLocations.Count() == 0 && reviews.Count() != 0) 
+            {
+                System.Diagnostics.Debug.WriteLine("case 2: user has no bookmarks but has reviews");
+                if (userActivities.Count() > 0)
+                {
+                    locations = reviews
+                        .Where(r => r.Rating)
+                        .Select(r => r.Location)
+                        .Where(l => l.Recreations.Intersect(userActivities).Count() > 0);
+                }
+                else
+                {
+                    locations = reviews
+                        .Where(r => r.Rating)
+                        .Select(r => r.Location); 
+                }
+            }
+
+            // case 3: user has no reviews
+            else if (reviews.Count() == 0)
+            {
+                System.Diagnostics.Debug.WriteLine("case 3: user has bookmarks but no reviews");
+                if (userActivities.Count() > 0)
+                {
+                    locations = bookmarkedLocations.Where(l => 
+                        l.Recreations.Intersect(userActivities).Count() > 0);
+                }
+                else
+                {
+                    locations = bookmarkedLocations;
+                }
+            }
+            // case 4: user has no bookmarks or reviews
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("case 3: user has neither bookmarks or reviews");
+                if (userActivities.Count() > 0)
+                {
+                    System.Diagnostics.Debug.WriteLine("case 3: user has bookmarks but no reviews");
+                    locations = db.Locations.Where(l =>
+                        l.Recreations.Intersect(userActivities).Count() > 0);
+                }
+                else
+                {
+                    locations = db.Locations.Select(l => l);
+                }
+            }
+
+            System.Diagnostics.Debug.WriteLine(String.Format("locations.Count(): {0}", locations.Count()));
+            foreach (Location l in locations)
+            {
+                System.Diagnostics.Debug.WriteLine(String.Format("State: {0}    Location: {1}", l.StateID, l.Label));
+            }
+            System.Diagnostics.Debug.WriteLineIf(locations.Count() > 0, "");
+
+
+            var states = locations.Select(u => u.StateID);
+
+            System.Diagnostics.Debug.WriteLine(String.Format("states.Count(): {0}", states.Count()));
+            foreach (string s in states)
+            {
+                System.Diagnostics.Debug.WriteLine(s);
+            }
+            System.Diagnostics.Debug.WriteLineIf(states.Count() > 0, "");
+
+
+            // finally, get all locations in the states of the result that are not already in result, or have reviews.
+            var result = db.Locations.Where(l =>
+                   states.Contains(l.StateID)
+                   && !locations.Contains(l)
+                   && !reviews.Select(r => r.LocationID).Contains(l.LocationID)
+               );
+
+           
+
+            System.Diagnostics.Debug.WriteLine(String.Format("result.Count(): {0}", result.Count()));
+            foreach (Location l in bookmarkedLocations)
+            {
+                System.Diagnostics.Debug.WriteLine(String.Format("State: {0}    Location: {1}", l.StateID, l.Label));
+            }
+            System.Diagnostics.Debug.WriteLineIf(result.Count() > 0, "");
+
+            return SortByRatingAndTake(result, amount);
+        }
+
+        /// <summary>
+        /// Get a list of locations that are recommended by the website based on your friends like.
+        /// </summary>
+        /// <param name="amount">The number of results to return.</param>
+        /// <returns>A list locations, sorted by rating.</returns>
+        public List<Location> GetFriendRecommendations(int amount)
+        {
+            System.Diagnostics.Debug.WriteLine("GetFriendRecommendations()");
+
+            //find the current User
+            User currentUser = db.Users.Find(User.Identity.GetUserId());
+            System.Diagnostics.Debug.WriteLine(String.Format("currentUser: {0}", currentUser.UserName));
+
+            // Union Connection where the current User matches either User1 or User2, but select the other one (the connected User) 
+            var connectedUsers =
+                db.Connections.Where(c =>
+                    c.User1.UserName.Equals(currentUser.UserName)
+                )
+                .Select(c => c.User2)
+                .Union(
+                    db.Connections.Where(c =>
+                        c.User2.UserName.Equals(currentUser.UserName)
+                    )
+                    .Select(c => c.User1)
+                );
+
+            // print friend details
+            System.Diagnostics.Debug.WriteLine(String.Format("connectedUsers.Count(): {0}", connectedUsers.Count()));
+            foreach (User user in connectedUsers)
+            {
+                System.Diagnostics.Debug.WriteLine(String.Format("User: {0}", user.UserName));
+            }
+            System.Diagnostics.Debug.WriteLineIf(connectedUsers.Count() > 0, "");
+
+            // get positive reviews by friends
+            var positiveReviews = connectedUsers
+                .Select(user => user.UserReviews)
+                .SelectMany(review => review)
+                .Where(review => review.Rating);
+
+            // print review details
+            System.Diagnostics.Debug.WriteLine(String.Format("positiveReviews.Count(): {0}", positiveReviews.Count()));
+            foreach (Review r in positiveReviews)
+            {
+                System.Diagnostics.Debug.WriteLine(String.Format("Location: {0}    Vote: {1}    Review: {2}", r.Location.Label, (r.Rating ? "Up" : "Down"), (r.Comment ?? "NULL")));
+
+            }
+            System.Diagnostics.Debug.WriteLineIf(positiveReviews.Count() > 0, "");
+
+            var locations = positiveReviews
+                .Select(r => r.Location)
+                .Distinct();
+
+            System.Diagnostics.Debug.WriteLine(String.Format("locations.Count(): {0}", locations.Count()));
+            foreach (Location l in locations)
+            {
+                System.Diagnostics.Debug.WriteLine(String.Format("State: {0}    Location: {1}", l.StateID, l.Label));
+            }
+            System.Diagnostics.Debug.WriteLineIf(locations.Count() > 0, "");
+
+            return SortByRatingAndTake(locations, amount);
+        }
+
+        /// <summary>
+        /// Convenience method for taking a raw IQueryable of type Location, ordering in descending order by
+        /// the rating, and taking a set amount to return as a proper List.
+        /// </summary>
+        /// <param name="locations">The raw IQueryable data</param>
+        /// <param name="amount">The amount to take</param>
+        /// <returns>A List of Locations</returns>
+        public List<Location> SortByRatingAndTake(IQueryable<Location> locations, int amount)
+        {
+            return locations.OrderByDescending(l =>
+                l.Reviews.Where(r => r.Rating).Count()
+                / ( (double) (l.Reviews.Count() == 0 ? 1 : l.Reviews.Count()) )
+            )
+            .Take(amount)
+            .ToList();
+        }
+
+
+        /// <summary>
+        /// Get All locations which match the passed collection's State, but do not match the ID.
+        /// </summary>
+        /// <param name="locations">A Collection of States.</param>
+        /// <returns>A Collection of States.</returns>
+        public IQueryable<Location> GetOtherLocationsMatchingState(IQueryable<Location> locations)
+        {
+            return db.Locations.Where(l =>
+                   locations.Select(u => u.StateID).Contains(l.StateID)
+                   && !locations.Contains(l)
+               );
+        }
+
 
         // Helper method that returns the ReviewID if this user has made a rating for this location or -1 elsewise
         public int getIdIfRated(int? LocationID)
@@ -231,9 +458,12 @@ namespace TentsNTrails.Controllers
                 }
             }
 
-            return ratings; 
+            return ratings;
         }
 
+        // ************************************************************************************************************
+        // MEDIA
+        // ************************************************************************************************************
 
         // GET: MediaViewModel
         //
@@ -259,22 +489,21 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: Location/Details/5
-        public ActionResult Details(int? id, bool? success)
+        public ActionResult Details(int? id, bool? success, string mergedLocation)
         {
             if (!id.HasValue)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            if (success == true)
-            {
-                ViewBag.SuccessMessage = "Location A has been merged into Location B.";
             }
             Location location = db.Locations.Find(id);
             if (location == null)
             {
                 return HttpNotFound();
             }
-
+            if (success == true && mergedLocation != null)
+            {
+                ViewBag.SuccessMessage = String.Format("{0} has been merged into {1}.", mergedLocation, location.Label);
+            }
             // See if there are any reviews for this location
             var reviews = db.Reviews.Include(r => r.Location);
             var reviewList = reviews.Where(r => r.LocationID == id)
@@ -419,6 +648,11 @@ namespace TentsNTrails.Controllers
             return RedirectToAction("Index", "Location");
         }
 
+
+        // ************************************************************************************************************
+        // CREATE
+        // ************************************************************************************************************
+
         [Authorize]
         // GET: Location/Create
         public ActionResult Create()
@@ -464,8 +698,11 @@ namespace TentsNTrails.Controllers
                 location.Rating();
                 location.UpVotes();
                 location.DownVotes();
-                location.RetrieveFormatedAddress();
-
+                /*
+                location.State = db.States.Where(s =>
+                    s.Abbreviation.Equals(Location.ReverseGeocodeState(location))
+                ).SingleOrDefault();
+                */
                 // save changes
                 db.Locations.Add(location);
                 db.SaveChanges();//must save before we move on so that location gets an ID
@@ -490,7 +727,28 @@ namespace TentsNTrails.Controllers
             }
 
             return View(location);
+        }  
+
+        /// <summary>
+        /// This is the search algorithm used by Location/Index and Location/Browse views.
+        /// </summary>
+        /// <param name="query">The user's raw search query.</param>
+        /// <returns>A List of locations matching the search query.</returns>
+        public List<Location> SearchFor(String query)
+        {
+            query = query.ToLower();
+            List<Location> locations = db.Locations.Where(l => 
+                l.Label.ToLower().Contains(query)
+                || l.StateID.Equals(query)
+                || l.State.Name.Equals(query)
+            ).OrderBy(l => l.Label)
+            .ToList();
+            return locations;
         }
+
+        // ************************************************************************************************************
+        // EDIT
+        // ************************************************************************************************************
 
         // GET: Location/Edit/5
         [Authorize(Roles = "Admin")]
@@ -542,6 +800,10 @@ namespace TentsNTrails.Controllers
             return View(location);
         }
 
+        // ************************************************************************************************************
+        // DELETE
+        // ************************************************************************************************************
+
         // GET: Location/Delete/5
         [Authorize(Roles = "Admin")]
         public ActionResult Delete(int? id)
@@ -569,6 +831,10 @@ namespace TentsNTrails.Controllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
+
+        // ************************************************************************************************************
+        // JOIN
+        // ************************************************************************************************************
 
         // GET: Location
         [Authorize(Roles = "Admin")]
@@ -705,7 +971,7 @@ namespace TentsNTrails.Controllers
                         ViewBag.SuccessMessage = "Location A successfully merged into Location B.";
 
                         // Redirect to the target location at the end of the merging
-                        return RedirectToAction("Details", new { id = locationB, success = true });
+                        return RedirectToAction("Details", new { id = locationB, success = true, mergedLocation = deleteLocation.Label});
                     }
                     else
                     {
@@ -718,7 +984,7 @@ namespace TentsNTrails.Controllers
                         int pageANumber = (pageA ?? 1);
                         int pageBNumber = (pageB ?? 1);
 
-                        LocationViewModel viewModel = new LocationViewModel();
+                        JoinLocationsViewModel viewModel = new JoinLocationsViewModel();
 
                         if (!String.IsNullOrEmpty(searchStringA))
                         {
@@ -764,7 +1030,7 @@ namespace TentsNTrails.Controllers
                     int pageANumber = (pageA ?? 1);
                     int pageBNumber = (pageB ?? 1);
 
-                    LocationViewModel viewModel = new LocationViewModel();
+                    JoinLocationsViewModel viewModel = new JoinLocationsViewModel();
 
                     if (!String.IsNullOrEmpty(searchStringA))
                     {
@@ -804,7 +1070,7 @@ namespace TentsNTrails.Controllers
                 int pageANumber = (pageA ?? 1);
                 int pageBNumber = (pageB ?? 1);
 
-                LocationViewModel viewModel = new LocationViewModel();
+                JoinLocationsViewModel viewModel = new JoinLocationsViewModel();
 
                 if (!String.IsNullOrEmpty(searchStringA))
                 {
@@ -840,8 +1106,6 @@ namespace TentsNTrails.Controllers
             }
         }
 
-        
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -849,6 +1113,274 @@ namespace TentsNTrails.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        /// <summary>
+        /// Convenience method to calculate the centerpoint of latlong coordinates using trigonometry
+        /// (solution used from http://stackoverflow.com/questions/6671183/calculate-the-center-point-of-multiple-latitude-longitude-coordinate-pairs)
+        /// </summary>
+        /// <param name="locations">The list of locations with latlong data to average.</param>
+        /// <returns>A temp location containing the averaged data.</returns>
+        private Location GetLatLongCenter(ICollection<Location> locations)
+        {
+            int count = locations.Count;
+
+            // return center of US if no locations.
+            if (count == 0)
+            {
+                // for now, use this: the below logic doesn't seem to be too accurate.  it is close, though ...
+                return new Location()
+                {
+                    Latitude = 39.8282,
+                    Longitude = -98.5795
+                };
+            }
+
+            double x = 0;
+            double y = 0;
+            double z = 0;
+
+            foreach(Location l in locations)
+            {
+                // convert to radians
+                double latitude = l.Latitude * Math.PI / 180;
+                double longitude = l.Longitude * Math.PI / 180;
+
+                // convert to cartesian coordinates
+                x += Math.Cos(latitude) * Math.Cos(longitude);
+                y += Math.Cos(latitude) * Math.Sin(longitude);
+                z += Math.Sin(latitude);
+            }
+
+            // average cartesian coordinates
+            x /= count;
+            y /= count;
+            z /= count;
+
+            // convert back to latitude/longitude
+            double hypoteneuse = Math.Sqrt(x * x + y * y);
+            double centerLatitude  = Math.Atan2(z, hypoteneuse) * 180 / Math.PI;
+            double centerLongitude = Math.Atan2(y, x) * 180 / Math.PI;
+
+            // store results in a temporary location.
+            return new Location()
+            {
+                Latitude = centerLatitude,
+                Longitude = centerLongitude
+            };
+        }
+
+        // ************************************************************************************************************
+        // VIEW ALL (simple index: no recommendations or extra lists)
+        // ************************************************************************************************************
+
+        // GET: Location
+        public ActionResult Browse(int? recreationID, string sortOrder, string currentFilter, string query, int? page)
+        {
+            // ViewModel
+            BrowseLocationsViewModel viewModel = new BrowseLocationsViewModel();
+            viewModel.Recreations = db.Recreations.ToList();
+            var locations = new List<Location>();
+
+            // *************************************************
+            // filter by Recreation
+            // *************************************************            
+            if (recreationID.HasValue)
+            {
+                List<LocationRecreation> locationRecreations = db.LocationRecreations
+                    .Include(lr => lr.Location)
+                    .Where(lr => lr.RecreationID == recreationID)
+                    .ToList();
+                foreach (LocationRecreation lr in locationRecreations)
+                {
+                    locations.Add(lr.Location);
+                }
+            }
+            else
+            {
+                locations = db.Locations
+                    .Include(l => l.Recreations)
+                    .ToList();
+            }
+
+            int count = locations.Count();
+
+            // *************************************************
+            // sort by name, rating, and difficulty
+            // *************************************************
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.RatingSortParm = sortOrder == "Rating" ? "rating_desc" : "Rating";
+            ViewBag.DifficultySortParm = sortOrder == "difficulty_desc" ? "Difficulty" : "difficulty_desc";
+
+            if (!String.IsNullOrEmpty(query))
+            {
+                page = 1;
+                locations = SearchFor(query);
+
+                if (locations.Count == 1)
+                {
+                    // If the search returns only one result, just go to the details page automatically
+                    return RedirectToAction("Details/" + locations.ElementAt(0).LocationID, "Location");
+                }
+            }
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    locations = locations.OrderByDescending(l => l.Label).ToList();
+                    break;
+                case "Rating":
+                    locations = locations.OrderBy(l => l.Rating()).ToList();
+                    break;
+                case "rating_desc":
+                    locations = locations.OrderByDescending(l => l.Rating()).ToList();
+                    break;
+                case "Difficulty":
+                    locations = locations.OrderBy(l => l.Difficulty).ToList();
+                    break;
+                case "difficulty_desc":
+                    locations = locations.OrderByDescending(l => l.Difficulty).ToList();
+                    break;
+                default:
+                    locations = locations.OrderBy(l => l.Label).ToList();
+                    break;
+            }
+
+            // PAGING
+            int pageSize = 10;
+            int pageNumber = (page ?? 1);
+            viewModel.Locations = locations.ToPagedList(pageNumber, pageSize); ;
+
+            // *************************************************
+            // calculate center of map display
+            // *************************************************            
+            Location center = GetLatLongCenter(viewModel.Locations.ToList());
+            System.Diagnostics.Debug.WriteLine("centerLatitude:  " + center.Latitude);
+            System.Diagnostics.Debug.WriteLine("centerLongitude: " + center.Longitude);
+            ViewBag.centerLatitude = center.Latitude;
+            ViewBag.centerLongitude = center.Longitude;
+
+            //Find if current user is an admin
+            ViewBag.IsAdmin = User.IsInRole("Admin");
+
+            return View(viewModel);
+        }
+
+
+        // ************************************************************************************************************
+        // REVIEW FORM
+        // ************************************************************************************************************
+
+        // Renders a partial view of a Review Form, with the up and down votes.
+        public PartialViewResult ReviewForm(int id, string redirectAction, string redirectController)
+        {
+            Location location = db.Locations.Find(id);
+            ViewBag.redirectAction = redirectAction ?? "Index";
+            ViewBag.redirectController = redirectController ?? "Location";
+            /*
+            System.Diagnostics.Debug.WriteLineIf(redirectAction != null, "/Location/ReviewForm?redirectAction=" + redirectAction);
+            System.Diagnostics.Debug.WriteLineIf(redirectAction == null, "/Location/ReviewForm?redirectAction=NULL");
+            System.Diagnostics.Debug.WriteLineIf(redirectController != null, "/Location/ReviewForm?redirectController=" + redirectController);
+            System.Diagnostics.Debug.WriteLineIf(redirectController == null, "/Location/ReviewForm?redirectController=NULL");
+            */
+            if (User.Identity.IsAuthenticated)
+            {
+                String userID = User.Identity.GetUserId();
+                // get review of current location and logged in user
+                Review review = db.Reviews.Where(
+                    r => r.LocationID == id && 
+                    r.User.Id.Equals(userID)
+                    ).SingleOrDefault();
+
+                // set viewbag values according to if voted.
+                if (review != null)
+                {
+                    if (review.Rating) ViewBag.UpVoted = true;
+                    else ViewBag.DownVoted = true;
+                }
+            }
+
+            return PartialView(location);
+        }
+
+        // ************************************************************************************************************
+        // LOCATION THUMBNAIL
+        // ************************************************************************************************************
+
+        // renders a square Profile Picture Thumbnail that links to that user.
+        public PartialViewResult LocationThumbnail(int id, int? size)
+        {
+            // get user matching the username, or the current user if it is not present.
+            Location location = db.Locations.Find(id);
+           
+            // put size in the viewbag
+            if (size.HasValue) ViewBag.Size = size;
+            else ViewBag.Size = 100;
+            return PartialView(location);
+        }
+
+        // ************************************************************************************************************
+        // SUMMARY
+        // ************************************************************************************************************
+
+        /// <summary>
+        /// Renders a list display of a Location.  This is used for the new box views of the Location Index.
+        /// </summary>
+        /// <param name="id">The id of the location.</param>
+        /// <param name="imageSize">The size of the image thumbnail to display, in pixels.</param>
+        /// <returns>A partial view with displays some information about a Location.</returns>
+        public PartialViewResult Summary(int? id, int? imageSize)
+        {
+            // find location
+            Location location = db.Locations
+                .Include(l => l.Reviews)
+                .Where(l => l.LocationID == id)
+                .SingleOrDefault();
+
+            // error checking for null case
+            if (location == null) return PartialView(location);
+
+            // load LocationRecreations
+            location.RecOptions = db.LocationRecreations
+                .Include(lr => lr.Recreation)
+                .Where(lr => lr.LocationID == id).ToList();
+
+            // load Recreations
+            location.Recreations = new List<Recreation>();
+            foreach (LocationRecreation lr in location.RecOptions)
+            {
+                location.Recreations.Add(lr.Recreation);
+            }
+            ViewBag.Size = imageSize ?? 100;
+
+            // done
+            return PartialView(location);
+        }
+
+        public PartialViewResult JoinSummary(int? id)
+        {
+            // find location
+            Location location = db.Locations
+                .Include(l => l.Reviews)
+                .Where(l => l.LocationID == id)
+                .SingleOrDefault();
+
+            // error checking for null case
+            if (location == null) return PartialView(location);
+
+            // load LocationRecreations
+            location.RecOptions = db.LocationRecreations
+                .Include(lr => lr.Recreation)
+                .Where(lr => lr.LocationID == id).ToList();
+
+            // load Recreations
+            location.Recreations = new List<Recreation>();
+            foreach (LocationRecreation lr in location.RecOptions)
+            {
+                location.Recreations.Add(lr.Recreation);
+            }
+
+            // done
+            return PartialView(location);
         }
     }
 }

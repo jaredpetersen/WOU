@@ -49,7 +49,8 @@
 
         <!--UPLOAD-->
         <p>
-            @Html.ActionLink("Add an Image", "CreateByUrl", "LocationImage", new { locationID = Model.LocationID }, null)
+            @*Html.ActionLink("Add an Image", "CreateByUrl", "LocationImage", new { locationID = Model.LocationID }, null)*@
+            @Html.ActionLink("Upload an Image", "Upload", "LocationImage", new { locationID = Model.LocationID }, null)
         </p>
     </div>
 </div>

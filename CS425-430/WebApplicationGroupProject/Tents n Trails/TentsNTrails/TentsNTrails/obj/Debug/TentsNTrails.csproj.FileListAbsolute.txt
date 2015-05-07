@@ -124,4 +124,11 @@ C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrail
 C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\bin\zh-Hant\System.Spatial.resources.dll
 C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\Debug\TentsNTrails.Migrations.AddProfilePicture.resources
 C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\Debug\TentsNTrails.Migrations.sprint7.resources
-C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\Debug\TentsNTrails.Migrations.aaronbrokeeverything.resources
+C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\Debug\TentsNTrails.Migrations.Sprint9start.resources
+C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\Debug\TentsNTrails.Migrations.UpdateNotifications.resources
+C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\Debug\TentsNTrails.Migrations.CreateMessageTable.resources
+C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\Debug\TentsNTrails.Migrations.updateRecreationNavProperties.resources
+C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\Debug\TentsNTrails.Migrations.updateEventComment.resources
+C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\Debug\TentsNTrails.Migrations.updateEventComment2.resources
+C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\Debug\TentsNTrails.Migrations.updateEventComment3.resources
+C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\Debug\TentsNTrails.Migrations.updateEventComment4.resources

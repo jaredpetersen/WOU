@@ -29,7 +29,7 @@ namespace TentsNTrails.Controllers
             User currentUser = manager.FindById(User.Identity.GetUserId());
             
             var locationFlags = db.LocationFlags.Include(l => l.Location).
-                Where(l => l.User.Id == currentUser.Id);
+                Where(l => l.User.Id == currentUser.Id).ToList();
 
             LocationFlagViewModel viewModel = new LocationFlagViewModel();
 
@@ -37,6 +37,9 @@ namespace TentsNTrails.Controllers
             {
                 // they haven't saved any locations
                 viewModel.HasSavedLocations = false;
+                viewModel.BeenThereLocations = new List<LocationFlag>();
+                viewModel.WantToGoLocations = new List<LocationFlag>();
+                viewModel.GoAgainLocations = new List<LocationFlag>();
             }
             else
             {

@@ -45,13 +45,14 @@
 <div class="row">
     <div class="col-xs-12">
         <hr />
-        <h3>Images</h3>
+        <h3>
+            Images
 
-        <!--UPLOAD-->
-        <p>
-            @*Html.ActionLink("Add an Image", "CreateByUrl", "LocationImage", new { locationID = Model.LocationID }, null)*@
-            @Html.ActionLink("Upload an Image", "Upload", "LocationImage", new { locationID = Model.LocationID }, null)
-        </p>
+            <!--UPLOAD-->
+            <a href="@Url.Action("Upload", "LocationImage", new { locationID = Model.LocationID, redirect = true })">
+                <i style="color: green;" class="glyphicon glyphicon-plus"></i>
+            </a>
+        </h3>
     </div>
 </div>
 
@@ -85,12 +86,14 @@
 <div class="row">
     <div class="col-xs-12">
         <hr />
-        <h3>Videos</h3>
+        <h3>
+            Videos
 
-        <!--UPLOAD-->
-        <p>
-            @Html.ActionLink("Add a Video", "Create", "LocationVideo", new { locationID = Model.LocationID }, null)
-        </p>
+            <!--UPLOAD-->
+            <a href="@Url.Action("Create", "LocationVideo", new { locationID = Model.LocationID, redirect = true })">
+                <i style="color: green;" class="glyphicon glyphicon-plus"></i>
+            </a>
+        </h3>
     </div>
 </div>
 

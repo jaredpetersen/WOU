@@ -87,14 +87,15 @@ namespace TentsNTrails.Controllers
             profileUser.UserActivities = ur;
 
             //add user reviews
-            List<Review> uRv = db.Reviews.Where(r => r.User.Id == profileUser.Id).ToList();
-            profileUser.UserReviews = uRv;
+            List<Review> uRV = db.Reviews.Where(r => r.User.Id == profileUser.Id).ToList().OrderByDescending(t => t.ReviewDate).Take(5).ToList();
+            //uRV.OrderByDescending(t => t.ReviewDate).Take(5).ToList();
+            profileUser.UserReviews = uRV;
 
             //add user bookmarks
             List<LocationFlag> locationFlags = db.LocationFlags.Include(l => l.Location).Where(f => f.User.Id == profileUser.Id).ToList();
             if (locationFlags.Count > 0)
             {
-                ViewBag.HasSaveLocations = true;
+                ViewBag.HasSavedLocations = true;
                 // Fill the three lists with their respective LocationFlags
                 profileUser.BeenThereLocations = locationFlags.Where(l => l.Flag == Flag.HaveBeen).ToList();
                 profileUser.WantToGoLocations = locationFlags.Where(l => l.Flag == Flag.WantToGo).ToList();
@@ -104,7 +105,7 @@ namespace TentsNTrails.Controllers
             }
             else
             {
-                ViewBag.HasSaveLocations = false;
+                ViewBag.HasSavedLocations = false;
             }
 
             //add user's location images
@@ -137,6 +138,7 @@ namespace TentsNTrails.Controllers
                 : message == ProfileMessageId.RequestSuccess ? "Congratulations! You have sent a connection request to " + profileUser.UserName + "."
                 : message == ProfileMessageId.ConnectionFailure ? "Sorry, we couldn't make that happen."
                 : message == ProfileMessageId.DenySuccess ? "You have successfully denied being connected to " + profileUser.UserName + "."
+                : message == ProfileMessageId.SentMessage ? "Your message has been sent to " + profileUser.UserName + "."
                 : "";
 
             return View(profileUser);
@@ -266,6 +268,7 @@ namespace TentsNTrails.Controllers
 
                 // save changes
                 db.ConnectionRequests.Add(conn);
+                db.Notifications.Add(FriendNotification.CreateRequestNotification(otherUser, thisUser));
                 db.SaveChanges();
 
                 return RedirectToAction("Index", new { username = username, Message = ProfileMessageId.RequestSuccess });
@@ -317,6 +320,7 @@ namespace TentsNTrails.Controllers
                 // Delete the connection request
                 var reqToDelete = request.First();
                 db.ConnectionRequests.Remove(reqToDelete);
+                db.Notifications.Add(FriendNotification.CreateDenyNotification(otherUser, thisUser));
                 db.SaveChanges();
 
                 return RedirectToAction("Index", new { username = username, Message = ProfileMessageId.DenySuccess });
@@ -365,6 +369,7 @@ namespace TentsNTrails.Controllers
                 db.Connections.Add(conn);
                 var reqToDelete = request.First();
                 db.ConnectionRequests.Remove(reqToDelete);
+                db.Notifications.Add(FriendNotification.CreateConfirmNotification(otherUser, thisUser));
                 db.SaveChanges();
 
                 return RedirectToAction("Index", new { username = username, Message = ProfileMessageId.ConnectionSuccess });
@@ -485,7 +490,20 @@ namespace TentsNTrails.Controllers
 
             return View(viewModel);
         }
-        
+
+        // renders a square Profile Picture Thumbnail that links to that user.
+        public PartialViewResult UserThumbnail(string username, int? size)
+        {
+            // get user matching the username, or the current user if it is not present.
+            User user;
+            if (username != null) user = db.Users.Where(u => u.UserName.Equals(username)).Single();
+            else user = manager.FindById(User.Identity.GetUserId());
+
+            // put size in the viewbag
+            if (size.HasValue) ViewBag.Size = size;
+            else ViewBag.Size = 100;
+            return PartialView(user);
+        }
     }
 
     
@@ -495,6 +513,7 @@ namespace TentsNTrails.Controllers
         ConnectionSuccess,
         ConnectionFailure,
         RequestSuccess,
-        DenySuccess
+        DenySuccess,
+        SentMessage
     }
 }

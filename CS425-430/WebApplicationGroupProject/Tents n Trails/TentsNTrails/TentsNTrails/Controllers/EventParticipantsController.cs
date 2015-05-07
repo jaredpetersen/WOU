@@ -127,10 +127,12 @@ namespace TentsNTrails.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            EventParticipants eventParticipants = db.EventParticipants.Find(id);
+            var userID = User.Identity.GetUserId();
+            EventParticipants eventParticipants = db.EventParticipants.Where(e => e.Event.EventID == id).Where(f => f.Participant.Id == userID).Single();
             db.EventParticipants.Remove(eventParticipants);
             db.SaveChanges();
-            return RedirectToAction("Index");
+            //return RedirectToAction("Index");
+            return RedirectToAction("/Details/" + id, "Events");
         }
 
         protected override void Dispose(bool disposing)

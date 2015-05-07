@@ -307,3 +307,54 @@ table.table-fill {
     width: 100%;
 }
 
+#MessageText {
+    height:250px;
+    max-width:500px;
+}
+
+tr.review-row > td > div#review > div,
+tr.review-row > td > div#review > div > b 
+{
+    min-height:75px;
+    height: auto;
+}
+
+div#review > div#fix-height {
+    clear:both;
+    min-height:0px;
+    height:auto;
+}
+
+#review.unread-message {
+    background-color:rgba(0,153,0,.3);
+}
+
+.dl-summary {
+    padding:0;
+    margin:0
+}
+dl.dl-summary {
+    width:100%;
+    overflow:hidden;
+}
+dl.dl-summary > dt {
+    float: left;
+    clear: left;
+    width: 85px;
+    text-align: left;
+    font-weight: bold;
+}
+dl.dl-summary > dt:after {
+    content: ":";
+    font-weight: bold;
+}
+dl.dl-summary > dd {
+    margin: 0px 0px 0px 85px;
+    padding: 0px;
+}
+.no-wrap { 
+    white-space: nowrap;
+}
+.bold {
+     font-weight: bold;
+}

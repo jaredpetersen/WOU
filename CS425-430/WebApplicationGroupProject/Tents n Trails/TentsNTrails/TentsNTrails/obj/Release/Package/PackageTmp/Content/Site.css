@@ -168,6 +168,8 @@ hr,
 
 #googleMap {
     border: 2px solid rgba(30, 30, 30, 0.9);
+    margin-left:auto;
+    margin-right:auto;
 }
 
 /* On Locations Index page */
@@ -303,5 +305,27 @@ h1.home-title {
 /*On Profile page*/
 table.table-fill {
     width: 100%;
+}
+
+#MessageText {
+    height:250px;
+    max-width:500px;
+}
+
+tr.review-row > td > div#review > div,
+tr.review-row > td > div#review > div > b 
+{
+    min-height:75px;
+    height: auto;
+}
+
+div#review > div#fix-height {
+    clear:both;
+    min-height:0px;
+    height:auto;
+}
+
+#review.unread-message {
+    background-color:rgba(0,153,0,.3);
 }
 

@@ -3,30 +3,65 @@
 {
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
-    @Html.AntiForgeryToken()
+        @Html.AntiForgeryToken()
 
-    <ul class="nav navbar-nav navbar-right">
-        <li>
-            @*@@Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })*@
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">@Html.Raw("Hello " + User.Identity.GetUserName() + "!")<b class="caret"></b></a>
-            <ul class="dropdown-menu" id="noUnderline">
-                <li>@Html.ActionLink("My Reviews", "Index", "Review")</li>
-                <li>@Html.ActionLink("My Saved Locations", "Index", "LocationFlag")</li>
-                <li class="divider"></li>
-                <li>@Html.ActionLink("My Profile", "Index", "Profile")</li>
-                <li>@Html.ActionLink("Personal Settings", "Index", "Manage")</li>
-                @if (Request.IsAuthenticated && User.IsInRole("Admin"))
-                {
+        <ul class="nav navbar-nav navbar-right">
+
+            <!-- USER DROPDOWN -->
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    @Html.Raw("Hello " + User.Identity.GetUserName() + "!")
+                    <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu" id="noUnderline">
+                    <li>@Html.ActionLink("My Reviews", "Index", "Review")</li>
+                    <li>@Html.ActionLink("My Saved Locations", "Index", "LocationFlag")</li>
+                    <li>@Html.ActionLink("My Messages", "Index", "Message")</li>
                     <li class="divider"></li>
-                    <li>@Html.ActionLink("User Management", "AdminControl", "Users")</li>
-                    <li>@Html.ActionLink("Join Locations", "Join", "Location")</li>
-                }
-            </ul>
-        </li>
-            @*@Html.ActionLink("Your Account", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })*@
-        <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
-    </ul>
+                    @*<li><a href="@Url.Action("Index", "Profile")"><span class="glyphicon glyphicon-user"></span> My Profile</a></li>*@
+                    <li>@Html.ActionLink("My Profile", "Index", "Profile")</li>
+                    <li>@Html.ActionLink("Personal Settings", "Index", "Manage")</li>
+                    @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        <li class="divider"></li>
+                        <li>@Html.ActionLink("User Management", "AdminControl", "Users")</li>
+                        <li>@Html.ActionLink("Join Locations", "Join", "Location")</li>
+                    }
+                    <img class="img-responsive" />
+                </ul>
+            </li>
+
+            <!-- NOTIFICATIONS -->
+            <li>
+                <a href="@Url.Action("Index", "Notification")">
+                    Notifications @{Html.RenderAction("UnreadCount", "Notification");}
+                </a>
+            </li>
+
+            @*
+            <!-- NOTIFICATION DROPDOWN -->
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    Notifications @{Html.RenderAction("UnreadCount", "Notification");}
+                </a>
+                <ul class="dropdown-menu" id="noUnderline">
+                    <li>Notification 1</li>
+                    <li>Notification 2</li>
+                    <li>Notification 3</li>
+                    <li>@Html.ActionLink("View All Notifications", "Index", "Notification")</li>
+                </ul>
+            </li>
+            *@
+            @*
+                <!-- THUMBNAIL -->
+                <li>
+                    {Html.RenderAction("UserThumbnail", "Profile", new { size = 25 });}
+                </li>
+            *@
+
+            <!-- LOGOUT -->
+            <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+        </ul>
     }
 }
 else

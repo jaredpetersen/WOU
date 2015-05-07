@@ -16,6 +16,8 @@
 
             <dt>Location</dt>
             <dd>@Html.ActionLink(Model.Location.Label, "Details", "Location", new { id = Model.LocationID }, null)</dd>
+            <dt>Uploaded by</dt>
+            <dd>@Html.ActionLink(Model.User.UserName, "Index", "Profile", new { Username = Model.User.UserName }, null)</dd>
         </dl>
 
         

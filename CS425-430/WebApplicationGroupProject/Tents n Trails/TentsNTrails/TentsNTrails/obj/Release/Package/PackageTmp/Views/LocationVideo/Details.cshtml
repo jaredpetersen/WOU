@@ -38,6 +38,9 @@
     <div class="col-xs-12">
         <p>
             <br />
+            Uploaded by @Html.ActionLink(Model.User.UserName, "Index", "Profile", new { Username = Model.User.UserName }, null)
+        </p>
+        <p>
             @if (ViewBag.IsAdmin)
             {
                 @Html.ActionLink("Edit", "Edit", new { id = Model.VideoID })

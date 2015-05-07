@@ -18,7 +18,7 @@
 
         // get the map
         var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
-        // add a markers to the map fir each of the book mark types
+        // add a marker to the map for each of the book mark types
         @foreach (var item in Model.BeenThereLocations)
         {
             @:console.log("latitude:" + @item.Location.Latitude + " longitude: " +  @item.Location.Longitude);
@@ -27,7 +27,6 @@
                                         @:marker.html='<div><img id="location-image-preview" src="@Url.Content(item.Location.PreviewImageURL)" title="Preview Image" alt="Image of @item.Location.Label" style="width: 100px; height: auto; margin:0 auto;" /><br /><div class="label" text-align="center">@Html.ActionLink(item.Location.Label, "Details", "Location", new { id = item.Location.LocationID }, null)</div></div>';
                                         @:google.maps.event.addListener(marker, 'click', function() {infowindow.setContent(this.html); infowindow.open(map,this);});
                                             }
-        // add a markers to the map
         @foreach (var item in Model.WantToGoLocations)
         {
             @:console.log("latitude:" + @item.Location.Latitude + " longitude: " +  @item.Location.Longitude);
@@ -35,8 +34,7 @@
                                         @:var infowindow = new google.maps.InfoWindow({content: 'Loading...'});
                                         @:marker.html='<div><img id="location-image-preview" src="@Url.Content(item.Location.PreviewImageURL)" title="Preview Image" alt="Image of @item.Location.Label" style="width: 100px; height: auto; margin:0 auto;" /><br /><div class="label" text-align="center">@Html.ActionLink(item.Location.Label, "Details", "Location", new { id = item.Location.LocationID }, null)</div></div>';
                                         @:google.maps.event.addListener(marker, 'click', function() {infowindow.setContent(this.html); infowindow.open(map,this);});
-                                             }
-        // add a markers to the map
+                                            }
         @foreach (var item in Model.GoAgainLocations)
         {
             @:console.log("latitude:" + @item.Location.Latitude + " longitude: " +  @item.Location.Longitude);
@@ -44,7 +42,7 @@
                                         @:var infowindow = new google.maps.InfoWindow({content: 'Loading...'});
                                         @:marker.html='<div><img id="location-image-preview" src="@Url.Content(item.Location.PreviewImageURL)" title="Preview Image" alt="Image of @item.Location.Label" style="width: 100px; height: auto; margin:0 auto;" /><br /><div class="label" text-align="center">@Html.ActionLink(item.Location.Label, "Details", "Location", new { id = item.Location.LocationID }, null)</div></div>';
                                         @:google.maps.event.addListener(marker, 'click', function() {infowindow.setContent(this.html); infowindow.open(map,this);});
-                                                    }
+                                            }
     }
 
     // display the map
@@ -55,51 +53,55 @@
     ViewBag.Title = "My Saved Locations";
 }
 
+<!-- FORMATTING -->
+<script type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+
 <h2>@ViewBag.Title</h2>
 
 @if (Model.HasSavedLocations)
-{
+{ 
     <!-- MAP OF BOOKMARKED LOCATIONS-->
-    <div id="googleMap" style="width:80%;height:300px;" ></div>
+    <div id="googleMap" style="width:80%;height:300px;"></div>
     <p></p>
 
-<table class="table centered">
-    <tr>
-        <th>
-            Been There <img src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Blue Pin" style="height:70%" />
-        </th>
-        <th>
-            Want to Go <img src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Red Pin" style="height:70%" />
-        </th>
-        <th>
-            Want to Go Again <img src="http://maps.google.com/mapfiles/ms/icons/green-dot.png" alt="Green Pin" style="height:70%"/>
-        </th>
-    </tr>
+
+    <table class="table centered">
+        <tr>
+            <th>
+                Been There <img src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Blue Pin" style="height:70%" />
+            </th>
+            <th>
+                Want to Go <img src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Red Pin" style="height:70%" />
+            </th>
+            <th>
+                Want to Go Again <img src="http://maps.google.com/mapfiles/ms/icons/green-dot.png" alt="Green Pin" style="height:70%"/>
+            </th>
+        </tr>
         
-    <tr>
-        <td>
-            @foreach (var item in Model.BeenThereLocations)
-            {
-                @Html.DisplayFor(modelItem => item.Location.Label)
-                <br/>
-            }
-        </td>
-        <td>
-            @foreach (var item in Model.WantToGoLocations)
-            {
-                @Html.DisplayFor(modelItem => item.Location.Label)
-                <br />
-            }
-        </td>
-        <td>
-            @foreach (var item in Model.GoAgainLocations)
-            {
-                @Html.DisplayFor(modelItem => item.Location.Label)
-                <br />
-            }
-        </td>
-    </tr>
-</table>
+        <tr>
+            <td>
+                @foreach (var item in Model.BeenThereLocations)
+                {
+                    @Html.DisplayFor(modelItem => item.Location.Label)
+                    <br/>
+                }
+            </td>
+            <td>
+                @foreach (var item in Model.WantToGoLocations)
+                {
+                    @Html.DisplayFor(modelItem => item.Location.Label)
+                    <br />
+                }
+            </td>
+            <td>
+                @foreach (var item in Model.GoAgainLocations)
+                {
+                    @Html.DisplayFor(modelItem => item.Location.Label)
+                    <br />
+                }
+            </td>
+        </tr>
+    </table>
 }
 else
 {

@@ -31,10 +31,15 @@ namespace TentsNTrails.Models
         public DbSet<LocationImage> LocationImages { get; set; }
         public DbSet<LocationVideo> LocationVideos { get; set; }
 
-        //public DbSet<ProfilePicture> ProfilePictures { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<FriendNotification> FriendNotifications { get; set; }
+
+        public DbSet<Message> Messages { get; set; }
+
         
         public DbSet<Recreation> Recreations { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<State> States { get; set; }
         
         public DbSet<UserRecreation> UserRecreations { get; set; }
         
@@ -66,6 +71,8 @@ namespace TentsNTrails.Models
         public System.Data.Entity.DbSet<TentsNTrails.Models.Events> Events { get; set; }
 
         public System.Data.Entity.DbSet<TentsNTrails.Models.EventParticipants> EventParticipants { get; set; }
+
+        public System.Data.Entity.DbSet<TentsNTrails.Models.EventComments> EventComments { get; set; }
 
         /*
         public void AddOrUpdateLocationFlag(string flag, int locationID)

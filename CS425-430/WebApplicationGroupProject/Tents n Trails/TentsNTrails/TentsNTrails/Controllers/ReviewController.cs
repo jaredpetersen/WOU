@@ -165,8 +165,13 @@ namespace TentsNTrails.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CreateShort([Bind(Include = "LocationID,Rating")] Review review)
+        public ActionResult CreateShort([Bind(Include = "LocationID,Rating")] Review review, string redirectAction, string redirectController)
         {
+            //System.Diagnostics.Debug.WriteLineIf(redirectAction != null, "/Review/CreateShort?redirectAction=" + redirectAction);
+            //System.Diagnostics.Debug.WriteLineIf(redirectAction == null, "/Review/CreateShort?redirectAction=null");
+            //System.Diagnostics.Debug.WriteLineIf(redirectController != null, "/Review/CreateShort?redirectController=" + redirectController);
+            //System.Diagnostics.Debug.WriteLineIf(redirectController == null, "/Review/CreateShort?redirectController=null");
+
             // Get the reviewID if this user has already made a rating/review
             int reviewID = getIdIfRated(review.LocationID);
 
@@ -181,7 +186,7 @@ namespace TentsNTrails.Controllers
                     db.SaveChanges();
 
                     var LocationID = review.LocationID;
-                    return RedirectToAction("Index", "Location");
+                    return RedirectToAction(redirectAction ?? "Index", redirectController ?? "Location");
                 }
             }
             else if (!hasReviewed(reviewID)) // the user has rated but not reviewed this location yet
@@ -193,7 +198,7 @@ namespace TentsNTrails.Controllers
                     thisReview.Rating = review.Rating;
                     db.Entry(thisReview).State = EntityState.Modified;
                     db.SaveChanges();
-                    return RedirectToAction("Index", "Location");
+                    return RedirectToAction(redirectAction ?? "Index", redirectController ?? "Location");
                 }
             }
             else // the user has made a rating and has made a review too, so they should now edit their review.
