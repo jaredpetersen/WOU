@@ -13,23 +13,41 @@ public class Globals{
     // Global variable
     private String userID;
     private CollectionFragment collectionFragment;
+    private boolean collectionLoaded = false;
 
     // Restrict the constructor from being instantiated
     private Globals(){}
 
-    public void setData(String id){
+    public void setData(String id)
+    {
         this.userID=id;
     }
-    public String getData(){
+
+    public String getData()
+    {
         return this.userID;
     }
+
+    // Set the collection fragment
     public void setCollection(CollectionFragment fragment)
     {
         collectionFragment = fragment;
     }
+
+    // Refresh the collection
     public CollectionFragment getCollection()
     {
         return collectionFragment;
+    }
+
+    public boolean getCollectionLoadedStatus()
+    {
+        return collectionLoaded;
+    }
+
+    public void setCollectionLoadedStatus(boolean status)
+    {
+        collectionLoaded = status;
     }
 
     public static synchronized Globals getInstance(){

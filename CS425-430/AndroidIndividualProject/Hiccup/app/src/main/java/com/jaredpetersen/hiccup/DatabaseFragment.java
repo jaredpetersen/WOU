@@ -107,8 +107,6 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener, 
 
         // start the next Activity using your prepared Intent
         startActivity(detailIntent);
-
-        g.getCollection().loadCollection();
     }
 
     private void searchDatabase(String searchString) {

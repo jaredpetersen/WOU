@@ -2,31 +2,21 @@ package com.jaredpetersen.hiccup;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 
 /**
  * Created by jaredpetersen on 4/12/15.
@@ -56,7 +46,7 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Only checking if gameID is null because the others will be null also if gameID is null
-        // Have to use this check because hitting the back button on AddCollection will call
+        // Have to use this check because hitting the back button on EditCollection will call
         // onCreate, which will break everything if it does all of this stuff
         if (gameID == null) {
             gameID = this.getIntent().getExtras().getString("gameID");
@@ -136,16 +126,12 @@ public class VideogameDetail extends ActionBarActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-        // create an Intent to take you over to a new AddCollection activity
-        Intent collectionIntent = new Intent(this, AddCollection.class);
+        // create an Intent to take you over to a new EditCollection activity
+        Intent collectionIntent = new Intent(this, EditCollection.class);
         collectionIntent.putExtra("gameID", gameID);
         // Definitely not the best practice, but it's 2:39 AM on a Monday, so...
         collectionIntent.putExtra("status", completionStatusTV.getText());
         startActivity(collectionIntent);
-
-        //addToCollection();
-        // Refresh the collection
-        g.getCollection().loadCollection();
     }
 
     private void getCompletionStatus() {

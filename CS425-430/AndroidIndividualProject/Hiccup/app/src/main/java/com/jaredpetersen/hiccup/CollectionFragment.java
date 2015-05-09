@@ -33,15 +33,17 @@ public class CollectionFragment extends Fragment implements AdapterView.OnItemCl
     ArrayList mGameList = new ArrayList();
     String userID = ((MainActivity)getActivity()).userID;
     Globals g = Globals.getInstance();
-    private static final String QUERY_URL = "http://www.wou.edu/~jpetersen11/api/ownership.php?&key=R@inDr0psOnro53s?&user=";
+    private static final String QUERY_URL =
+            "http://www.wou.edu/~jpetersen11/api/ownership.php?&key=R@inDr0psOnro53s?&user=";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+
         View v = inflater.inflate(R.layout.collection_fragment, container, false);
 
         resultsTextView = (TextView) v.findViewById(R.id.collection_no_results);
-        resultsTextView.setText("Loading... Please wait.");
+        resultsTextView.setText("Loading... Please wait...");
 
         // Access the ListView
         mainListView = (ListView) v.findViewById(R.id.collection_listview);
@@ -49,11 +51,10 @@ public class CollectionFragment extends Fragment implements AdapterView.OnItemCl
         mJSONAdapter = new JSONAdapter(getActivity(), getActivity().getLayoutInflater());
         mainListView.setAdapter(mJSONAdapter);
 
+        g.setCollection(this);
+
         mainListView.setOnItemClickListener(this);
 
-        loadCollection();
-
-        g.setCollection(this);
 
         return v;
     }

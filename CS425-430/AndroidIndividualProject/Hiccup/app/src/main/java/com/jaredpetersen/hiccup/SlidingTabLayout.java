@@ -341,6 +341,10 @@ public class SlidingTabLayout extends HorizontalScrollView
             {
                 mViewPagerPageChangeListener.onPageSelected(position);
             }
+
+            // Reload the Collection Fragment ListView
+            Globals g = Globals.getInstance();
+            g.getCollection().loadCollection();
         }
 
     }
