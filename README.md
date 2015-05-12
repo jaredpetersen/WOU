@@ -1,2 +1,2 @@
 # WOU
-Repository of all of my college CS labs and projects
+All of my college CS labs and projects
