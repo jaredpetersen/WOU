@@ -14,7 +14,7 @@
     <br />
     @Model.GetDescriptionPreview()
     <br />
-    @{ Html.RenderAction("ReviewForm", "Location", new { id = Model.LocationID, redirectAction = "ViewAll", redirectController = "Location" }); }
+    @{ Html.RenderAction("ReviewForm", "Location", new { id = Model.LocationID, redirectAction = ViewBag.redirectAction, redirectController = ViewBag.redirectController }); }
     @if (User.IsInRole("Admin"))
     {
         <span style="float:right">

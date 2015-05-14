@@ -115,20 +115,27 @@
             </div>
         </div>
 
-        @for (int i = 0; i < Model.RecOptions.Count; i++ )
-        {
-        @Html.HiddenFor(m => m.RecOptions[i].RecreationID)
-        @Html.HiddenFor(m => m.RecOptions[i].RecreationLabel)
-        <div class="form-group">
-            <div class="col-md-2 control-label" style="font-weight: bold">
-                @Html.DisplayFor(m => m.RecOptions[i].RecreationLabel, new { @class = "col-md-2 control-label" })
-            </div>
-            <div class="col-md-10">
-                @Html.CheckBoxFor(m => m.RecOptions[i].IsChecked, new { @class = "form-control" })
-            </div>
+        
+        <div id="review">
+            <b>Recreation Type(s):</b>
+            Choose all the activities that can be done at this location.
+            @for (int i = 0; i < Model.RecOptions.Count; i++)
+            {
+                @Html.HiddenFor(m => m.RecOptions[i].RecreationID)
+                @Html.HiddenFor(m => m.RecOptions[i].RecreationLabel)
+                <div class="form-group">
+                    <div class="col-md-2 control-label" style="font-weight: bold">
+                        @Html.DisplayFor(m => m.RecOptions[i].RecreationLabel, new { @class = "col-md-2 control-label" })
+                    </div>
+                    <div class="col-md-10">
+                        @Html.CheckBoxFor(m => m.RecOptions[i].IsChecked, new { @class = "form-control" })
+                    </div>
+                </div>
+            }
+            @Html.ValidationMessage("Recreations", new { @class = "text-danger" })
         </div>
-        }
 
+        <br />
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Create" class="btn btn-default" />

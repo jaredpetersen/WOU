@@ -186,14 +186,16 @@
             else if (ViewBag.HasConnectionRequest)
             {
                 <h4>@Model.UserName would like to connect with you.</h4>
-    <button class="btn btn-success active" onclick="location.href='@Url.Action("ConfirmConnect",
-                            "Profile", new { username = Model.UserName })'" style="float:right; overflow:hidden">
-        Confirm
-    </button>
-    <button class="btn btn-danger active" onclick="location.href='@Url.Action("DenyConnect",
-                            "Profile", new { username = Model.UserName })'" style="float:right; overflow:hidden">
-        Deny
-    </button>
+                // With the float spans, the right-most element must come first (on the page, the order is Confirm, then Deny)
+                <button class="btn btn-danger active" onclick="location.href='@Url.Action("DenyConnect",
+                                    "Profile", new { username = Model.UserName })'" style="float:right; overflow:hidden;margin-left:3px">
+                    Deny
+                </button>
+                <button class="btn btn-success active" onclick="location.href='@Url.Action("ConfirmConnect",
+                                    "Profile", new { username = Model.UserName })'" style="float:right; overflow:hidden;">
+                    Confirm
+                </button>
+    
             }
             else if (ViewBag.HasSentRequest)
             {
@@ -232,6 +234,10 @@
                     You Have No Connection Requests
                 </button>
             }
+            <button class="btn btn-success active" onclick="location.href='@Url.Action("Connections",
+                        "Profile")'" style="float:right; overflow:hidden; margin-top: 5px">
+                <span class="glyphicon glyphicon-user" aria-hidden="true"></span> See Connections
+            </button>
         }
 
     </div>

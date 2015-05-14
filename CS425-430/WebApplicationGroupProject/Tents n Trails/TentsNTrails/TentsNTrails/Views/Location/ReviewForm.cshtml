@@ -2,7 +2,7 @@
 
     <!--UPVOTES-->
     <span style="display:inline-block; padding: 0px;">
-        @using (Html.BeginForm("CreateShort", "Review", FormMethod.Post, new { @id = "up" + Model.LocationID, redirectAction = ViewBag.redirectAction, redirectController = ViewBag.redirectController }))
+        @using (Html.BeginForm("CreateShort", "Review", new { @id = "up" + Model.LocationID, redirectAction = ViewBag.redirectAction, redirectController = ViewBag.redirectController }, FormMethod.Post))
         {
             @Html.AntiForgeryToken();
             @Html.Hidden("LocationID", Model.LocationID);
@@ -17,7 +17,7 @@
 
     <!--DOWNVOTES-->
     <span style="display:inline-block; padding: 0px;">
-        @using (Html.BeginForm("CreateShort", "Review", FormMethod.Post, new { @id = "down" + Model.LocationID, redirectAction = ViewBag.redirectAction, redirectController = ViewBag.redirectController }))
+        @using (Html.BeginForm("CreateShort", "Review", new { @id = "down" + Model.LocationID, redirectAction = ViewBag.redirectAction, redirectController = ViewBag.redirectController },  FormMethod.Post))
         {
             @Html.AntiForgeryToken();
             @Html.Hidden("LocationID", Model.LocationID);

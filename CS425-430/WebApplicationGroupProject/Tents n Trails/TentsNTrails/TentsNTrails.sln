@@ -16,14 +16,17 @@ Global
 		SccLocalPath1 = TentsNTrails
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		AzureNightly|Any CPU = AzureNightly|Any CPU
+		AzureRelease|Any CPU = AzureRelease|Any CPU
+		Local|Any CPU = Local|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4B0D34B5-7C7A-4B89-92AC-9540B0EC8394}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4B0D34B5-7C7A-4B89-92AC-9540B0EC8394}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4B0D34B5-7C7A-4B89-92AC-9540B0EC8394}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4B0D34B5-7C7A-4B89-92AC-9540B0EC8394}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B0D34B5-7C7A-4B89-92AC-9540B0EC8394}.AzureNightly|Any CPU.ActiveCfg = AzureNightly|Any CPU
+		{4B0D34B5-7C7A-4B89-92AC-9540B0EC8394}.AzureNightly|Any CPU.Build.0 = AzureNightly|Any CPU
+		{4B0D34B5-7C7A-4B89-92AC-9540B0EC8394}.AzureRelease|Any CPU.ActiveCfg = AzureRelease|Any CPU
+		{4B0D34B5-7C7A-4B89-92AC-9540B0EC8394}.AzureRelease|Any CPU.Build.0 = AzureRelease|Any CPU
+		{4B0D34B5-7C7A-4B89-92AC-9540B0EC8394}.Local|Any CPU.ActiveCfg = Local|Any CPU
+		{4B0D34B5-7C7A-4B89-92AC-9540B0EC8394}.Local|Any CPU.Build.0 = Local|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

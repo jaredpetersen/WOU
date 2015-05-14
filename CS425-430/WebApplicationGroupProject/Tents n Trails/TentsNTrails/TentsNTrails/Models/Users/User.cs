@@ -58,5 +58,24 @@ namespace TentsNTrails.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+        // Calculate this user's total contributions (reviews and media items)
+        public virtual int TotalContributions()
+        {
+            int total = 0;
+            if (UserReviews != null)
+            {
+                total += UserReviews.Count;
+            }
+            if (UserLocationImages != null)
+            {
+                total += UserLocationImages.Count;
+            }
+            if (UserLocationVideos != null)
+            {
+                total += UserLocationVideos.Count;
+            }
+            return total;
+        }
     }
 }

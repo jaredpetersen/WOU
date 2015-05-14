@@ -30,7 +30,7 @@ namespace TentsNTrails.Controllers
         public ActionResult Index(ProfileMessageId? message)
         {
             User currentUser = manager.FindById(User.Identity.GetUserId());
-            var messages = db.Messages.Where(m => m.ToUser.UserName == currentUser.UserName)
+            var messages = db.Messages.Where(m => m.ToUser.UserName == currentUser.UserName && !m.DeletedByRecipient)
                 .OrderBy(m => m.IsRead)
                 .ThenByDescending(m => m.TimeSent);
 
@@ -40,6 +40,20 @@ namespace TentsNTrails.Controllers
             ViewBag.SuccessMessage =
                 message == ProfileMessageId.SentMessage ? "Your message has been sent."
                 : "";
+
+            return View(messages.ToList());
+        }
+
+        // GET: Sent Messages
+        [Authorize]
+        public ActionResult SentMessages(ProfileMessageId? message)
+        {
+            User currentUser = manager.FindById(User.Identity.GetUserId());
+            var messages = db.Messages.Where(m => m.FromUser.UserName == currentUser.UserName && !m.DeletedBySender)
+                .OrderBy(m => m.IsRead)
+                .ThenByDescending(m => m.TimeSent);
+
+            ViewBag.TotalCount = messages.Count();
 
             return View(messages.ToList());
         }
@@ -197,8 +211,19 @@ namespace TentsNTrails.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
+            User user = manager.FindById(User.Identity.GetUserId());
             Message message = db.Messages.Find(id);
-            db.Messages.Remove(message);
+
+            if (user.Id == message.FromUser.Id)
+            {
+                message.DeletedBySender = true;
+            }
+            else if (user.Id == message.ToUser.Id)
+            {
+                message.DeletedByRecipient = true;
+            }
+
+            //db.Messages.Remove(message);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

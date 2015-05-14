@@ -27,7 +27,6 @@ namespace TentsNTrails.Migrations
         //
         protected override void Seed(TentsNTrails.Models.ApplicationDbContext db)
         {
-            Console.WriteLine("MIGRATION!");   
             CreateAdmin(db);
             AddUsers(db);
             Add50States(db);
@@ -36,7 +35,7 @@ namespace TentsNTrails.Migrations
             AddReviews(db);
             AddImages(db);
             AddVideos(db);
-            
+            AddNaturalFeatures(db);            
         }
 
 
@@ -669,19 +668,19 @@ namespace TentsNTrails.Migrations
                 // Silver Falls
                 new LocationVideo {
                     Description="Trail of Ten Falls at Silver Falls State Park", 
-                    EmbedCode = "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/J4HM7JDUrAA\" frameborder=\"0\" allowfullscreen></iframe>", 
+                    EmbedCode = "https://www.youtube.com/watch?v=J4HM7JDUrAA", 
                     LocationID = sf_ID,
                     User = pretzles
                 },
                 new LocationVideo {
                     Description="Silver Falls State Park - Day Use", 
-                    EmbedCode = "<iframe width=\"420\" height=\"315\" src=\"https://www.youtube.com/embed/qYzh7JirlZI\" frameborder=\"0\" allowfullscreen></iframe>", 
+                    EmbedCode = "https://www.youtube.com/watch?v=qYzh7JirlZI", 
                     LocationID = sf_ID,
                     User = fancyman55
                 },
                 new LocationVideo {
                     Description="South Falls",
-                    EmbedCode = "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/LIurcmmypDc\" frameborder=\"0\" allowfullscreen></iframe>",
+                    EmbedCode = "https://www.youtube.com/watch?v=LIurcmmypDc",
                     LocationID = sf_ID,
                     User = pretzles
                 },
@@ -689,7 +688,7 @@ namespace TentsNTrails.Migrations
                 // Multnomah Falls
                 new LocationVideo {
                     Description="Multnomah Falls, Oregon - Aerial",
-                    EmbedCode = "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/aZUx2xZhjAI\" frameborder=\"0\" allowfullscreen></iframe>",
+                    EmbedCode = "https://www.youtube.com/watch?v=aZUx2xZhjAI",
                     LocationID = mf_ID,
                     User = pretzles
                 },
@@ -697,7 +696,7 @@ namespace TentsNTrails.Migrations
                 // Grand Canyon
                 new LocationVideo {
                     Description="Grand Canyon National Park (Documentary)",
-                    EmbedCode = "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/bEVEsIW4OXo\" frameborder=\"0\" allowfullscreen></iframe>",
+                    EmbedCode = "https://www.youtube.com/watch?v=bEVEsIW4OXo",
                     LocationID = gc_ID,
                     User = morningmist
                 },
@@ -705,7 +704,7 @@ namespace TentsNTrails.Migrations
                 // Zion National Park
                 new LocationVideo {
                     Description="The Subway in Zion National Park Video Hike",
-                    EmbedCode = "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/rgNSrE0BJ8g\" frameborder=\"0\" allowfullscreen></iframe>",
+                    EmbedCode = "https://www.youtube.com/watch?v=rgNSrE0BJ8g",
                     LocationID = zn_ID,
                     User = fancyman55
                 },
@@ -791,6 +790,190 @@ namespace TentsNTrails.Migrations
             }
             db.SaveChanges();
         }
+
+
+        // using this website http://www.50states.com/abbreviations.htm#.VUfIiflViko as reference for data
+        public void AddNaturalFeatures(ApplicationDbContext db)
+        {
+            // Add NaturalFeatures
+            // helpful word list: http://www.americantrails.org/glossary2.html#g
+            List<NaturalFeature> naturalFeatures = new List<NaturalFeature>();
+            naturalFeatures.Add(new NaturalFeature("Bayou"));
+            naturalFeatures.Add(new NaturalFeature("Beaches"));
+            naturalFeatures.Add(new NaturalFeature("Butte"));
+            naturalFeatures.Add(new NaturalFeature("Canyon"));
+            naturalFeatures.Add(new NaturalFeature("Caves"));
+            naturalFeatures.Add(new NaturalFeature("Cliffs"));
+            naturalFeatures.Add(new NaturalFeature("Coastline"));
+            naturalFeatures.Add(new NaturalFeature("Deciduous Trees"));
+            naturalFeatures.Add(new NaturalFeature("Delta"));
+            naturalFeatures.Add(new NaturalFeature("Desert"));
+            naturalFeatures.Add(new NaturalFeature("Dunes"));
+            naturalFeatures.Add(new NaturalFeature("Evergreen Trees"));
+            naturalFeatures.Add(new NaturalFeature("Forest"));
+            naturalFeatures.Add(new NaturalFeature("Greenway"));
+            naturalFeatures.Add(new NaturalFeature("Gorge"));
+            naturalFeatures.Add(new NaturalFeature("Glacier"));
+            naturalFeatures.Add(new NaturalFeature("Geyser"));
+            naturalFeatures.Add(new NaturalFeature("Hills"));
+            naturalFeatures.Add(new NaturalFeature("Hot Springs"));
+            naturalFeatures.Add(new NaturalFeature("Hoodoos"));
+            naturalFeatures.Add(new NaturalFeature("Island"));
+            naturalFeatures.Add(new NaturalFeature("Lakes"));
+            naturalFeatures.Add(new NaturalFeature("Marshes"));
+            naturalFeatures.Add(new NaturalFeature("Mesa"));
+            naturalFeatures.Add(new NaturalFeature("Monolith"));
+            naturalFeatures.Add(new NaturalFeature("Mountains"));
+            naturalFeatures.Add(new NaturalFeature("Mountainous"));
+            naturalFeatures.Add(new NaturalFeature("Natural Arches"));
+            naturalFeatures.Add(new NaturalFeature("Ocean"));
+            naturalFeatures.Add(new NaturalFeature("Old Growth"));
+            naturalFeatures.Add(new NaturalFeature("Peninsula"));
+            naturalFeatures.Add(new NaturalFeature("Plateau"));
+            naturalFeatures.Add(new NaturalFeature("Pond"));
+            naturalFeatures.Add(new NaturalFeature("Prairie"));
+            naturalFeatures.Add(new NaturalFeature("Rapids"));
+            naturalFeatures.Add(new NaturalFeature("River"));
+            naturalFeatures.Add(new NaturalFeature("Shoreline"));
+            naturalFeatures.Add(new NaturalFeature("Sea"));
+            naturalFeatures.Add(new NaturalFeature("Steppe"));
+            naturalFeatures.Add(new NaturalFeature("Streams"));
+            naturalFeatures.Add(new NaturalFeature("Swamp"));
+            naturalFeatures.Add(new NaturalFeature("Valley"));
+            naturalFeatures.Add(new NaturalFeature("Volcano"));
+            naturalFeatures.Add(new NaturalFeature("Wetlands"));
+            naturalFeatures.Add(new NaturalFeature("Waterfalls"));
+            naturalFeatures.Add(new NaturalFeature("Woods"));
+            naturalFeatures.Add(new NaturalFeature("Woodlands"));
+            naturalFeatures.ForEach(s => db.NaturalFeatures.AddOrUpdate(f => f.Name, s));
+            db.SaveChanges();
+
+            // convenience locationID's
+            int silver_ID = db.Locations.Where(l => l.Label.Contains("Silver Falls")).Single().LocationID;
+            int multnomah_ID = db.Locations.Where(l => l.Label.Contains("Multnomah Falls")).Single().LocationID;
+            int grand_ID = db.Locations.Where(l => l.Label.Contains("Grand Canyon")).Single().LocationID;
+            int zion_ID = db.Locations.Where(l => l.Label.Contains("Zion National Park")).Single().LocationID;
+            int santiam_ID = db.Locations.Where(l => l.Label.Contains("Santiam State Forest")).Single().LocationID;
+            int hood_ID = db.Locations.Where(l => l.Label.Contains("Mount Hood")).Single().LocationID;
+            int yosemite_ID = db.Locations.Where(l => l.Label.Contains("Yosemite")).Single().LocationID;
+            int yellowstone_ID = db.Locations.Where(l => l.Label.Contains("Yellowstone")).Single().LocationID;
+            int rainier_ID = db.Locations.Where(l => l.Label.Contains("Mount Rainier")).Single().LocationID;
+            int bryce_ID = db.Locations.Where(l => l.Label.Contains("Bryce Canyon")).Single().LocationID;
+
+            // Add LocationFeatures 
+            List<LocationFeature> locationFeatures = new List<LocationFeature>();
+
+            // Silver Falls
+            locationFeatures.Add(new LocationFeature(silver_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Deciduous")).Single().ID));
+            locationFeatures.Add(new LocationFeature(silver_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Evergreen")).Single().ID));
+            locationFeatures.Add(new LocationFeature(silver_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Forest")).Single().ID));
+            locationFeatures.Add(new LocationFeature(silver_ID, db.NaturalFeatures.Where(f => f.Name.Contains("River")).Single().ID));
+            locationFeatures.Add(new LocationFeature(silver_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Stream")).Single().ID));
+            locationFeatures.Add(new LocationFeature(silver_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Waterfalls")).Single().ID));
             
+            // Multnomah Falls
+            locationFeatures.Add(new LocationFeature(multnomah_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Cliff")).Single().ID));
+            locationFeatures.Add(new LocationFeature(multnomah_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Deciduous")).Single().ID));
+            locationFeatures.Add(new LocationFeature(multnomah_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Evergreen")).Single().ID));
+            locationFeatures.Add(new LocationFeature(multnomah_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Forest")).Single().ID));
+            locationFeatures.Add(new LocationFeature(multnomah_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Mountainous")).Single().ID));
+            locationFeatures.Add(new LocationFeature(multnomah_ID, db.NaturalFeatures.Where(f => f.Name.Contains("River")).Single().ID));
+            locationFeatures.Add(new LocationFeature(multnomah_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Waterfalls")).Single().ID));
+
+            // Grand Canyon
+            locationFeatures.Add(new LocationFeature(grand_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Canyon")).Single().ID));
+            locationFeatures.Add(new LocationFeature(grand_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Caves")).Single().ID));
+            locationFeatures.Add(new LocationFeature(grand_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Cliff")).Single().ID));
+            locationFeatures.Add(new LocationFeature(grand_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Plateau")).Single().ID));
+            locationFeatures.Add(new LocationFeature(grand_ID, db.NaturalFeatures.Where(f => f.Name.Contains("River")).Single().ID));
+            locationFeatures.Add(new LocationFeature(grand_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Valley")).Single().ID));
+
+            // Zion National Park
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Butte")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Canyon")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Deciduous")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Desert")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Evergreen")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Forest")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Lake")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Mesa")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Monolith")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Mountains")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Mountainous")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Natural Arches")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("River")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Stream")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Waterfall")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Woodlands")).Single().ID));
+            locationFeatures.Add(new LocationFeature(zion_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Valley")).Single().ID));
+
+            // Santiam State Forest
+            locationFeatures.Add(new LocationFeature(santiam_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Deciduous")).Single().ID));
+            locationFeatures.Add(new LocationFeature(santiam_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Evergreen")).Single().ID));
+            locationFeatures.Add(new LocationFeature(santiam_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Forest")).Single().ID));
+            locationFeatures.Add(new LocationFeature(santiam_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Hills")).Single().ID));
+            locationFeatures.Add(new LocationFeature(santiam_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Old Growth")).Single().ID));
+            locationFeatures.Add(new LocationFeature(santiam_ID, db.NaturalFeatures.Where(f => f.Name.Contains("River")).Single().ID));
+            locationFeatures.Add(new LocationFeature(santiam_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Woods")).Single().ID));
+            locationFeatures.Add(new LocationFeature(santiam_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Woodlands")).Single().ID));
+
+            // Mount Hood
+            locationFeatures.Add(new LocationFeature(hood_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Evergreen")).Single().ID));
+            locationFeatures.Add(new LocationFeature(hood_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Forest")).Single().ID));
+            locationFeatures.Add(new LocationFeature(hood_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Glacier")).Single().ID));
+            locationFeatures.Add(new LocationFeature(hood_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Mountains")).Single().ID));
+            locationFeatures.Add(new LocationFeature(hood_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Mountainous")).Single().ID));
+            locationFeatures.Add(new LocationFeature(hood_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Old Growth")).Single().ID));
+            
+
+            // Yosemite
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Cliffs")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Evergreen")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Forest")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Glacier")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Hills")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Lake")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Monolith")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Mountains")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Mountainous")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Old Growth")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("River")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Streams")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Valley")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Waterfall")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yosemite_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Woodlands")).Single().ID));
+
+            // Yellowstone
+            locationFeatures.Add(new LocationFeature(yellowstone_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Canyon")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yellowstone_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Forest")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yellowstone_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Geyser")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yellowstone_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Lake")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yellowstone_ID, db.NaturalFeatures.Where(f => f.Name.Contains("River")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yellowstone_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Mountains")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yellowstone_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Volcano")).Single().ID));
+            locationFeatures.Add(new LocationFeature(yellowstone_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Waterfall")).Single().ID));
+        
+            // Mount Rainier
+            locationFeatures.Add(new LocationFeature(rainier_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Evergreen")).Single().ID));
+            locationFeatures.Add(new LocationFeature(rainier_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Forest")).Single().ID));
+            locationFeatures.Add(new LocationFeature(rainier_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Glacier")).Single().ID));
+            locationFeatures.Add(new LocationFeature(rainier_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Mountains")).Single().ID));
+            locationFeatures.Add(new LocationFeature(rainier_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Mountainous")).Single().ID));
+
+            // Bryce Canyon
+            locationFeatures.Add(new LocationFeature(bryce_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Cliffs")).Single().ID));
+            locationFeatures.Add(new LocationFeature(bryce_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Hoodoo")).Single().ID));
+            locationFeatures.Add(new LocationFeature(bryce_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Plateau")).Single().ID));
+            locationFeatures.Add(new LocationFeature(bryce_ID, db.NaturalFeatures.Where(f => f.Name.Contains("River")).Single().ID));
+            locationFeatures.Add(new LocationFeature(bryce_ID, db.NaturalFeatures.Where(f => f.Name.Contains("Valley")).Single().ID));
+            
+
+            
+            // update if the Location and NaturalFeature IDs match.
+            locationFeatures.ForEach(s => db.LocationFeatures.AddOrUpdate(f => new { f.LocationID, f.NaturalFeatureID}, s));
+            db.SaveChanges();
+            
+        }
+
     }
 }

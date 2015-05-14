@@ -31,7 +31,10 @@ namespace TentsNTrails.Controllers
         // INDEX
         // ************************************************************************************************************
 
-        // GET: Location
+        /// <summary>
+        /// GET: Location
+        /// </summary>
+        /// <returns>The Location/Index view.</returns> 
         public ActionResult Index(int? recreationID, string sortOrder, string currentFilter)
         {
             // *************************************************
@@ -89,7 +92,7 @@ namespace TentsNTrails.Controllers
 
 
         // ************************************************************************************************************
-        // LIST HELPER METHODS
+        // HELPER METHODS
         // ************************************************************************************************************
 
         /// <summary>
@@ -144,11 +147,11 @@ namespace TentsNTrails.Controllers
         /// <returns>A list of Locations.</returns>
         public List<Location> GetPersonalRecommendations(int amount)
         {
-            System.Diagnostics.Debug.WriteLine(String.Format("GetPersonalRecommendations({0}", amount));
+            //System.Diagnostics.Debug.WriteLine(String.Format("GetPersonalRecommendations({0})", amount));
             // ensure user is logged in.
             if (!User.Identity.IsAuthenticated)
             {
-                System.Diagnostics.Debug.WriteLine("User not authenticated.");
+                //System.Diagnostics.Debug.WriteLine("User not authenticated.");
                 return new List<Location>();
             }
 
@@ -172,7 +175,7 @@ namespace TentsNTrails.Controllers
                     && f.Flag == Flag.HaveBeen
                     || f.Flag == Flag.WantToGo
                 ).Select(f => f.Location);
-
+            /*
             System.Diagnostics.Debug.WriteLine(String.Format("userActivities.Count(): {0}", userActivities.Count()));
             foreach (Recreation r in userActivities)
             {
@@ -197,7 +200,7 @@ namespace TentsNTrails.Controllers
                 System.Diagnostics.Debug.WriteLine(String.Format("State: {0}    Location: {1}", l.StateID, l.Label));
             }
             System.Diagnostics.Debug.WriteLineIf(bookmarkedLocations.Count() > 0, "");
-
+            */
 
 
             // union the locations.
@@ -206,7 +209,7 @@ namespace TentsNTrails.Controllers
             // case 1: use has bookmarks and reviews
             if (bookmarkedLocations.Count() != 0 && reviews.Count() != 0)
             {
-                System.Diagnostics.Debug.WriteLine("case 1: use has bookmarks and reviews");
+                //System.Diagnostics.Debug.WriteLine("case 1: use has bookmarks and reviews");
                 if (userActivities.Count() > 0)
                 {
                     locations = reviews
@@ -227,7 +230,7 @@ namespace TentsNTrails.Controllers
             // case 2: user has no bookmarks
             else if (bookmarkedLocations.Count() == 0 && reviews.Count() != 0) 
             {
-                System.Diagnostics.Debug.WriteLine("case 2: user has no bookmarks but has reviews");
+                //System.Diagnostics.Debug.WriteLine("case 2: user has no bookmarks but has reviews");
                 if (userActivities.Count() > 0)
                 {
                     locations = reviews
@@ -246,7 +249,7 @@ namespace TentsNTrails.Controllers
             // case 3: user has no reviews
             else if (reviews.Count() == 0)
             {
-                System.Diagnostics.Debug.WriteLine("case 3: user has bookmarks but no reviews");
+                //System.Diagnostics.Debug.WriteLine("case 3: user has bookmarks but no reviews");
                 if (userActivities.Count() > 0)
                 {
                     locations = bookmarkedLocations.Where(l => 
@@ -260,10 +263,10 @@ namespace TentsNTrails.Controllers
             // case 4: user has no bookmarks or reviews
             else
             {
-                System.Diagnostics.Debug.WriteLine("case 3: user has neither bookmarks or reviews");
+                //System.Diagnostics.Debug.WriteLine("case 3: user has neither bookmarks or reviews");
                 if (userActivities.Count() > 0)
                 {
-                    System.Diagnostics.Debug.WriteLine("case 3: user has bookmarks but no reviews");
+                    //System.Diagnostics.Debug.WriteLine("case 3: user has bookmarks but no reviews");
                     locations = db.Locations.Where(l =>
                         l.Recreations.Intersect(userActivities).Count() > 0);
                 }
@@ -273,23 +276,25 @@ namespace TentsNTrails.Controllers
                 }
             }
 
+            /*
             System.Diagnostics.Debug.WriteLine(String.Format("locations.Count(): {0}", locations.Count()));
             foreach (Location l in locations)
             {
                 System.Diagnostics.Debug.WriteLine(String.Format("State: {0}    Location: {1}", l.StateID, l.Label));
             }
             System.Diagnostics.Debug.WriteLineIf(locations.Count() > 0, "");
-
+            */
 
             var states = locations.Select(u => u.StateID);
 
+            /*
             System.Diagnostics.Debug.WriteLine(String.Format("states.Count(): {0}", states.Count()));
             foreach (string s in states)
             {
                 System.Diagnostics.Debug.WriteLine(s);
             }
             System.Diagnostics.Debug.WriteLineIf(states.Count() > 0, "");
-
+            */
 
             // finally, get all locations in the states of the result that are not already in result, or have reviews.
             var result = db.Locations.Where(l =>
@@ -299,13 +304,14 @@ namespace TentsNTrails.Controllers
                );
 
            
-
+            /*
             System.Diagnostics.Debug.WriteLine(String.Format("result.Count(): {0}", result.Count()));
             foreach (Location l in bookmarkedLocations)
             {
                 System.Diagnostics.Debug.WriteLine(String.Format("State: {0}    Location: {1}", l.StateID, l.Label));
             }
             System.Diagnostics.Debug.WriteLineIf(result.Count() > 0, "");
+             */
 
             return SortByRatingAndTake(result, amount);
         }
@@ -317,11 +323,11 @@ namespace TentsNTrails.Controllers
         /// <returns>A list locations, sorted by rating.</returns>
         public List<Location> GetFriendRecommendations(int amount)
         {
-            System.Diagnostics.Debug.WriteLine("GetFriendRecommendations()");
+            //System.Diagnostics.Debug.WriteLine("GetFriendRecommendations()");
 
             //find the current User
             User currentUser = db.Users.Find(User.Identity.GetUserId());
-            System.Diagnostics.Debug.WriteLine(String.Format("currentUser: {0}", currentUser.UserName));
+            //System.Diagnostics.Debug.WriteLine(String.Format("currentUser: {0}", currentUser.UserName));
 
             // Union Connection where the current User matches either User1 or User2, but select the other one (the connected User) 
             var connectedUsers =
@@ -336,6 +342,7 @@ namespace TentsNTrails.Controllers
                     .Select(c => c.User1)
                 );
 
+            /*
             // print friend details
             System.Diagnostics.Debug.WriteLine(String.Format("connectedUsers.Count(): {0}", connectedUsers.Count()));
             foreach (User user in connectedUsers)
@@ -343,13 +350,14 @@ namespace TentsNTrails.Controllers
                 System.Diagnostics.Debug.WriteLine(String.Format("User: {0}", user.UserName));
             }
             System.Diagnostics.Debug.WriteLineIf(connectedUsers.Count() > 0, "");
-
+            */
             // get positive reviews by friends
             var positiveReviews = connectedUsers
                 .Select(user => user.UserReviews)
                 .SelectMany(review => review)
                 .Where(review => review.Rating);
 
+            /*
             // print review details
             System.Diagnostics.Debug.WriteLine(String.Format("positiveReviews.Count(): {0}", positiveReviews.Count()));
             foreach (Review r in positiveReviews)
@@ -358,17 +366,20 @@ namespace TentsNTrails.Controllers
 
             }
             System.Diagnostics.Debug.WriteLineIf(positiveReviews.Count() > 0, "");
+            */
 
             var locations = positiveReviews
                 .Select(r => r.Location)
                 .Distinct();
 
+            /*
             System.Diagnostics.Debug.WriteLine(String.Format("locations.Count(): {0}", locations.Count()));
             foreach (Location l in locations)
             {
                 System.Diagnostics.Debug.WriteLine(String.Format("State: {0}    Location: {1}", l.StateID, l.Label));
             }
             System.Diagnostics.Debug.WriteLineIf(locations.Count() > 0, "");
+            */
 
             return SortByRatingAndTake(locations, amount);
         }
@@ -390,7 +401,6 @@ namespace TentsNTrails.Controllers
             .ToList();
         }
 
-
         /// <summary>
         /// Get All locations which match the passed collection's State, but do not match the ID.
         /// </summary>
@@ -404,8 +414,11 @@ namespace TentsNTrails.Controllers
                );
         }
 
-
-        // Helper method that returns the ReviewID if this user has made a rating for this location or -1 elsewise
+        /// <summary>
+        /// Helper method that returns the ReviewID if this user has made a rating for this location or -1 elsewise
+        /// </summary>
+        /// <param name="LocationID">The index of the Location to check.</param>
+        /// <returns>the ReviewID4 if the current user has made a review; otherwise, returns -1.</returns>
         public int getIdIfRated(int? LocationID)
         {
             var currentUserName = manager.FindById(User.Identity.GetUserId()).UserName;
@@ -422,7 +435,14 @@ namespace TentsNTrails.Controllers
             }
         }
 
-        // Helper method that returns a map of locationIDs to the rating this user has associated with it
+        /// <summary>
+        /// Helper method that returns a map of locationIDs to the rating this user has associated with it
+        /// </summary>
+        /// <param name="locations">The list of locations to get ratings for.</param>
+        /// <returns>
+        /// A Dictionary of Key/Value pairs that matches a Location with a current user's ratings. 
+        /// (-1 if no rating, 0 if down rating, 1 if up rating). 
+        /// </returns>
         public Dictionary<int, int> getRatingsForLocations(List<Location> locations)
         {
             var ratings = new Dictionary<int, int>(locations.Count());
@@ -461,34 +481,96 @@ namespace TentsNTrails.Controllers
             return ratings;
         }
 
-        // ************************************************************************************************************
-        // MEDIA
-        // ************************************************************************************************************
-
-        // GET: MediaViewModel
-        //
-        // Shows a grid display of images and videos for the given location.  
-        public ActionResult Media(int locationID)
+        /// <summary>
+        /// POST: Location/SaveFlag
+        /// </summary>
+        /// <param name="flag">The string representation of a flag.</param>
+        /// <param name="locationID">The index of the location for which to save the flag.</param>
+        /// <returns>If successful, a redirect to Location/Details; otherwise, a redirect back to Location/Index.</returns>
+        [Authorize]
+        public ActionResult SaveFlag(String flag, int? locationID)
         {
-            /*
-            LocationMediaViewModel media = new LocationMediaViewModel();
-            media.Images = db.LocationImages.Where(i => i.LocationID == locationID).ToList();
-            media.Videos = db.LocationVideos.Where(i => i.LocationID == locationID).ToList();
-            
-            ViewBag.Location = db.Locations.Where(i => i.LocationID == locationID).SingleOrDefault();
-            ViewBag.CancelAction = "Details/" + locationID;
-
-            return View(media);
-             */
-            Location location = db.Locations.Find(locationID);
-            if (location == null)
+            if (ModelState.IsValid && flag != null && locationID != null)
             {
-                return HttpNotFound();
+                User currentUser = manager.FindById(User.Identity.GetUserId());
+                Flag newFlag;
+
+                if (flag.Equals(Flag.HaveBeen.ToString()))
+                {
+                    newFlag = Flag.HaveBeen;
+                }
+                else if (flag.Equals(Flag.WantToGo.ToString()))
+                {
+                    newFlag = Flag.WantToGo;
+                }
+                else
+                {
+                    newFlag = Flag.GoAgain;
+                }
+
+
+                //// Find if there are any flags already in the DB for this user for this location
+                //var oldLocationFlag = db.LocationFlags
+                //    .Where(f => f.LocationID == locationID)
+                //    .Where(f => f.User.Id == currentUser.Id)
+                //    .Single();
+                try
+                {
+                    // Find if there are any flags already in the DB for this user for this location
+                    // Throws an exception if there's not exactly one LocationFlag returned, in which case we'll add it
+                    var oldLocationFlag = db.LocationFlags
+                        .Where(f => f.LocationID == locationID)
+                        .Where(f => f.User.Id == currentUser.Id)
+                        .Single();
+
+                    // set the new flag (the user and location ID will stay the same)
+                    oldLocationFlag.Flag = newFlag;
+
+                    // update what's in the DB
+                    db.Entry(oldLocationFlag).State = EntityState.Modified;
+                }
+                catch (InvalidOperationException e)
+                {
+                    LocationFlag locationFlag = new LocationFlag();
+                    locationFlag.LocationID = (int)locationID;
+                    locationFlag.User = currentUser;
+                    locationFlag.Flag = newFlag;
+                    //add it to the DB
+                    db.LocationFlags.Add(locationFlag);
+                }
+                db.SaveChanges();
+
+                return RedirectToAction("Details/" + locationID, "Location");
             }
-            return View(location);
+
+            return RedirectToAction("Index", "Location");
         }
 
-        // GET: Location/Details/5
+        /// <summary>
+        /// Get all the NaturalFeatures associated with a given Location.
+        /// </summary>
+        /// <param name="location">The Location from which to fetch the associated NaturalFeatures.</param>
+        public List<NaturalFeature> getNaturalFeaturesFor(int locationID)
+        {
+            return db.LocationFeatures
+                .Where(lf => lf.LocationID == locationID)
+                .Select(lf => lf.NaturalFeature)
+                .ToList();
+        }
+
+        // ************************************************************************************************************
+        // DETAILS
+        // ************************************************************************************************************
+
+        /// <summary>
+        /// GET: Location/Details/5
+        /// </summary>
+        /// <param name="id">The index of the Location to view the Details for.</param>
+        /// <param name="success">An optional success message, used after Joining locations (see Location/Join).</param>
+        /// <param name="mergedLocation">An optional name of the merged Location (see Location/Join).</param>
+        /// <returns>
+        /// The Location/Details view, showing all related information for the specified Location.
+        /// </returns>
         public ActionResult Details(int? id, bool? success, string mergedLocation)
         {
             if (!id.HasValue)
@@ -584,77 +666,15 @@ namespace TentsNTrails.Controllers
             return View(location);
         }
 
-        // POST: Location/SaveFlag
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize]
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult SaveFlag([Bind(Include = "LocationID")] LocationFlag location, String flag)
-        public ActionResult SaveFlag(String flag, int? locationID)
-        {
-            if (ModelState.IsValid && flag != null && locationID != null)
-            {
-                User currentUser = manager.FindById(User.Identity.GetUserId());
-                Flag newFlag;
-
-                if (flag.Equals(Flag.HaveBeen.ToString()))
-                {
-                    newFlag = Flag.HaveBeen;
-                }
-                else if (flag.Equals(Flag.WantToGo.ToString()))
-                {
-                    newFlag = Flag.WantToGo;
-                }
-                else 
-                {
-                    newFlag = Flag.GoAgain;
-                }
-
-
-                //// Find if there are any flags already in the DB for this user for this location
-                //var oldLocationFlag = db.LocationFlags
-                //    .Where(f => f.LocationID == locationID)
-                //    .Where(f => f.User.Id == currentUser.Id)
-                //    .Single();
-                try {
-                    // Find if there are any flags already in the DB for this user for this location
-                    // Throws an exception if there's not exactly one LocationFlag returned, in which case we'll add it
-                    var oldLocationFlag = db.LocationFlags
-                        .Where(f => f.LocationID == locationID)
-                        .Where(f => f.User.Id == currentUser.Id)
-                        .Single();
-                    
-                    // set the new flag (the user and location ID will stay the same)
-                    oldLocationFlag.Flag = newFlag;
-
-                    // update what's in the DB
-                    db.Entry(oldLocationFlag).State = EntityState.Modified;
-                }
-                catch (InvalidOperationException e)
-                {
-                    LocationFlag locationFlag = new LocationFlag();
-                    locationFlag.LocationID = (int)locationID;
-                    locationFlag.User = currentUser;
-                    locationFlag.Flag = newFlag;
-                    //add it to the DB
-                    db.LocationFlags.Add(locationFlag);
-                }
-                db.SaveChanges();
-
-                return RedirectToAction("Details/" + locationID, "Location");
-            }
-
-            return RedirectToAction("Index", "Location");
-        }
-
-
         // ************************************************************************************************************
         // CREATE
         // ************************************************************************************************************
 
-        [Authorize]
-        // GET: Location/Create
+        /// <summary>
+        /// GET: Location/Create
+        /// </summary>
+        /// <returns>The Location/Create view.</returns>
+        [Authorize]        
         public ActionResult Create()
         {
             //Set up LocationRecreation Options
@@ -670,18 +690,35 @@ namespace TentsNTrails.Controllers
                 locRecList.Add(lr);
             }
             locViewModel.RecOptions = locRecList;
+
             return View(locViewModel);
         }
-
-        // POST: Location/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
+        /// <summary>
+        /// POST: Location/Create
+        /// </summary>
+        /// <param name="model">The viewModel containing the model data associated with this Create method.</param>
+        /// <returns>If successful, a redirect to Location/Index view; otherwise, a redirect to Location/Create.</returns>
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(CreateLocationViewModel model)
         {
             Location location = new Location();
+
+            bool foundRecreation = false;
+            foreach (var locRec in model.RecOptions)
+            {
+                if (locRec.IsChecked)
+                {
+                    foundRecreation = true;
+                }
+            }
+            // if they didn't choose any recreations, give an error
+            if (!foundRecreation)
+            {
+                ModelState.AddModelError("Recreations", "You must choose at least one recreation type.");
+            }
 
             if (ModelState.IsValid)
             {
@@ -698,11 +735,10 @@ namespace TentsNTrails.Controllers
                 location.Rating();
                 location.UpVotes();
                 location.DownVotes();
-                /*
-                location.State = db.States.Where(s =>
-                    s.Abbreviation.Equals(Location.ReverseGeocodeState(location))
-                ).SingleOrDefault();
-                */
+
+                string abbrev = Location.ReverseGeocodeState(location);
+                location.State = db.States.Where(s => s.StateID.Equals(abbrev)).SingleOrDefault();
+                
                 // save changes
                 db.Locations.Add(location);
                 db.SaveChanges();//must save before we move on so that location gets an ID
@@ -716,17 +752,23 @@ namespace TentsNTrails.Controllers
                         LocationRecreation lr = locRec;
 
                         int latestID = db.Locations.Where(l => l.Label == location.Label).ToList().First().LocationID;
-                        Location tempL = db.Locations.Find(latestID);//get the last Location entered
+                        Location tempL = db.Locations.Find(latestID); //get the last Location entered
                         lr.LocationID = tempL.LocationID;
                         db.LocationRecreations.Add(lr);
                     }
                 }
-
                 db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
 
-            return View(location);
+            CreateLocationViewModel viewModel = new CreateLocationViewModel();
+            viewModel.Label = model.Label;
+            viewModel.Latitude = model.Latitude;
+            viewModel.Longitude = model.Longitude;
+            viewModel.Description = model.Description;
+            viewModel.RecOptions = model.RecOptions;
+            return View(viewModel);
         }  
 
         /// <summary>
@@ -750,7 +792,11 @@ namespace TentsNTrails.Controllers
         // EDIT
         // ************************************************************************************************************
 
-        // GET: Location/Edit/5
+        /// <summary>
+        /// GET: Location/Edit/5
+        /// </summary>
+        /// <param name="id">The index of the Locatoin to edit.</param>
+        /// <returns>The Location/Edit view.</returns>
         [Authorize(Roles = "Admin")]
         public ActionResult Edit(int? id)
         {
@@ -763,25 +809,16 @@ namespace TentsNTrails.Controllers
             {
                 return HttpNotFound();
             }
-
-            //List<LocationRecreation> locRecList = new List<LocationRecreation>();
-
-            //foreach (var rec in db.Recreations)
-            //{
-            //    LocationRecreation lr = new LocationRecreation();
-            //    lr.RecreationID = rec.RecreationID;
-            //    lr.RecreationLabel = rec.Label;
-
-            //    locRecList.Add(lr);
-            //}
-            //location.RecOptions = locRecList;
-
             return View(location);
         }
 
-        // POST: Location/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <summary>
+        /// POST: Location/Edit/5
+        /// </summary>
+        /// <param name="location">The Location model containing any edits to be applied.</param>
+        /// <returns>
+        /// If successful, a redirect to Location/Index; otherwise, a redirect to the Location/Edit view.
+        /// </returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -804,7 +841,13 @@ namespace TentsNTrails.Controllers
         // DELETE
         // ************************************************************************************************************
 
-        // GET: Location/Delete/5
+        /// <summary>
+        /// GET: Location/Delete/5
+        /// </summary>
+        /// <param name="id">The index of the Location to delete.</param>
+        /// <returns>
+        /// The Location/Delete view, confirming if the user is sure they want to delete the specified Location.
+        /// </returns>
         [Authorize(Roles = "Admin")]
         public ActionResult Delete(int? id)
         {
@@ -820,7 +863,11 @@ namespace TentsNTrails.Controllers
             return View(location);
         }
 
-        // POST: Location/Delete/5
+        /// <summary>
+        /// POST: Location/Delete/5
+        /// </summary>
+        /// <param name="id">The index of the Location to delete.</param>
+        /// <returns>A redirect to the Location/Index view.</returns>
         [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -836,7 +883,20 @@ namespace TentsNTrails.Controllers
         // JOIN
         // ************************************************************************************************************
 
-        // GET: Location
+        /// <summary>
+        /// <para>GET: Location/Join</para>
+        /// <para>View for Joining two locations together. Location A will be merged into Location B.</para>
+        /// </summary>
+        /// <param name="searchStringA">The user's search string to filter selections for Location A.</param>
+        /// <param name="searchStringB">The user's search string to filter selections for Location A.</param>
+        /// <param name="LocationA">The selection options for Location A.</param>
+        /// <param name="LocationB">The selection options for Location B.</param>
+        /// <param name="pageA">The page number for Location A search listings.</param>
+        /// <param name="pageB">The page number for Location B search listings.</param>
+        /// <returns>
+        /// If successful, a redirect to Location/Details for Location B (the saved location),
+        /// otherwise a redirect to Location/Details.
+        /// </returns>
         [Authorize(Roles = "Admin")]
         public ActionResult Join(string searchStringA, string searchStringB, int[] LocationA, int[] LocationB, int? pageA, int? pageB)
         {
@@ -1106,6 +1166,10 @@ namespace TentsNTrails.Controllers
             }
         }
 
+        /// <summary>
+        /// Releases resources not needed by the applciation.
+        /// </summary>
+        /// <param name="disposing">To dispose, or not to dispose, THAT is the question.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -1171,10 +1235,19 @@ namespace TentsNTrails.Controllers
         }
 
         // ************************************************************************************************************
-        // VIEW ALL (simple index: no recommendations or extra lists)
+        // BROWSE
         // ************************************************************************************************************
 
-        // GET: Location
+        /// <summary>
+        /// <para>GET: Location/Browse</para>
+        /// <para>Displays a paged list view of all Locations on the site, filtered by some search criteria.</para>
+        /// </summary>
+        /// <param name="recreationID">An optional parameter to filter the Locations by their Recreation types.</param>
+        /// <param name="sortOrder">The current sorting order.  (TODO: not accessible by UI)</param>
+        /// <param name="currentFilter">The current sorting filter.  (TODO: not accessible by UI)</param>
+        /// <param name="query">The search string the user has typed into the search field.  If empty, all Locations are returned.</param>
+        /// <param name="page">The current page of results that is being accessed.</param>
+        /// <returns>The Location/Browse view, which shows all Locations with paging.</returns>
         public ActionResult Browse(int? recreationID, string sortOrder, string currentFilter, string query, int? page)
         {
             // ViewModel
@@ -1194,6 +1267,7 @@ namespace TentsNTrails.Controllers
                 foreach (LocationRecreation lr in locationRecreations)
                 {
                     locations.Add(lr.Location);
+                    ViewBag.Recreation = lr;
                 }
             }
             else
@@ -1216,6 +1290,7 @@ namespace TentsNTrails.Controllers
             {
                 page = 1;
                 locations = SearchFor(query);
+                ViewBag.SearchString = query;
 
                 if (locations.Count == 1)
                 {
@@ -1265,23 +1340,28 @@ namespace TentsNTrails.Controllers
             return View(viewModel);
         }
 
-
         // ************************************************************************************************************
         // REVIEW FORM
         // ************************************************************************************************************
 
-        // Renders a partial view of a Review Form, with the up and down votes.
+        /// <summary>
+        /// Renders a partial view of a Review Form, with the up and down votes.
+        /// </summary>
+        /// <param name="id">The id of the Location that the Review Form is associated with.</param>
+        /// <param name="redirectAction">The name of the Action method to redirect to.</param>
+        /// <param name="redirectController">The name of the Controller to redirect to.</param>
+        /// <returns>
+        /// A partial view containing the thumbs up and down buttons, which submit a vote on a Location 
+        /// for the currently logged in user.
+        /// </returns>
         public PartialViewResult ReviewForm(int id, string redirectAction, string redirectController)
         {
             Location location = db.Locations.Find(id);
             ViewBag.redirectAction = redirectAction ?? "Index";
             ViewBag.redirectController = redirectController ?? "Location";
-            /*
-            System.Diagnostics.Debug.WriteLineIf(redirectAction != null, "/Location/ReviewForm?redirectAction=" + redirectAction);
-            System.Diagnostics.Debug.WriteLineIf(redirectAction == null, "/Location/ReviewForm?redirectAction=NULL");
-            System.Diagnostics.Debug.WriteLineIf(redirectController != null, "/Location/ReviewForm?redirectController=" + redirectController);
-            System.Diagnostics.Debug.WriteLineIf(redirectController == null, "/Location/ReviewForm?redirectController=NULL");
-            */
+            //System.Diagnostics.Debug.WriteLine(String.Format("LocationController.ReviewForm(LocationID: {0}) ViewBag.redirectAction:     {1}", id, redirectAction ?? "Index"));
+            //System.Diagnostics.Debug.WriteLine(String.Format("LocationController.ReviewForm(LocationID: {0}) ViewBag.redirectController: {1}", id, redirectController ?? "Location"));
+
             if (User.Identity.IsAuthenticated)
             {
                 String userID = User.Identity.GetUserId();
@@ -1306,7 +1386,12 @@ namespace TentsNTrails.Controllers
         // LOCATION THUMBNAIL
         // ************************************************************************************************************
 
-        // renders a square Profile Picture Thumbnail that links to that user.
+        /// <summary>
+        /// renders a square Profile Picture Thumbnail that links to that user.
+        /// </summary>
+        /// <param name="id">The index of the Location from which to fetch the associated Image.</param>
+        /// <param name="size">Optinal parameter for the height and width dimensions of the thumbnail, in pixels.  (defaults to 100)</param>
+        /// <returns>A partial view of a thumbnail image of the specified Location.</returns>
         public PartialViewResult LocationThumbnail(int id, int? size)
         {
             // get user matching the username, or the current user if it is not present.
@@ -1328,7 +1413,7 @@ namespace TentsNTrails.Controllers
         /// <param name="id">The id of the location.</param>
         /// <param name="imageSize">The size of the image thumbnail to display, in pixels.</param>
         /// <returns>A partial view with displays some information about a Location.</returns>
-        public PartialViewResult Summary(int? id, int? imageSize)
+        public PartialViewResult Summary(int? id, int? imageSize, string redirectAction, string redirectController)
         {
             // find location
             Location location = db.Locations
@@ -1351,11 +1436,19 @@ namespace TentsNTrails.Controllers
                 location.Recreations.Add(lr.Recreation);
             }
             ViewBag.Size = imageSize ?? 100;
-
+            ViewBag.redirectAction = redirectAction ?? "Index";
+            ViewBag.redirectController = redirectController ?? "Location";
+            //System.Diagnostics.Debug.WriteLine(String.Format("LocationController.Summary(LocationID: {0}) ViewBag.redirectAction:     {1}", id ?? -1, redirectAction ?? "Index"));
+            //System.Diagnostics.Debug.WriteLine(String.Format("LocationController.Summary(LocationID: {0}) ViewBag.redirectController: {1}", id ?? -1, redirectController ?? "Location"));
             // done
             return PartialView(location);
         }
 
+        /// <summary>
+        /// Renders a partial view of a Location Summary, to be used in Location/Join.
+        /// </summary>
+        /// <param name="id">The index of the Location to render the view for.</param>
+        /// <returns>A partial view of a Location.</returns>
         public PartialViewResult JoinSummary(int? id)
         {
             // find location
@@ -1381,6 +1474,26 @@ namespace TentsNTrails.Controllers
 
             // done
             return PartialView(location);
+        }
+
+        // ************************************************************************************************************
+        // MEDIA
+        // ************************************************************************************************************
+
+        /// <summary>
+        /// <para>GET: MediaViewModel</para>
+        /// <para>Shows a grid display of images and videos for the given location.</para>
+        /// </summary>
+        /// <param name="locationID">The index of the Location for which to display the associated Media.</param>
+        /// <returns> The Location/Media view.</returns>
+        public ActionResult Media(int locationID)
+        {
+            Location location = db.Locations.Find(locationID);
+            if (location == null)
+            {
+                return HttpNotFound();
+            }
+            return View(location);
         }
     }
 }

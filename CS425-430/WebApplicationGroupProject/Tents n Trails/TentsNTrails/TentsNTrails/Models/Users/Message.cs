@@ -27,6 +27,11 @@ namespace TentsNTrails.Models
         // Ture if has been read, false elsewise
         public bool IsRead { get; set; }
 
+        // True if deleted by sender
+        public bool DeletedBySender { get; set; }
+
+        // True if deleted by recipient
+        public bool DeletedByRecipient { get; set; }
 
         public virtual User ToUser { get; set; }
         public virtual User FromUser { get; set; }

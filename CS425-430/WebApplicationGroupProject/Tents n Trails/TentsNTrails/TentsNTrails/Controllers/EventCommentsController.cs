@@ -50,6 +50,7 @@ namespace TentsNTrails.Controllers
         public ActionResult Create()
         {
             ViewBag.EventID = new SelectList(db.Events, "EventID", "Name");
+
             return View();
         }
 

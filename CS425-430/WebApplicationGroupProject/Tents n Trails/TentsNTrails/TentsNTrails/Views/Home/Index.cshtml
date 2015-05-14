@@ -6,21 +6,22 @@
 <div align="center">
     <div class="floating-box">
 
-            <h1 class="home-title">tentsntrails</h1>
-            <div>
+        <h1 class="home-title">tents<span style="color:#326400">n</span>trails</h1>
+        
+        <div>
 
-            @using (Html.BeginForm("Browse", "Location"))
-            {
-                @Html.AntiForgeryToken();
-                <div class="input-group">
-                    <input type="text" class="form-control input-home" name="searchString" placeholder="Find your next adventure spot...">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" id="btn" type="submit"> 
-                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                            </button>
-                        </span>
-                </div>
-            }
+        @using (Html.BeginForm("Browse", "Location"))
+        {
+            @Html.AntiForgeryToken();
+            <div class="input-group">
+                <input type="text" class="form-control input-home" name="query" placeholder="Search our locations to find your next adventure spot...">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" id="btn" type="submit"> 
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                    </span>
+            </div>
+        }
         </div>
     </div>
 </div>

@@ -11,6 +11,8 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Threading.Tasks;
 using TentsNTrails.Azure;
+using PagedList;
+
 
 namespace TentsNTrails.Controllers
 {
@@ -185,6 +187,61 @@ namespace TentsNTrails.Controllers
             profileUser.UserLocationVideos = videos;
 
             return View(profileUser);
+        }
+        
+
+        // GET: Connections
+        [Authorize]
+        public ActionResult Connections(string currentFilter, string searchString, int? page)
+        {
+
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            string thisUser = User.Identity.GetUserId();
+            var connections = db.Connections.Where(u => u.User1.Id == thisUser || u.User2.Id == thisUser).ToList();
+            List<User> userList = new List<User>();
+            foreach (Connection c in connections)
+            {
+                if (c.User1.Id == thisUser)
+                {
+                    // this is User1; add the other user (User2) to the list
+                    userList.Add(c.User2);
+                }
+                else
+                {
+                    // the other user is User1; add the User1 to the list
+                    userList.Add(c.User1);
+                }
+            }
+            var users = userList.AsQueryable();
+
+            int pageSize = 8;
+            int pageNumber = (page ?? 1);
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                // Find the users that contain the search string 
+                searchString = searchString.ToLower();
+                users = users.Where(u => u.UserName.ToLower().Contains(searchString)
+                                        || (u.LastName.ToLower().Contains(searchString))
+                                        || u.FirstName.ToLower().Contains(searchString));
+            }
+
+
+            users = users.OrderBy( u => u.UserName);
+            ViewBag.rowCount = users.Count().ToString();
+
+
+            return View(users.ToPagedList(pageNumber, pageSize));
         }
 
         // GET: Profile/Edit/5
