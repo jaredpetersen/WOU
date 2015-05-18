@@ -22,6 +22,7 @@ import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -345,6 +346,15 @@ public class SlidingTabLayout extends HorizontalScrollView
             // Reload the Collection Fragment ListView
             Globals g = Globals.getInstance();
             g.getCollection().loadCollection();
+            /*if (g.getMetrics() != null)
+            {
+                Log.d("hookamooka", "Metrics is not null");
+                g.getMetrics().setData();
+            }
+            else
+            {
+                Log.d("hookamooka", "Metrics is null");
+            }*/
         }
 
     }

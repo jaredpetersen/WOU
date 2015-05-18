@@ -14,6 +14,8 @@ public class Globals{
     private String userID;
     private CollectionFragment collectionFragment;
     private boolean collectionLoaded = false;
+    private MetricsFragment metricsFragment;
+    private boolean metricsLoaded = false;
 
     // Restrict the constructor from being instantiated
     private Globals(){}
@@ -28,26 +30,42 @@ public class Globals{
         return this.userID;
     }
 
-    // Set the collection fragment
+    // Set the fragments
     public void setCollection(CollectionFragment fragment)
     {
         collectionFragment = fragment;
     }
+    public void setMetrics(MetricsFragment fragment)
+    {
+        metricsFragment = fragment;
+    }
 
-    // Refresh the collection
+    // Refresh the fragment data
     public CollectionFragment getCollection()
     {
         return collectionFragment;
+    }
+    public MetricsFragment getMetrics()
+    {
+        return metricsFragment;
     }
 
     public boolean getCollectionLoadedStatus()
     {
         return collectionLoaded;
     }
+    public boolean getMetricsLoadedStatus()
+    {
+        return metricsLoaded;
+    }
 
     public void setCollectionLoadedStatus(boolean status)
     {
         collectionLoaded = status;
+    }
+    public void setMetricsLoadedStatus(boolean status)
+    {
+        metricsLoaded = status;
     }
 
     public static synchronized Globals getInstance(){

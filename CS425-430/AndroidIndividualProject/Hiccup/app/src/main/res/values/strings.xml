@@ -25,5 +25,6 @@
     <string name="unowned_def_body">You do not own this game</string>
     <string name="unowned_button">Mark Unowned</string>
     <string name="status_head">Completion Status:</string>
+    <string name="metrics_title">Collection Data</string>
 
 </resources>
