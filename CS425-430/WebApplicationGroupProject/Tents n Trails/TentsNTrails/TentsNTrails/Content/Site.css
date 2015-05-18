@@ -358,3 +358,65 @@ dl.dl-summary > dd {
 .bold {
      font-weight: bold;
 }
+
+#recreation.badge {
+    font-weight:normal;
+    background-color:#3251B5;
+    font-size:13px;
+}
+
+
+/*****************************************************************************/
+/* LABEL (used for Recreation & NaturalFeatures on Location/Details)         */
+/*****************************************************************************/
+.label {
+    display:inline-block;
+    padding: .3em .7em .4em;
+    margin:2px;
+    font-size: 75%;
+    font-weight: bold;
+    line-height: 1;
+    color: #ffffff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+
+.label-recreation {
+    background: rgba(51, 204, 255, 0.5);
+}
+
+.label-natural-feature {
+    background: rgba(51, 204, 51, 0.5);
+}
+
+/* unvisited link */
+.label a:link{
+    color:#FFFFFF;
+     text-decoration: none;
+     font-weight:lighter;
+}
+
+/* visited link */
+.label a:visited {
+     color:#FFFFFF;
+     text-decoration: none;
+     font-weight:lighter;
+}
+
+/* mouse over link */
+.label a:hover {
+     color:#FFFFFF;
+     text-decoration: underline;
+     font-weight:lighter;
+}
+
+/* selected link */
+.label a:active {
+     color:#FFFFFF;
+     text-decoration: underline;
+     font-weight:normal;
+}
+
+

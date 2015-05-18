@@ -85,6 +85,12 @@ namespace TentsNTrails.Models
         public string StateID { get; set; }
         public virtual State State { get; set; }
 
+        /// <summary>
+        /// NavigationProperty to the LocationFeature bridge entity.
+        /// (A Location can have zero or more NaturalFeatures, associated via LocationFeatures).
+        /// </summary>
+        public virtual ICollection<LocationFeature> LocationFeatures { get; set; }
+
         // a convenience preview image url.
         public virtual String PreviewImageURL
         { 

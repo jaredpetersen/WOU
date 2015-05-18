@@ -1,5 +1,8 @@
 ﻿@model TentsNTrails.Models.Location
 @using Microsoft.AspNet.Identity
+@{
+    string state = Model.State == null? "" : Model.State.Name;
+}
 
 <!-- MAPS API -->
 <script src="http://maps.googleapis.com/maps/api/js"></script>
@@ -38,6 +41,7 @@
 <h2>@Html.DisplayFor(model => model.Label)</h2>
 <p style="color: green;">@ViewBag.SuccessMessage</p>
 <hr />
+
 <!-- LOCATION DETAILS-->
 <div class="row">
     <div class="col-sm-6 col xs-12">
@@ -45,9 +49,11 @@
 
         <dl class="dl-horizontal">
 
-            <dt>@Html.DisplayNameFor(model => model.State.Name)</dt>
+            @if (Model.State != null) 
+            {
+            <dt>state</dt>
             <dd>@Html.ActionLink(Model.State.Name, "Browse", new { query = Model.StateID }, new { title = String.Format("Browse all locations in {0}", Model.State.Name) })</dd>
-
+            }
             <dt>@Html.DisplayNameFor(model => model.Latitude)</dt>
             <dd>@Html.DisplayFor(model => model.Latitude)</dd>
 
@@ -62,83 +68,37 @@
 
             <dt>Ratings</dt>
             <dd>
-                @if (ViewBag.Rating == 1)
-                {
-                        <span style="float:left;">
-                            @using (Html.BeginForm("CreateShortToDetails", "Review", FormMethod.Post, new { @id = "up" + Model.LocationID }))
-                            {
-                                @Html.AntiForgeryToken();
-                                @Html.Hidden("LocationID", Model.LocationID);
-                                @Html.Hidden("Rating", true);
-                                @Html.Hidden("Comment", null);
-                                <label for="@("UpSubmit" + Model.LocationID)" class="btn"><i class="glyphicon glyphicon-thumbs-up voted"></i></label>
-                                <input id="@("UpSubmit" + Model.LocationID)" type="submit" value="Up" class="hidden" />
-                                @Model.UpVotes()
-                            }
-                        </span>
-                }
-                else
-                {
-                        <span style="float:left;">
-                            @using (Html.BeginForm("CreateShortToDetails", "Review", FormMethod.Post, new { @id = "up" + Model.LocationID }))
-                            {
-                                @Html.AntiForgeryToken();
-                                @Html.Hidden("LocationID", Model.LocationID);
-                                @Html.Hidden("Rating", true);
-                                @Html.Hidden("Comment", null);
-                                <label for="@("UpSubmit" + Model.LocationID)" class="btn"><i class="glyphicon glyphicon-thumbs-up"></i></label>
-                                <input id="@("UpSubmit" + Model.LocationID)" type="submit" value="Up" class="hidden" />
-                                @Model.UpVotes()
-                            }
-                        </span>
-                }
-                &nbsp;&nbsp;
-                @if (ViewBag.Rating == 0)
-                {
-                    <span style="float:left;">
-                        @using (Html.BeginForm("CreateShortToDetails", "Review", FormMethod.Post, new { @id = "down" + Model.LocationID }))
-                        {
-                            @Html.AntiForgeryToken();
-                            @Html.Hidden("LocationID", Model.LocationID);
-                            @Html.Hidden("Rating", false);
-                            @Html.Hidden("Comment", null);
-                            <label for="@("DownSubmit" + Model.LocationID)" class="btn"><i class="glyphicon glyphicon-thumbs-down voted"></i></label>
-                            <input id="@("DownSubmit" + Model.LocationID)" type="submit" value="Down" class="hidden" />
-                            @Model.DownVotes()
-                        }
-                    </span>
-                }
-                else
-                {
-                        <span style="float:left;">
-                            @using (Html.BeginForm("CreateShortToDetails", "Review", FormMethod.Post, new { @id = "down" + Model.LocationID }))
-                            {
-                                @Html.AntiForgeryToken();
-                                @Html.Hidden("LocationID", Model.LocationID);
-                                @Html.Hidden("Rating", false);
-                                @Html.Hidden("Comment", null);
-                                <label for="@("DownSubmit" + Model.LocationID)" class="btn"><i class="glyphicon glyphicon-thumbs-down"></i></label>
-                                <input id="@("DownSubmit" + Model.LocationID)" type="submit" value="Down" class="hidden" />
-                                @Model.DownVotes()
-                            }
-                        </span>
-                }
-
-
+                @{ Html.RenderAction("ReviewForm", "Location", new { id = Model.LocationID, redirectAction = "Details", redirectController = "Location" }); }
             </dd>
             <dt>
                 Recreation Types
             </dt>
             <dd>
-                <table>
+                <div>
                     @foreach (var item in Model.RecOptions)
                     {
-                        <tr>
-                            <td>@Html.ActionLink(item.RecreationLabel, "Browse", new { recreationID = item.RecreationID }, new { title = String.Format("Browse all {0} locations", item.RecreationLabel) })</td>
-                        </tr>
+                        <span class="label label-recreation">
+                            @Html.ActionLink(item.RecreationLabel, "Browse", new { recreationID = item.RecreationID }, new { title = String.Format("Browse all {0} locations", item.RecreationLabel) })
+                        </span>
                     }
-                </table>
+                </div>
             </dd>
+
+            <dt>
+                Natural Features
+            </dt>
+            <dd>
+                <div>
+                    @foreach (var item in Model.LocationFeatures.Select(lf => lf.NaturalFeature))
+                    {
+                        <span class="label label-natural-feature">
+                            @Html.ActionLink(item.Name, "Details", "NaturalFeatures", new { id = item.ID }, null)
+                        </span>
+                    }
+                </div>
+            </dd>
+
+
         </dl>
     </div>
 
@@ -215,6 +175,7 @@
             @Html.ActionLink("View all images and videos", "Media", "Location", new { locationID = Model.LocationID }, null)
         </p>
     </div>
+
     <div class="col-xs-12">
 
         <!-- FORMATTING -->

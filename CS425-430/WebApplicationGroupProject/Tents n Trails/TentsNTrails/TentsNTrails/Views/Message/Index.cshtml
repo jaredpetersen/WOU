@@ -9,6 +9,9 @@
 <div class="row">
     <div class="col-xs-12">
         <p style="color: green;">@ViewBag.SuccessMessage</p>
+        <button class="btn btn-default" onclick="location.href='@Url.Action("SentMessages")'" style="float:right">
+            Sent Messages
+        </button>
     </div>
 </div>
 
@@ -25,7 +28,7 @@
     {
         <tr class="review-row">
             <td>
-                @if (!item.IsRead)
+                @if (!item.IsRead && !item.DeletedByRecipient)
                 {
                     <div id="review" class="unread-message">
                         <!-- PROFILE PICTURE -->

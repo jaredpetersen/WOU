@@ -22,14 +22,9 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Locations", "Index", "Location")</li>
-                    @*
-    <li>Html.ActionLink("Hiking", "Index", "Location", new { recreationID = 1 }, null)</li>
-    <li>Html.ActionLink("Camping", "Index", "Location", new { recreationID = 2 }, null)</li>
-                    *@
                     <li>@Html.ActionLink("Find Friends", "Index", "Users")</li>
                     <li>@Html.ActionLink("Events", "Index", "Events")</li>
-                    @*<li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>*@
+                    <li>@Html.ActionLink("Leaderboard", "Index", "Leaderboard")</li>
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>

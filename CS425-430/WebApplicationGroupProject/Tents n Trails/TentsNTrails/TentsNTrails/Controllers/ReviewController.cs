@@ -165,12 +165,10 @@ namespace TentsNTrails.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult CreateShort([Bind(Include = "LocationID,Rating")] Review review, string redirectAction, string redirectController)
+        public ActionResult CreateShort([Bind(Include = "LocationID,Rating")] Review review, string redirectAction = "Index", string redirectController = "Location")
         {
-            //System.Diagnostics.Debug.WriteLineIf(redirectAction != null, "/Review/CreateShort?redirectAction=" + redirectAction);
-            //System.Diagnostics.Debug.WriteLineIf(redirectAction == null, "/Review/CreateShort?redirectAction=null");
-            //System.Diagnostics.Debug.WriteLineIf(redirectController != null, "/Review/CreateShort?redirectController=" + redirectController);
-            //System.Diagnostics.Debug.WriteLineIf(redirectController == null, "/Review/CreateShort?redirectController=null");
+            System.Diagnostics.Debug.WriteLine(String.Format("ReviewController.CreateShort(LocationID: {0}) ViewBag.redirectAction:     {1}", review.LocationID, redirectAction));
+            System.Diagnostics.Debug.WriteLine(String.Format("ReviewController.CreateShort(LocationID: {0}) ViewBag.redirectController: {1}", review.LocationID, redirectController));
 
             // Get the reviewID if this user has already made a rating/review
             int reviewID = getIdIfRated(review.LocationID);
@@ -185,8 +183,9 @@ namespace TentsNTrails.Controllers
                     db.Reviews.Add(review);
                     db.SaveChanges();
 
-                    var LocationID = review.LocationID;
-                    return RedirectToAction(redirectAction ?? "Index", redirectController ?? "Location");
+                    // deterime redirect action
+                    object routeParameters = (redirectAction.Equals("Details") && redirectController.Equals("Location")) ? new { id = review.LocationID } : null;
+                    return RedirectToAction(redirectAction, redirectController, routeParameters);
                 }
             }
             else if (!hasReviewed(reviewID)) // the user has rated but not reviewed this location yet
@@ -198,7 +197,10 @@ namespace TentsNTrails.Controllers
                     thisReview.Rating = review.Rating;
                     db.Entry(thisReview).State = EntityState.Modified;
                     db.SaveChanges();
-                    return RedirectToAction(redirectAction ?? "Index", redirectController ?? "Location");
+
+                    // deterime redirect action
+                    object routeParameters = (redirectAction.Equals("Details") && redirectController.Equals("Location")) ? new { id = review.LocationID } : null;
+                    return RedirectToAction(redirectAction, redirectController, routeParameters);
                 }
             }
             else // the user has made a rating and has made a review too, so they should now edit their review.
@@ -307,7 +309,7 @@ namespace TentsNTrails.Controllers
             {
                 db.Entry(review).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Details/" + review.LocationID, "Location");
             }
             ViewBag.LocationID = new SelectList(db.Locations, "LocationID", "Label", review.LocationID);
             return View(review);

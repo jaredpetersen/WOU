@@ -85,12 +85,23 @@
         <span class="input-group-btn">
             <button class="btn btn-default" id="btn" type="submit">
                 <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-            </button>
+            </button>            
         </span>
         @Html.TextBox("query", null, new { @class = "form-control", placeholder = "Search by Name or State" })
+
+        @if (ViewBag.Recreation != null)
+        {
+            <span style="margin:12px"></span>
+            <span id="recreation" class="badge">
+                @ViewBag.Recreation.RecreationLabel
+            </span>
+        }
+        @if (ViewBag.SearchString != null && ViewBag.SearchString != "")
+        {
+            <span style="padding:12px">Showing results for "@ViewBag.SearchString"</span>
+        }
     </div>
-}
-<br />
+}<br />
 
 <!-- LOCATIONS -->
 @{
@@ -104,7 +115,7 @@
                 Location item = Model.Locations[j];
                 <div class="col-xs-12 col-md-6" style="padding: @(padding)px;">
                     <div id="review" style="min-height: 124px; min-width:370px">
-                        @{ Html.RenderAction("Summary", "Location", new { id = item.LocationID }); }
+                        @{ Html.RenderAction("Summary", "Location", new { id = item.LocationID, redirectAction = "Browse", redirectController = "Location" }); }
                     </div>
                 </div>
             }

@@ -38,7 +38,7 @@ namespace TentsNTrails.Models
         // The date the user took the photograph (optional)
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        [Display(Name = "Date Taken")]
+        [Display(Name = "Date Taken (optional)")]
         public DateTime? DateTaken { get; set; }
 
         // URL to the image
@@ -70,7 +70,7 @@ namespace TentsNTrails.Models
         // The date the user took the photograph (optional)
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        [Display(Name = "Date Taken")]
+        [Display(Name = "Date Taken (optional)")]
         public DateTime? DateTaken { get; set; }
 
         // Holds the uploaded image file

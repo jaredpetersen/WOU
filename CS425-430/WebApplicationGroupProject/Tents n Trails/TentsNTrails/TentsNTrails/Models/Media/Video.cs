@@ -56,7 +56,7 @@ namespace TentsNTrails.Models
             try
             {
                 // if image is from youtube, return the path to youtube thumbnail.
-                if (EmbedCode.Contains("youtube"))
+                if (EmbedCode.Contains("youtube.com/embed/"))
                 {
                     //try to find the id
                     string videoID = EmbedCode
@@ -68,6 +68,13 @@ namespace TentsNTrails.Models
                     Console.WriteLine("Retrieved Youtube VideoID: " + videoID);
                     Console.WriteLine("Created Thumbnail URL: " + thumbnailUrl);
 
+                    return thumbnailUrl;
+                }
+
+                else if (EmbedCode.Contains("www.youtube.com/watch?v="))
+                {
+                    string videoID = EmbedCode.Split(new string[] { "www.youtube.com/watch?v=" }, StringSplitOptions.None)[1];
+                    string thumbnailUrl = "http://img.youtube.com/vi/" + videoID + "/0.jpg";
                     return thumbnailUrl;
                 }
 

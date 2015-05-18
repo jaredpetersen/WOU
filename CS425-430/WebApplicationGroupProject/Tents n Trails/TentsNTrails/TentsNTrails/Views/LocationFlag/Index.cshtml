@@ -50,7 +50,7 @@
 </script>
 
 @{
-    ViewBag.Title = "My Saved Locations";
+    ViewBag.Title = "My Bookmarked Locations";
 }
 
 <!-- FORMATTING -->
@@ -82,21 +82,21 @@
             <td>
                 @foreach (var item in Model.BeenThereLocations)
                 {
-                    @Html.DisplayFor(modelItem => item.Location.Label)
+                    @Html.ActionLink(item.Location.Label, "Details", "Location", new { id = item.Location.LocationID }, null)
                     <br/>
                 }
             </td>
             <td>
                 @foreach (var item in Model.WantToGoLocations)
                 {
-                    @Html.DisplayFor(modelItem => item.Location.Label)
+                    @Html.ActionLink(item.Location.Label, "Details", "Location", new { id = item.Location.LocationID }, null)
                     <br />
                 }
             </td>
             <td>
                 @foreach (var item in Model.GoAgainLocations)
                 {
-                    @Html.DisplayFor(modelItem => item.Location.Label)
+                    @Html.ActionLink(item.Location.Label, "Details", "Location", new { id = item.Location.LocationID }, null)
                     <br />
                 }
             </td>

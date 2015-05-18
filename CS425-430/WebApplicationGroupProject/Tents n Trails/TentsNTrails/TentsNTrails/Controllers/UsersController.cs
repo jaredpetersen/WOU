@@ -62,7 +62,7 @@ namespace TentsNTrails.Controllers
             var users = from s in db.Users select s;
             
 
-            int pageSize = 3;
+            int pageSize = 8;
             int pageNumber = (page ?? 1);
 
             if (searchString ==  "" || searchString == null)
