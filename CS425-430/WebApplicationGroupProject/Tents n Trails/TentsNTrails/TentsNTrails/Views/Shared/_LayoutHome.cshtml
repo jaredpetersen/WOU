@@ -6,57 +6,20 @@
     <title>@ViewBag.Title - tents n trails</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
-
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("tentsntrails", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Locations", "Index", "Location")</li>
-                    <li>@Html.ActionLink("Find Friends", "Index", "Users")</li>
-                    <li>@Html.ActionLink("Events", "Index", "Events")</li>
-                    <li>@Html.ActionLink("Leaderboard", "Index", "Leaderboard")</li>
-                </ul>
-                @Html.Partial("_LoginPartial")
-            </div>
-        </div>
-    </div>
-    <div class="container body-content home"> 
+    <!-- NAVBAR -->
+    @Html.Partial("_Navbar")
+
+    <!-- CONTENT -->
+    <div class="container body-content home" style="padding:15px">
         @RenderBody()
-
-        <div class="home-buttons container">
-            <button class="home-btn" onclick="location.href='@Url.Action("Index", "Location")'">
-                Find Locations &raquo
-            </button>
-            <button class="home-btn" onclick="location.href='@Url.Action("Index", "Events")'">
-                Join Outdoor Events &raquo
-            </button><button class="home-btn" onclick="location.href='@Url.Action("Index", "LocationFlag", new { })'">
-                See Bookmarks &raquo
-            </button>
-        </div>
-    </div>  
-
-    <div class="navbar navbar-fixed-bottom">
-        <div class="container">
-            <div class="navbar-header" style="float: right">
-                @Html.ActionLink("About", "About", "Home", null, new { @style = "color:#999;" })
-                &nbsp;&nbsp;
-                &copy; @DateTime.Now.Year - tents n trails
-            </div>
-        </div>
     </div>
+    @Html.Partial("_FooterFixedBottom")
 
-            @Scripts.Render("~/bundles/jquery")
-            @Scripts.Render("~/bundles/bootstrap")
-            @RenderSection("scripts", required: false)
+    <!--SCRIPTS-->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
 </body>
 </html>

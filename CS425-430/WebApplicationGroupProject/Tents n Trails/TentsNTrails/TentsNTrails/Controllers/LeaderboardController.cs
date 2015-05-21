@@ -7,6 +7,12 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using TentsNTrails.Models;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using PagedList;
+using System.Web.Routing;
+using TentsNTrails.Controllers;
+using System.Xml.Linq;
 
 namespace TentsNTrails.Controllers
 {
@@ -17,6 +23,7 @@ namespace TentsNTrails.Controllers
         // GET: Leaderboard
         public ActionResult Index()
         {
+            
             var allUsers = db.Users.ToList();
             // sort the users by their contributions, but only count it if they have at least 1 contribution
             var topUsers = allUsers
@@ -24,7 +31,22 @@ namespace TentsNTrails.Controllers
                 .OrderByDescending(e => e.TotalContributions())
                 .Take(10);
 
-            return View(topUsers);
+            var topReviewers = allUsers
+                .Where(u => u.TotalReviews() > 0)
+                .OrderByDescending(e => e.TotalReviews())
+                .Take(10);
+
+            var topMediaUploaders = allUsers
+                .Where(u => u.TotalMediaItems() > 0)
+                .OrderByDescending(e => e.TotalMediaItems())
+                .Take(10);
+
+            LeaderboardViewModel viewModel = new LeaderboardViewModel();
+            viewModel.TopRanked = topUsers.ToList();
+            viewModel.TopReviewers = topReviewers.ToList();
+            viewModel.TopMediaUploaders = topMediaUploaders.ToList();
+
+            return View(viewModel);
         }
 
         // GET: Leaderboard/Details/5

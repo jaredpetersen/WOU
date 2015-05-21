@@ -77,5 +77,30 @@ namespace TentsNTrails.Models
             }
             return total;
         }
+        // Calculate this user's total reviews
+        public virtual int TotalReviews()
+        {
+            int total = 0;
+            if (UserReviews != null)
+            {
+                total += UserReviews.Count;
+            }
+            return total;
+        }
+
+        // Calculate this user's total media items
+        public virtual int TotalMediaItems()
+        {
+            int total = 0;
+            if (UserLocationImages != null)
+            {
+                total += UserLocationImages.Count;
+            }
+            if (UserLocationVideos != null)
+            {
+                total += UserLocationVideos.Count;
+            }
+            return total;
+        }
     }
 }

@@ -47,11 +47,12 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: EventComments/Create
-        public ActionResult Create()
+        public ActionResult Create(int eventID)
         {
-            ViewBag.EventID = new SelectList(db.Events, "EventID", "Name");
-
-            return View();
+            EventComments comment = new EventComments();
+            comment.EventID = eventID;
+            comment.Event = db.Events.Find(eventID);
+            return View(comment);
         }
 
         // POST: EventComments/Create
@@ -59,7 +60,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "EventCommentID,Comment,Date,EventID")] EventComments eventComments)
+        public ActionResult Create([Bind(Include = "EventCommentID,EventID,Comment")] EventComments eventComments)
         {
             eventComments.Author = manager.FindById(User.Identity.GetUserId());
             eventComments.Date = DateTime.Now;
@@ -70,7 +71,7 @@ namespace TentsNTrails.Controllers
             }
 
             //ViewBag.EventID = new SelectList(db.Events, "EventID", "Name", eventComments.EventID);
-            return RedirectToAction("/Details/" + eventComments.EventID, "Events");
+            return RedirectToAction("Details", "Events", new { id = eventComments.EventID });
         }
 
         // GET: EventComments/Edit/5

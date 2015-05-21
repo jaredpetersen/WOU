@@ -13,6 +13,7 @@ using PagedList;
 using System.Web.Routing;
 using TentsNTrails.Controllers;
 using System.Xml.Linq;
+using System.Text;
 
 
 namespace TentsNTrails.Controllers
@@ -81,7 +82,7 @@ namespace TentsNTrails.Controllers
             // *************************************************
             // calculate center of map display
             // *************************************************    
-            Location center = GetLatLongCenter(viewModel.Locations);
+            Location center = Location.GetLatLongCenter(viewModel.Locations);
             System.Diagnostics.Debug.WriteLine("centerLatitude:  " + center.Latitude);
             System.Diagnostics.Debug.WriteLine("centerLongitude: " + center.Longitude);
             ViewBag.centerLatitude = center.Latitude;
@@ -94,6 +95,35 @@ namespace TentsNTrails.Controllers
         // ************************************************************************************************************
         // HELPER METHODS
         // ************************************************************************************************************
+
+        /// <summary>
+        /// Helper method to format a collection of strings into a human-readable string,
+        /// in an array-literal format (i.e. '{"hello", "world"}'.
+        /// </summary>
+        /// <param name="strings">The collection of strings to format.</param>
+        /// <returns>A formatted string.</returns>
+        public string GetArrayFormattedString(ICollection<string> strings)
+        {
+            // case 1 - null
+            if (strings == null) return "null";
+
+            int length = strings.Count();
+
+            // case 2 - empty
+            if (length == 0) return "{ }";
+
+            // case 3 - general
+            string[] array = strings.ToArray();
+            StringBuilder sb = new StringBuilder();
+            sb.Append('{');
+            for (int i = 0; i < length; i++)
+            {
+                sb.Append(String.Format("\"{0}\"{1}", array[i], i + 1 < length ? ", " : ""));
+            }
+            sb.Append('}');
+            return sb.ToString();
+        }
+
 
         /// <summary>
         /// Get the specified amount of Top-Rated Locations.
@@ -151,19 +181,14 @@ namespace TentsNTrails.Controllers
             // ensure user is logged in.
             if (!User.Identity.IsAuthenticated)
             {
-                //System.Diagnostics.Debug.WriteLine("User not authenticated.");
                 return new List<Location>();
             }
 
             User user = db.Users.Find(User.Identity.GetUserId());
 
             // get all Recreations the user partakes in.
-            var userActivities = db.UserRecreations.Where(r =>
-                    r.User.Equals(user.Id)
-                    && r.IsChecked
-                ).Select(r => r.Recreation);
-            //if (userActivities.Count() == 0) userActivities = db.Recreations;
-            
+            var userActivities = db.UserRecreations.Where(ur => ur.User.Equals(user.Id)).Select(r => r.Recreation);
+             
             // get all positively reviewed Locations by the user
             var reviews = db.Reviews.Where(r =>
                     r.User.Id.Equals(user.Id)
@@ -175,33 +200,6 @@ namespace TentsNTrails.Controllers
                     && f.Flag == Flag.HaveBeen
                     || f.Flag == Flag.WantToGo
                 ).Select(f => f.Location);
-            /*
-            System.Diagnostics.Debug.WriteLine(String.Format("userActivities.Count(): {0}", userActivities.Count()));
-            foreach (Recreation r in userActivities)
-            {
-                System.Diagnostics.Debug.WriteLine(String.Format("Recreation: {0}", r.Label));
-            }
-            System.Diagnostics.Debug.WriteLineIf(userActivities.Count() > 0, "");
-
-
-
-            System.Diagnostics.Debug.WriteLine(String.Format("reviews.Count(): {0}", reviews.Count()));
-            foreach (Review r in reviews)
-            {
-                System.Diagnostics.Debug.WriteLine(String.Format("Location: {0}    Vote: {1}    Review: {2}", r.Location.Label, (r.Rating ? "Up":"Down"), (r.Comment ?? "NULL")));
-            }
-            System.Diagnostics.Debug.WriteLineIf(reviews.Count() > 0, "");
-
-
-
-            System.Diagnostics.Debug.WriteLine(String.Format("bookmarkedLocations.Count(): {0}", bookmarkedLocations.Count()));
-            foreach (Location l in bookmarkedLocations)
-            {
-                System.Diagnostics.Debug.WriteLine(String.Format("State: {0}    Location: {1}", l.StateID, l.Label));
-            }
-            System.Diagnostics.Debug.WriteLineIf(bookmarkedLocations.Count() > 0, "");
-            */
-
 
             // union the locations.
             IQueryable<Location> locations = null;
@@ -209,7 +207,6 @@ namespace TentsNTrails.Controllers
             // case 1: use has bookmarks and reviews
             if (bookmarkedLocations.Count() != 0 && reviews.Count() != 0)
             {
-                //System.Diagnostics.Debug.WriteLine("case 1: use has bookmarks and reviews");
                 if (userActivities.Count() > 0)
                 {
                     locations = reviews
@@ -230,7 +227,6 @@ namespace TentsNTrails.Controllers
             // case 2: user has no bookmarks
             else if (bookmarkedLocations.Count() == 0 && reviews.Count() != 0) 
             {
-                //System.Diagnostics.Debug.WriteLine("case 2: user has no bookmarks but has reviews");
                 if (userActivities.Count() > 0)
                 {
                     locations = reviews
@@ -249,7 +245,6 @@ namespace TentsNTrails.Controllers
             // case 3: user has no reviews
             else if (reviews.Count() == 0)
             {
-                //System.Diagnostics.Debug.WriteLine("case 3: user has bookmarks but no reviews");
                 if (userActivities.Count() > 0)
                 {
                     locations = bookmarkedLocations.Where(l => 
@@ -263,10 +258,8 @@ namespace TentsNTrails.Controllers
             // case 4: user has no bookmarks or reviews
             else
             {
-                //System.Diagnostics.Debug.WriteLine("case 3: user has neither bookmarks or reviews");
                 if (userActivities.Count() > 0)
                 {
-                    //System.Diagnostics.Debug.WriteLine("case 3: user has bookmarks but no reviews");
                     locations = db.Locations.Where(l =>
                         l.Recreations.Intersect(userActivities).Count() > 0);
                 }
@@ -276,25 +269,7 @@ namespace TentsNTrails.Controllers
                 }
             }
 
-            /*
-            System.Diagnostics.Debug.WriteLine(String.Format("locations.Count(): {0}", locations.Count()));
-            foreach (Location l in locations)
-            {
-                System.Diagnostics.Debug.WriteLine(String.Format("State: {0}    Location: {1}", l.StateID, l.Label));
-            }
-            System.Diagnostics.Debug.WriteLineIf(locations.Count() > 0, "");
-            */
-
             var states = locations.Select(u => u.StateID);
-
-            /*
-            System.Diagnostics.Debug.WriteLine(String.Format("states.Count(): {0}", states.Count()));
-            foreach (string s in states)
-            {
-                System.Diagnostics.Debug.WriteLine(s);
-            }
-            System.Diagnostics.Debug.WriteLineIf(states.Count() > 0, "");
-            */
 
             // finally, get all locations in the states of the result that are not already in result, or have reviews.
             var result = db.Locations.Where(l =>
@@ -302,16 +277,6 @@ namespace TentsNTrails.Controllers
                    && !locations.Contains(l)
                    && !reviews.Select(r => r.LocationID).Contains(l.LocationID)
                );
-
-           
-            /*
-            System.Diagnostics.Debug.WriteLine(String.Format("result.Count(): {0}", result.Count()));
-            foreach (Location l in bookmarkedLocations)
-            {
-                System.Diagnostics.Debug.WriteLine(String.Format("State: {0}    Location: {1}", l.StateID, l.Label));
-            }
-            System.Diagnostics.Debug.WriteLineIf(result.Count() > 0, "");
-             */
 
             return SortByRatingAndTake(result, amount);
         }
@@ -342,44 +307,15 @@ namespace TentsNTrails.Controllers
                     .Select(c => c.User1)
                 );
 
-            /*
-            // print friend details
-            System.Diagnostics.Debug.WriteLine(String.Format("connectedUsers.Count(): {0}", connectedUsers.Count()));
-            foreach (User user in connectedUsers)
-            {
-                System.Diagnostics.Debug.WriteLine(String.Format("User: {0}", user.UserName));
-            }
-            System.Diagnostics.Debug.WriteLineIf(connectedUsers.Count() > 0, "");
-            */
             // get positive reviews by friends
             var positiveReviews = connectedUsers
                 .Select(user => user.UserReviews)
                 .SelectMany(review => review)
                 .Where(review => review.Rating);
 
-            /*
-            // print review details
-            System.Diagnostics.Debug.WriteLine(String.Format("positiveReviews.Count(): {0}", positiveReviews.Count()));
-            foreach (Review r in positiveReviews)
-            {
-                System.Diagnostics.Debug.WriteLine(String.Format("Location: {0}    Vote: {1}    Review: {2}", r.Location.Label, (r.Rating ? "Up" : "Down"), (r.Comment ?? "NULL")));
-
-            }
-            System.Diagnostics.Debug.WriteLineIf(positiveReviews.Count() > 0, "");
-            */
-
             var locations = positiveReviews
                 .Select(r => r.Location)
                 .Distinct();
-
-            /*
-            System.Diagnostics.Debug.WriteLine(String.Format("locations.Count(): {0}", locations.Count()));
-            foreach (Location l in locations)
-            {
-                System.Diagnostics.Debug.WriteLine(String.Format("State: {0}    Location: {1}", l.StateID, l.Label));
-            }
-            System.Diagnostics.Debug.WriteLineIf(locations.Count() > 0, "");
-            */
 
             return SortByRatingAndTake(locations, amount);
         }
@@ -508,12 +444,6 @@ namespace TentsNTrails.Controllers
                     newFlag = Flag.GoAgain;
                 }
 
-
-                //// Find if there are any flags already in the DB for this user for this location
-                //var oldLocationFlag = db.LocationFlags
-                //    .Where(f => f.LocationID == locationID)
-                //    .Where(f => f.User.Id == currentUser.Id)
-                //    .Single();
                 try
                 {
                     // Find if there are any flags already in the DB for this user for this location
@@ -571,7 +501,7 @@ namespace TentsNTrails.Controllers
         /// <returns>
         /// The Location/Details view, showing all related information for the specified Location.
         /// </returns>
-        public ActionResult Details(int? id, bool? success, string mergedLocation)
+        public ActionResult Details(int? id, LocationMessageId? message, string mergedLocation)
         {
             if (!id.HasValue)
             {
@@ -582,10 +512,12 @@ namespace TentsNTrails.Controllers
             {
                 return HttpNotFound();
             }
-            if (success == true && mergedLocation != null)
-            {
-                ViewBag.SuccessMessage = String.Format("{0} has been merged into {1}.", mergedLocation, location.Label);
-            }
+
+            ViewBag.StatusMessage =
+                message == LocationMessageId.ReviewSavedSuccess ? "Your review has been saved. Thanks!"
+                : message == LocationMessageId.MergeLocationSuccess ? String.Format("{0} has been merged into {1}.", mergedLocation, location.Label)
+                : "";
+            
             // See if there are any reviews for this location
             var reviews = db.Reviews.Include(r => r.Location);
             var reviewList = reviews.Where(r => r.LocationID == id)
@@ -678,20 +610,23 @@ namespace TentsNTrails.Controllers
         public ActionResult Create()
         {
             //Set up LocationRecreation Options
-            CreateLocationViewModel locViewModel = new CreateLocationViewModel();
             List<LocationRecreation> locRecList = new List<LocationRecreation>();
-
             foreach (var rec in db.Recreations)
             {
                 LocationRecreation lr = new LocationRecreation();
                 lr.RecreationID = rec.RecreationID;
                 lr.RecreationLabel = rec.Label;
-
                 locRecList.Add(lr);
             }
-            locViewModel.RecOptions = locRecList;
 
-            return View(locViewModel);
+            CreateLocationViewModel viewModel = new CreateLocationViewModel();
+            viewModel.RecOptions = locRecList;
+            viewModel.SelectedFeatures = new List<string>();
+            viewModel.AllNaturalFeatures = db.NaturalFeatures
+                .Select(nf => nf.Name)
+                .ToList();
+
+            return View(viewModel);
         }
         
         /// <summary>
@@ -727,7 +662,7 @@ namespace TentsNTrails.Controllers
                 location.Latitude = model.Latitude;
                 location.Longitude = model.Longitude;
                 location.Description = model.Description;
-                location.Difficulty = (Location.DifficultyRatings)model.Difficulty;
+                location.Difficulty = (Location.DifficultyRatings) model.Difficulty;
                 // initialize DateTime Stamps
                 location.DateCreated = DateTime.UtcNow;
                 location.DateModified = location.DateCreated;
@@ -743,31 +678,29 @@ namespace TentsNTrails.Controllers
                 db.Locations.Add(location);
                 db.SaveChanges();//must save before we move on so that location gets an ID
 
-                // update LocationRecreation Table
-                List<LocationRecreation> locrecList = new List<LocationRecreation>();
-                foreach (var locRec in model.RecOptions)
-                {
-                    if (locRec.IsChecked)
-                    {
-                        LocationRecreation lr = locRec;
+                // edit Recreations
+                EditRecreationsFor(location, model.RecOptions);
 
-                        int latestID = db.Locations.Where(l => l.Label == location.Label).ToList().First().LocationID;
-                        Location tempL = db.Locations.Find(latestID); //get the last Location entered
-                        lr.LocationID = tempL.LocationID;
-                        db.LocationRecreations.Add(lr);
-                    }
-                }
-                db.SaveChanges();
+                // edit NaturalFeatures
+                System.Diagnostics.Debug.WriteLine("SelectedFeatures = " + GetArrayFormattedString(model.SelectedFeatures));
+                EditNaturalFeaturesFor(location, model.SelectedFeatures ?? new List<string>());
 
                 return RedirectToAction("Index");
             }
 
+            ModelState.AddModelError("Overall", "You are missing one or more required fields.");
             CreateLocationViewModel viewModel = new CreateLocationViewModel();
             viewModel.Label = model.Label;
             viewModel.Latitude = model.Latitude;
             viewModel.Longitude = model.Longitude;
             viewModel.Description = model.Description;
             viewModel.RecOptions = model.RecOptions;
+            viewModel.Difficulty = model.Difficulty;
+            viewModel.SelectedFeatures = model.SelectedFeatures ?? new List<String>();
+            viewModel.AllNaturalFeatures = db.NaturalFeatures
+                .Select(nf => nf.Name)
+                .ToList();
+
             return View(viewModel);
         }  
 
@@ -779,13 +712,19 @@ namespace TentsNTrails.Controllers
         public List<Location> SearchFor(String query)
         {
             query = query.ToLower();
-            List<Location> locations = db.Locations.Where(l => 
-                l.Label.ToLower().Contains(query)
-                || l.StateID.Equals(query)
-                || l.State.Name.Equals(query)
-            ).OrderBy(l => l.Label)
-            .ToList();
-            return locations;
+            var locations = db.LocationFeatures  // locations with a matching NaturalFeature
+                .Include(lf => lf.NaturalFeature)
+                .Include(lf => lf.Location)
+                .Where(lf => query.Length > 2    // ensure short searches are not flooded with irrelevant results
+                    && lf.NaturalFeature.Name.ToLower().Contains(query)
+                ).Select(lf => lf.Location)
+                .Union(db.Locations.Where(l =>   // unioned with locations with partially matching name
+                    l.Label.ToLower().Contains(query)
+                    || l.StateID.ToLower().Equals(query) // or matching state information.
+                    || l.State.Name.ToLower().Equals(query))
+                ).OrderBy(l => l.Label) // ordered alphabetically
+                .ToList();
+                return locations;
         }
 
         // ************************************************************************************************************
@@ -809,7 +748,42 @@ namespace TentsNTrails.Controllers
             {
                 return HttpNotFound();
             }
-            return View(location);
+
+            // *********************************************************
+            // get LocationRecreations
+            // *********************************************************
+            var selectedRecreations = db.LocationRecreations
+                .Where(lr => lr.LocationID == location.LocationID)
+                .Select(lr => lr.Recreation);
+
+            var allLocationRecreations = new List<LocationRecreation>();
+            foreach (var rec in db.Recreations)
+            {
+                LocationRecreation lr = new LocationRecreation();
+                lr.RecreationID = rec.RecreationID;
+                lr.RecreationLabel = rec.Label;
+
+                // check if selected.
+                var result = selectedRecreations.SingleOrDefault(r => rec.RecreationID == r.RecreationID);
+                if (result != null) lr.IsChecked = true;
+                else lr.IsChecked = false;
+                allLocationRecreations.Add(lr);
+            }
+
+            // *********************************************************
+            // Create and populate the ViewModel.
+            // *********************************************************
+            EditLocationViewModel viewModel = new EditLocationViewModel(location);
+            viewModel.RecOptions = allLocationRecreations;
+            viewModel.SelectedFeatures = location.LocationFeatures
+                .Select(lf => lf.NaturalFeature)
+                .Select(nf => nf.Name)
+                .ToList();
+            viewModel.AllNaturalFeatures = db.NaturalFeatures
+                .Select(nf => nf.Name)
+                .ToList();
+
+            return View(viewModel);
         }
 
         /// <summary>
@@ -822,19 +796,45 @@ namespace TentsNTrails.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "LocationID,Label,Latitude,Longitude,DateCreated,Rating,Description,Difficulty")] Location location)
+        public ActionResult Edit([Bind(Include = "LocationID,Label,Latitude,Longitude,DateCreated,Rating,Description,Difficulty,SelectedFeatures")] EditLocationViewModel viewModel)
         {
+            // ensure SelectedFeatures is not null if no values passed.
+            viewModel.SelectedFeatures = viewModel.SelectedFeatures ?? new List<string>();
+
             if (ModelState.IsValid)
             {
+                Location location = db.Locations.Find(viewModel.LocationID);
+                
                 // update DateModified
+                location.Label = viewModel.Label;
+                location.Latitude = viewModel.Latitude;
+                location.Longitude = viewModel.Longitude;
+                location.Description = viewModel.Description;
+                location.Difficulty = (Location.DifficultyRatings) viewModel.Difficulty;
                 location.DateModified = DateTime.UtcNow;
-
+                string abbrev = Location.ReverseGeocodeState(location);
+                location.State = db.States.Where(s => s.StateID.Equals(abbrev)).SingleOrDefault();
+                
                 // save changes
                 db.Entry(location).State = EntityState.Modified;
                 db.SaveChanges();
+
+                // edit Recreations
+                System.Diagnostics.Debug.WriteLine("Editing Recreations does not work, will be implemented next sprint.");
+                //EditRecreationsFor(location, viewModel.RecOptions);
+
+                // edit NaturalFeatures
+                System.Diagnostics.Debug.WriteLine("SelectedFeatures = " + GetArrayFormattedString(viewModel.SelectedFeatures));
+                EditNaturalFeaturesFor(location, viewModel.SelectedFeatures ?? new List<string>());
+
                 return RedirectToAction("Index");
             }
-            return View(location);
+
+            ModelState.AddModelError("Overall", "You are missing one or more required fields.");
+            viewModel.AllNaturalFeatures = db.NaturalFeatures
+                .Select(nf => nf.Name)
+                .ToList();
+            return View(viewModel);
         }
 
         // ************************************************************************************************************
@@ -1179,60 +1179,7 @@ namespace TentsNTrails.Controllers
             base.Dispose(disposing);
         }
 
-        /// <summary>
-        /// Convenience method to calculate the centerpoint of latlong coordinates using trigonometry
-        /// (solution used from http://stackoverflow.com/questions/6671183/calculate-the-center-point-of-multiple-latitude-longitude-coordinate-pairs)
-        /// </summary>
-        /// <param name="locations">The list of locations with latlong data to average.</param>
-        /// <returns>A temp location containing the averaged data.</returns>
-        private Location GetLatLongCenter(ICollection<Location> locations)
-        {
-            int count = locations.Count;
 
-            // return center of US if no locations.
-            if (count == 0)
-            {
-                // for now, use this: the below logic doesn't seem to be too accurate.  it is close, though ...
-                return new Location()
-                {
-                    Latitude = 39.8282,
-                    Longitude = -98.5795
-                };
-            }
-
-            double x = 0;
-            double y = 0;
-            double z = 0;
-
-            foreach(Location l in locations)
-            {
-                // convert to radians
-                double latitude = l.Latitude * Math.PI / 180;
-                double longitude = l.Longitude * Math.PI / 180;
-
-                // convert to cartesian coordinates
-                x += Math.Cos(latitude) * Math.Cos(longitude);
-                y += Math.Cos(latitude) * Math.Sin(longitude);
-                z += Math.Sin(latitude);
-            }
-
-            // average cartesian coordinates
-            x /= count;
-            y /= count;
-            z /= count;
-
-            // convert back to latitude/longitude
-            double hypoteneuse = Math.Sqrt(x * x + y * y);
-            double centerLatitude  = Math.Atan2(z, hypoteneuse) * 180 / Math.PI;
-            double centerLongitude = Math.Atan2(y, x) * 180 / Math.PI;
-
-            // store results in a temporary location.
-            return new Location()
-            {
-                Latitude = centerLatitude,
-                Longitude = centerLongitude
-            };
-        }
 
         // ************************************************************************************************************
         // BROWSE
@@ -1328,7 +1275,7 @@ namespace TentsNTrails.Controllers
             // *************************************************
             // calculate center of map display
             // *************************************************            
-            Location center = GetLatLongCenter(viewModel.Locations.ToList());
+            Location center = Location.GetLatLongCenter(viewModel.Locations.ToList());
             System.Diagnostics.Debug.WriteLine("centerLatitude:  " + center.Latitude);
             System.Diagnostics.Debug.WriteLine("centerLongitude: " + center.Longitude);
             ViewBag.centerLatitude = center.Latitude;
@@ -1494,6 +1441,244 @@ namespace TentsNTrails.Controllers
                 return HttpNotFound();
             }
             return View(location);
+        }
+
+        public enum LocationMessageId
+        {
+            ReviewSavedSuccess,
+            MergeLocationSuccess,
+            Error
+        }
+
+        // ************************************************************************************************************
+        // NATURAL FEATURES
+        // ************************************************************************************************************
+
+        /// <summary>
+        /// Edit the NaturalFeatures for a single Location.
+        /// </summary>
+        /// <param name="locationID">The index of the Location to edit.</param>
+        /// <returns>the Location/EditFor view.</returns>
+        [Authorize]
+        public ActionResult EditNaturalFeatures(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            System.Diagnostics.Debug.WriteLine("get EditNaturalFeatures(" + id + ")");
+
+            Location location = db.Locations.Find(id);
+
+            if (location == null)
+            {
+                return HttpNotFound();
+            }
+            EditNaturalFeaturesViewModel viewModel = new EditNaturalFeaturesViewModel();
+            viewModel.Location = location;
+            viewModel.LocationID = location.LocationID;
+            viewModel.LocationLabel = location.Label;
+            viewModel.SelectedFeatures = location.LocationFeatures
+                .Select(lf => lf.NaturalFeature)
+                .Select(nf => nf.Name)
+                .ToList();
+            viewModel.AllNaturalFeatures = db.NaturalFeatures
+                .Select(nf => nf.Name)
+                .ToList();
+            return View(viewModel);
+        }
+
+        /// <summary>
+        /// HttpPost NaturalFeatures/EditNaturalFeatures/5
+        /// </summary>
+        /// <param name="viewModel">The model to validate.</param>
+        /// <returns>A redirect to location details if successful, else back to EditNaturalFeatures.</returns>
+        [Authorize]
+        [HttpPost]
+        public ActionResult EditNaturalFeatures([Bind(Include = "LocationID, LocationLabel, AllNaturalFeatures, SelectedFeatures")] EditNaturalFeaturesViewModel viewModel)
+        {
+            System.Diagnostics.Debug.WriteLine("post Location/EditNaturalFeatures(viewModel)");
+            System.Diagnostics.Debug.WriteLine("SelectedFeatures = " + GetArrayFormattedString(viewModel.SelectedFeatures));
+
+            // check for no SelectedFeatures.
+            if (viewModel.SelectedFeatures == null) viewModel.SelectedFeatures = new List<string>();
+            Location location = db.Locations.Find(viewModel.LocationID);
+            // save all changes to the db.
+            if (ModelState.IsValid)
+            {
+                System.Diagnostics.Debug.WriteLine("ModelState is valid.");
+                EditNaturalFeaturesFor(location, viewModel.SelectedFeatures);
+                return RedirectToAction("Details", "Location", new { id = viewModel.LocationID });
+            }
+
+            // **********************************************************
+            // a model state error occurred, redirect back to edit view.
+            // **********************************************************                
+            System.Diagnostics.Debug.WriteLine("ModelState is INVALID.");
+
+            // reload AllNaturalFeatures from the db.
+            viewModel.Location = location;
+            viewModel.AllNaturalFeatures = db.NaturalFeatures
+                .Select(nf => nf.Name)
+                .ToList();
+
+            return View(viewModel);
+        }
+        /// <summary>
+        /// Helper method to edit the NaturalFeatures of the specified Location by modifying
+        /// the entries of the bridge entity LocationFeatures.
+        /// </summary>
+        ///<param name="location">The Location to modify the associated NaturalFeatures of.</param>
+        /// <param name="SelectedFeatures">
+        /// <para>        
+        /// The names of which NaturalFeatures to associate.
+        /// </para><para>
+        /// Any names which don't match an existing NaturalFeature will be
+        /// added as a new NaturalFeature.  
+        /// </para><para>
+        /// Any NaturalFeatures which are associated with the Location
+        /// but are are not in this list will be removed from the Location.
+        /// </para><para>
+        /// Any NaturalFeatures which not are associated with the Location
+        /// but are in this list will be added to the Location.
+        /// </para><para>
+        /// All other NaturalFeature associations will remain untouched. 
+        /// </para>
+        /// </param>
+        public void EditNaturalFeaturesFor(Location location, ICollection<string> SelectedFeatures)
+        {
+            int locationID = location.LocationID;
+
+            System.Diagnostics.Debug.WriteLine("ModelState is valid.");
+
+            // 1) - Set aside all previous location features for comparison.
+            var associated = db.LocationFeatures
+                .Include(lf => lf.NaturalFeature)
+                .Where(lf => lf.LocationID == locationID)
+                .ToList();
+
+            // ****************************************************
+            // 2) - add any new NaturalFeatures.
+            // ****************************************************
+            int newNfCount = 0;
+            foreach (string name in SelectedFeatures)
+            {
+                var match = db.NaturalFeatures.SingleOrDefault(nf => nf.Name.Equals(name));
+                if (match == null)
+                {
+                    db.NaturalFeatures.Add(new NaturalFeature(name));
+                    newNfCount++;
+                }
+            }
+            db.SaveChanges();
+            System.Diagnostics.Debug.WriteLine(String.Format("successfully added {0} new NaturalFeatures.", newNfCount));
+
+
+            // get all features to iterate over.
+            var selected = db.NaturalFeatures
+                .Where(nf => SelectedFeatures.Contains(nf.Name))
+                .ToList();
+
+
+            // ****************************************************
+            // 3) - remove any LocationFeatures that are currently 
+            //      associated, but aren't selected.
+            // ****************************************************
+            int removedLfcount = 0;
+            foreach (LocationFeature item in associated)
+            {
+                var result = selected.SingleOrDefault(nf => nf.ID == item.NaturalFeatureID);
+                if (result == null)
+                {
+                    System.Diagnostics.Debug.WriteLine(String.Format("'{0}' is associated with '{1}', but needs to be removed.", item.NaturalFeature.Name, location.Label));
+                    db.LocationFeatures.Remove(item);
+                    removedLfcount++;
+                }
+            }
+            db.SaveChanges();
+            System.Diagnostics.Debug.WriteLine(String.Format("successfully removed {0} LocationFeatures from {1}.", removedLfcount, location.Label));
+
+
+            // ****************************************************
+            // 4) - add any LocationFeatures that are currently 
+            //      selected, but aren't associated.
+            // ****************************************************
+            int addedLfCount = 0;
+            foreach (NaturalFeature item in selected)
+            {
+                var result = associated.SingleOrDefault(lf => lf.NaturalFeatureID == item.ID);
+                if (result == null)
+                {
+                    System.Diagnostics.Debug.WriteLine(String.Format("'{0}' is not associated with '{1}', but needs to be added.", item.Name, location.Label));
+                    db.LocationFeatures.Add(new LocationFeature(locationID, item.ID));
+                    addedLfCount++;
+                }
+            }
+            db.SaveChanges();
+            System.Diagnostics.Debug.WriteLine(String.Format("successfully added {0} new LocationFeatures for {1}.", addedLfCount, location.Label));
+        }
+
+        // ************************************************************************************************************
+        // RECREATIONS
+        // ************************************************************************************************************
+
+
+        /// <summary>
+        /// Edit the NaturalFeatures for a single Location.
+        /// </summary>
+        /// <param name="locationID">The index of the Location to edit.</param>
+        /// <returns>the Location/EditFor view.</returns>
+        [Authorize]
+        public ActionResult EditRecreations(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            System.Diagnostics.Debug.WriteLine("get EditRecreations(" + id + ")");
+
+            Location location = db.Locations.Find(id);
+
+            if (location == null)
+            {
+                return HttpNotFound();
+            }
+            /*
+            EditNaturalFeaturesViewModel viewModel = new EditNaturalFeaturesViewModel();
+            viewModel.LocationID = location.LocationID;
+            viewModel.LocationLabel = location.Label;
+            viewModel.SelectedFeatures = location.LocationFeatures
+                .Select(lf => lf.NaturalFeature)
+                .Select(nf => nf.Name)
+                .ToList();
+            viewModel.AllNaturalFeatures = db.NaturalFeatures
+                .Select(nf => nf.Name)
+                .ToList();
+            return View(viewModel);
+             */
+            return View();
+        }
+
+        /// <summary>
+        /// Helper method to edit the Recreations for a given Location.
+        /// </summary>
+        /// <param name="location">The location to edit the Recreations for.</param>
+        public void EditRecreationsFor(Location location, List<LocationRecreation> recOptions)
+        {
+            List<LocationRecreation> locrecList = new List<LocationRecreation>();
+            foreach (var locRec in recOptions)
+            {
+                if (locRec.IsChecked)
+                {
+                    LocationRecreation lr = locRec;
+
+                    int latestID = db.Locations.Where(l => l.Label == location.Label).ToList().First().LocationID;
+                    Location tempL = db.Locations.Find(latestID); //get the last Location entered
+                    lr.LocationID = tempL.LocationID;
+                    db.LocationRecreations.Add(lr);
+                }
+            }
+            db.SaveChanges();
         }
     }
 }

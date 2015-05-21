@@ -49,24 +49,6 @@
         <h2>@ViewBag.Title <a href="/Location/Create"><span title="Add New Location" style="color: green;"><i class="glyphicon glyphicon-plus"></i></span></a></h2>
     </div>
 
-    <!--RECREATIONS FILTER-->
-    <div class="col-xs-12 col-sm-6">
-        <br />
-        <div class="dropdown" style="float:right">
-            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-                Filter by Recreation Type
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                <li>@Html.ActionLink("All", "Browse", "Location", null, new { role = "menuItem", tabindex = "-1" })</li>
-                @foreach (var item in Model.Recreations)
-                {
-                    <li>@Html.ActionLink(item.Label, "Browse", "Location", new { recreationID = item.RecreationID }, new { role = "menuItem", tabindex = "-1" })</li>
-                }
-            </ul>
-        </div>
-    </div>
-
 </div>
 
 <!-- MAP -->
@@ -80,27 +62,43 @@
 
 <!-- SEARCH -->
 @using (Html.BeginForm("Browse", "Location"))
-{
+{   <!--RECREATIONS FILTER-->
+    <div class="dropdown" style="float:left">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+            Recreation Type
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+            <li>@Html.ActionLink("All", "Browse", "Location", null, new { role = "menuItem", tabindex = "-1" })</li>
+            @foreach (var item in Model.Recreations)
+            {
+                <li>@Html.ActionLink(item.Label, "Browse", "Location", new { recreationID = item.RecreationID }, new { role = "menuItem", tabindex = "-1" })</li>
+            }
+        </ul>
+    </div>
     <div class="input-group">
-        <span class="input-group-btn">
+        @Html.TextBox("query", null, new { @class = "form-control", placeholder = "Search by Name or State" })
+        <span class="input-group-btn" style="grid-column-align:center">
             <button class="btn btn-default" id="btn" type="submit">
                 <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-            </button>            
+            </button>
         </span>
-        @Html.TextBox("query", null, new { @class = "form-control", placeholder = "Search by Name or State" })
-
-        @if (ViewBag.Recreation != null)
-        {
-            <span style="margin:12px"></span>
-            <span id="recreation" class="badge">
-                @ViewBag.Recreation.RecreationLabel
-            </span>
-        }
-        @if (ViewBag.SearchString != null && ViewBag.SearchString != "")
-        {
-            <span style="padding:12px">Showing results for "@ViewBag.SearchString"</span>
-        }
+        <div style="float:left">
+            @if (ViewBag.Recreation != null)
+            {
+                <span style="margin:12px"></span>
+                <span class="tag tag-recreation tag-normal-size">
+                    @ViewBag.Recreation.RecreationLabel
+                </span>
+                @Html.HiddenFor(m => m.recreationID)
+            }
+            @if (ViewBag.SearchString != null && ViewBag.SearchString != "")
+            {
+                <span style="padding:12px">Showing results for <b>"@ViewBag.SearchString"</b></span>
+            }
+        </div>
     </div>
+
 }<br />
 
 <!-- LOCATIONS -->

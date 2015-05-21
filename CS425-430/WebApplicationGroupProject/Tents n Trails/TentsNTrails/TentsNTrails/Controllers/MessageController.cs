@@ -223,7 +223,11 @@ namespace TentsNTrails.Controllers
                 message.DeletedByRecipient = true;
             }
 
-            //db.Messages.Remove(message);
+            if (message.DeletedByRecipient && message.DeletedBySender)
+            {
+                db.Messages.Remove(message);
+            }
+
             db.SaveChanges();
             return RedirectToAction("Index");
         }
@@ -235,6 +239,17 @@ namespace TentsNTrails.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+        
+        /// <summary>
+        /// Renders a PartialView showing how many unread messages the current user has.
+        /// </summary>
+        /// <returns>A PartialView showing the count of unread messages.</returns>
+        public PartialViewResult UnreadCount()
+        {
+            string userID = User.Identity.GetUserId();
+            ViewBag.UnreadCount = db.Messages.Where(m => m.ToUser.Id.Equals(userID) && !m.IsRead).Count();
+            return PartialView();
         }
     }
 }

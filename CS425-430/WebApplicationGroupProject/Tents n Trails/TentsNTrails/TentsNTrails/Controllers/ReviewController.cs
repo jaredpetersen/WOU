@@ -59,6 +59,7 @@ namespace TentsNTrails.Controllers
                 ViewBag.HasReviews = true;
             }
 
+
             return View(viewModelList);
         }
 
@@ -152,7 +153,7 @@ namespace TentsNTrails.Controllers
                 db.SaveChanges();
                 
                 var LocationID = review.LocationID;
-                return RedirectToAction("Details/" + LocationID, "Location");
+                return RedirectToAction("Details/" + review.LocationID, "Location", new { Message = LocationController.LocationMessageId.ReviewSavedSuccess });
             }
 
             //ViewBag.LocationID = new SelectList(db.Locations, "LocationID", "Label", review.LocationID);
@@ -309,9 +310,10 @@ namespace TentsNTrails.Controllers
             {
                 db.Entry(review).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Details/" + review.LocationID, "Location");
+                return RedirectToAction("Details/" + review.LocationID, "Location", new { Message = LocationController.LocationMessageId.ReviewSavedSuccess });
             }
             ViewBag.LocationID = new SelectList(db.Locations, "LocationID", "Label", review.LocationID);
+            
             return View(review);
         }
 

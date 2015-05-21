@@ -63,6 +63,8 @@ namespace TentsNTrails.Models
         public static String DENY    = " has denied your connection request.";
 
         // the friend who the notification is about.
+        [ForeignKey("PotentialFriend")]
+        public string PotentialFriend_Id { get; set; }
         public User PotentialFriend { get; set; }
         
         /// <summary>
@@ -79,8 +81,10 @@ namespace TentsNTrails.Models
                 DateCreated = DateTime.UtcNow,
                 DateRead = null,
                 User = targetUser,
+                UserID = targetUser.Id,
                 PotentialFriend = potentialFriend,
-        };
+                PotentialFriend_Id = potentialFriend.Id,
+            };
         }
 
         /// <summary>

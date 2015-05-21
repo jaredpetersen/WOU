@@ -80,6 +80,10 @@ namespace TentsNTrails.Controllers
             return PartialView(viewModel);
         }
 
+        /// <summary>
+        /// Renders a PartialView showing how many unread notifications the current user has.
+        /// </summary>
+        /// <returns>A PartialView showing the count of unread notifications.</returns>
         public PartialViewResult UnreadCount()
         {
             string userID = User.Identity.GetUserId();

@@ -59,6 +59,7 @@ namespace TentsNTrails.Controllers
 
             var model = new IndexViewModel
             {
+                Id = user.Id,
                 HasPassword = HasPassword(),
                 FirstName = user.FirstName,
                 LastName = user.LastName,

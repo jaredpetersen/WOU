@@ -38,8 +38,18 @@
     ViewBag.Title = Model.Label;
 }
 
+@if (ViewBag.StatusMessage != null && ViewBag.StatusMessage != "")
+{
+    <br />
+    <div class="row">
+        <div class="alert alert-success col-md-4" style="margin-left:15px" role="alert">
+            @ViewBag.StatusMessage
+        </div>
+    </div>
+}
+
+
 <h2>@Html.DisplayFor(model => model.Label)</h2>
-<p style="color: green;">@ViewBag.SuccessMessage</p>
 <hr />
 
 <!-- LOCATION DETAILS-->
@@ -70,34 +80,62 @@
             <dd>
                 @{ Html.RenderAction("ReviewForm", "Location", new { id = Model.LocationID, redirectAction = "Details", redirectController = "Location" }); }
             </dd>
-            <dt>
-                Recreation Types
-            </dt>
+
+            <!--RECREATIONS-->
+            <dt>Recreation Types</dt>
             <dd>
                 <div>
-                    @foreach (var item in Model.RecOptions)
-                    {
-                        <span class="label label-recreation">
-                            @Html.ActionLink(item.RecreationLabel, "Browse", new { recreationID = item.RecreationID }, new { title = String.Format("Browse all {0} locations", item.RecreationLabel) })
-                        </span>
+                    <span class="tag tag-button">
+                        <a href="@Url.Action("EditRecreations", "Location", new { id = Model.LocationID })" title="Add or remove Recreations">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                    </span>
+                    @{
+                        var recreations = Model.RecOptions.Select(r => r.Recreation);
+                        if (recreations.Count() == 0)
+                        {
+                            <span class="tag tag-disabled" title="No Natural Features are associated with @Model.Label">None</span>
+                        }
+                        else
+                        {
+                            foreach (var item in recreations)
+                            {
+                                <span class="tag tag-recreation">
+                                    @Html.ActionLink(item.Label, "Browse", "Location", new { recreationID = item.RecreationID }, new { title = String.Format("Browse all {0} locations", item.Label) })
+                                </span>
+                            }
+                        }
                     }
                 </div>
             </dd>
 
-            <dt>
-                Natural Features
-            </dt>
+            <!--NATURAL FEATURES-->
+            <dt>Natural Features</dt>
             <dd>
                 <div>
-                    @foreach (var item in Model.LocationFeatures.Select(lf => lf.NaturalFeature))
-                    {
-                        <span class="label label-natural-feature">
-                            @Html.ActionLink(item.Name, "Details", "NaturalFeatures", new { id = item.ID }, null)
-                        </span>
+                    <span class="tag tag-button">
+                        <a href="@Url.Action("EditNaturalFeatures", "Location", new { id = Model.LocationID })" title="Add or remove Natural Features">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                    </span>
+                    @{
+                        var naturalFeatures = Model.LocationFeatures.Select(lf => lf.NaturalFeature);
+                        if (naturalFeatures.Count() == 0)
+                        {
+                            <span class="tag tag-disabled" title="No Natural Features are associated with @Model.Label">None</span>
+                        }
+                        else
+                        {
+                            foreach (var item in naturalFeatures)
+                            {
+                                <span class="tag tag-natural-feature">
+                                    @Html.ActionLink(item.Name, "Details", "NaturalFeatures", new { id = item.ID }, new { title = String.Format("Browse all {0} locations", item.Name) })
+                                </span>
+                            }
+                        }
                     }
                 </div>
             </dd>
-
 
         </dl>
     </div>

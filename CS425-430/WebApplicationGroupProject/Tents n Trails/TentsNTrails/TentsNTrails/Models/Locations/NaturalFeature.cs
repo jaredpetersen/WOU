@@ -45,5 +45,11 @@ namespace TentsNTrails.Models
         {
             this.Name = name;
         }
+
+        public override string ToString()
+        {
+            return String.Format("NaturalFeature '{0}'", Name ?? "null");
+        }
+
     }
 }

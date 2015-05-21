@@ -213,5 +213,60 @@ namespace TentsNTrails.Models
             }
             return state;
         }
+
+        /// <summary>
+        /// Convenience method to calculate the centerpoint of latlong coordinates using trigonometry
+        /// (solution used from http://stackoverflow.com/questions/6671183/calculate-the-center-point-of-multiple-latitude-longitude-coordinate-pairs)
+        /// </summary>
+        /// <param name="locations">The list of locations with latlong data to average.</param>
+        /// <returns>A temp location containing the averaged data.</returns>
+        public static Location GetLatLongCenter(ICollection<Location> locations)
+        {
+            int count = locations.Count;
+
+            // return center of US if no locations.
+            if (count == 0)
+            {
+                // for now, use this: the below logic doesn't seem to be too accurate.  it is close, though ...
+                return new Location()
+                {
+                    Latitude = 39.8282,
+                    Longitude = -98.5795
+                };
+            }
+
+            double x = 0;
+            double y = 0;
+            double z = 0;
+
+            foreach (Location l in locations)
+            {
+                // convert to radians
+                double latitude = l.Latitude * Math.PI / 180;
+                double longitude = l.Longitude * Math.PI / 180;
+
+                // convert to cartesian coordinates
+                x += Math.Cos(latitude) * Math.Cos(longitude);
+                y += Math.Cos(latitude) * Math.Sin(longitude);
+                z += Math.Sin(latitude);
+            }
+
+            // average cartesian coordinates
+            x /= count;
+            y /= count;
+            z /= count;
+
+            // convert back to latitude/longitude
+            double hypoteneuse = Math.Sqrt(x * x + y * y);
+            double centerLatitude = Math.Atan2(z, hypoteneuse) * 180 / Math.PI;
+            double centerLongitude = Math.Atan2(y, x) * 180 / Math.PI;
+
+            // store results in a temporary location.
+            return new Location()
+            {
+                Latitude = centerLatitude,
+                Longitude = centerLongitude
+            };
+        }
     }
 }

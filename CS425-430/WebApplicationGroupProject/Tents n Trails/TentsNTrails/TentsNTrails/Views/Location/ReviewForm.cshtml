@@ -9,7 +9,7 @@
             @Html.Hidden("Rating", true);
             @Html.Hidden("Comment", null);
             // The user must be logged in and they've made a rating for this location and it was an up vote
-            <label for="@("UpSubmit" + Model.LocationID)" class="btn" style="padding:0px 2px;"><i title ="Up Vote" class="glyphicon glyphicon-thumbs-up @(ViewBag.UpVoted ?? false ? "voted" : "") "></i></label>
+            <label for="@("UpSubmit" + Model.LocationID)" class="btn" style="padding:0px 2px;"><i title="Up Vote" class="glyphicon glyphicon-thumbs-up @(ViewBag.UpVoted ?? false ? "voted" : "") "></i></label>
             <input id="@("UpSubmit" + Model.LocationID)" type="submit" value="Up" class="hidden" />
             @Model.UpVotes()
         }

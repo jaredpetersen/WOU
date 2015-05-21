@@ -312,6 +312,7 @@
     <Compile Include="Models\Locations\NaturalFeatureViewModels.cs" />
     <Compile Include="Models\Users\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
+    <Compile Include="Models\Users\LeaderboardViewModel.cs" />
     <Compile Include="Models\Users\Message.cs" />
     <Compile Include="Models\Users\NotificationModels.cs" />
     <Compile Include="Models\Media\ProfilePicture.cs" />
@@ -358,6 +359,12 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Scripts\hidden-form-controls.js" />
+    <Content Include="Scripts\hidden-list-search.js" />
+    <Content Include="Scripts\location-details-google-map.js" />
+    <Content Include="Scripts\location-edit-google-map.js" />
+    <Content Include="Scripts\location-create-google-map.js" />
+    <Content Include="Scripts\set-select-list-text-color.js" />
     <Content Include="WindowsAzure.Caching.MemcacheShim\AzureMemcacheService.exe" />
     <Content Include="WindowsAzure.Caching.MemcacheShim\CacheDumpGenerator.exe" />
     <Content Include="WindowsAzure.Caching.MemcacheShim\ClientPerfCountersInstaller.exe" />
@@ -535,6 +542,18 @@
     <Content Include="Views\NaturalFeatures\Index.cshtml" />
     <Content Include="Views\Leaderboard\Details.cshtml" />
     <Content Include="Views\Leaderboard\Index.cshtml" />
+    <Content Include="Views\Shared\_SocialMenuPartial.cshtml" />
+    <Content Include="Views\Message\UnreadCount.cshtml" />
+    <Content Include="Views\Shared\_UserMenuPartial.cshtml" />
+    <Content Include="Views\NaturalFeatures\TestForm.cshtml" />
+    <Content Include="Views\NaturalFeatures\SearchForm.cshtml" />
+    <Content Include="Views\NaturalFeatures\CombinedExample.cshtml" />
+    <Content Include="Views\NaturalFeatures\EditFor.cshtml" />
+    <Content Include="Views\Location\EditRecreations.cshtml" />
+    <Content Include="Views\Location\EditNaturalFeatures.cshtml" />
+    <Content Include="Views\Shared\_FooterBody.cshtml" />
+    <Content Include="Views\Shared\_FooterFixedBottom.cshtml" />
+    <Content Include="Views\Shared\_Navbar.cshtml" />
     <None Include="Web.AzureNightly.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

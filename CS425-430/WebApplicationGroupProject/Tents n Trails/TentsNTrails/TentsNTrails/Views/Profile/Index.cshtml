@@ -93,44 +93,42 @@
                     alt="Image of @Model.UserName"
                     style="max-width: 100%; height: 170px; overflow:hidden;" />
             <br />
-            @if (ViewBag.IsOnOwnProfile)
-            {
-                @Html.ActionLink("[Upload new profile picture]", "UploadProfilePicture")
-            }
         </div>
     </div>
                 
     <!-- USER INFO -->
     <div class="col-md-6 col-xs-6">
-        <h2>@Html.DisplayFor(model => model.UserName)</h2>
+        <h2>
+            @Html.DisplayFor(model => model.UserName)
+            @if (ViewBag.IsOnOwnProfile)
+            {
+                <a href="/Manage/Index"><span title="Edit Personal Settings" style="color: green;"><i class="glyphicon glyphicon-wrench"></i></span></a>
+            }
+        </h2>
 
         @if (!ViewBag.IsPrivate || (ViewBag.IsPrivate && ViewBag.IsConnected))
         {
             <!-- SHOW ALL -->
             <dl class="dl-horizontal">
-                <dt>
-                    <label>First Name:</label>
-                </dt>
-                <dd>
-                    @Html.DisplayFor(model => model.FirstName)
-                </dd>
+                <dt><label>First Name:</label></dt>
+                <dd>@Html.DisplayFor(model => model.FirstName)</dd>
 
-                <dt>
-                    <label>Last Name:</label>
-                </dt>
-                <dd>
-                    @Html.DisplayFor(model => model.LastName)
-                </dd>
+                <dt><label>Last Name:</label></dt>
+                <dd>@Html.DisplayFor(model => model.LastName)</dd>
                 
                 @if (Model.UserActivities.Count > 0)
                 {
-                    <dt>
-                        <label>Activities:</label>
-                    </dt>
-                    foreach (var item in Model.UserActivities)
+                    <dt><label>Activities:</label></dt>
+                    <dd>
+                        <div>
+                            @foreach (var item in Model.UserActivities.Select(a => a.Recreation))
                     {
-                        <dd> @Html.DisplayFor(m => item.RecreationLabel) </dd>
+                                <span class="tag tag-recreation">
+                                    @Html.ActionLink(item.Label, "Browse", "Location", new { recreationID = item.RecreationID }, new { title = String.Format("Browse all {0} locations", item.Label) })
+                                </span>
                     }
+                        </div>
+                    </dd>
                 }
 
                 <dt>
@@ -139,14 +137,6 @@
                 <dd>
                     @Html.DisplayFor(model => model.About)
                 </dd>
-                @if (Request.IsAuthenticated && (User.Identity.Name == Model.UserName || User.IsInRole("Admin")))
-                    {
-                    <dd class="dl-horizontal">
-                        [
-                        @Html.ActionLink("Update About Me", "Edit", new { id = Model.Id })
-                        ]
-                    </dd>
-                    }
             </dl>
         }
         else
@@ -156,13 +146,17 @@
             <dl class="dl-horizontal">
                 @if (Model.UserActivities.Count > 0)
                 {
-                    <dt>
-                        <label>Activities:</label>
-                    </dt>
-                    foreach (var item in Model.UserActivities)
+                    <dt><label>Activities:</label></dt>
+                    <dd>
+                        <div>
+                            @foreach (var item in Model.UserActivities.Select(a => a.Recreation))
                     {
-                        <dd> @Html.DisplayFor(m => item.RecreationLabel) </dd>
+                                <span class="tag tag-recreation">
+                                    @Html.ActionLink(item.Label, "Browse", "Location", new { recreationID = item.RecreationID }, new { title = String.Format("Browse all {0} locations", item.Label) })
+                                </span>
                     }
+                        </div>
+                    </dd>
                 }
             </dl>
         }

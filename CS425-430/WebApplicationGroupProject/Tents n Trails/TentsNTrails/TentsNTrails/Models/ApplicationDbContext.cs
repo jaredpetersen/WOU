@@ -29,7 +29,8 @@ namespace TentsNTrails.Models
         public const string LOCAL_DB = "LocalDB";
         public const string AZURE_RELEASE = "AzureRelease";
         public const string AZURE_NIGHTLY = "AzureNightly";
-        public const string CURRENT = ConnectionStrings.LOCAL_DB;
+        public const string CURRENT = ConnectionStrings.TENTS_N_TRAILS_DB;
+        //public const string CURRENT = ConnectionStrings.AZURE_RELEASE;
     }
 
     /// <summary>

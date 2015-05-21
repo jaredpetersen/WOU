@@ -29,6 +29,7 @@ namespace TentsNTrails.Migrations
         {
             CreateAdmin(db);
             AddUsers(db);
+            AddConnections(db);
             Add50States(db);
             AddLocationData(db);
             AddStatesToLocations(db);
@@ -92,7 +93,7 @@ namespace TentsNTrails.Migrations
                     Email = "pretzles@hotmail.com",
                     Firstname = "Barack",
                     Lastname = "Obama",
-                    About = "",
+                    About = "I think that things should be taken one at a time, like a bag of pretzels.",
                     Private = true,
                     ImageUrl = "https://tentsntrails.blob.core.windows.net/images/profile-picture-pretzlesf954b007-7ed5-4aa9-a969-80bc834b113a.jpg"
                 },
@@ -163,6 +164,91 @@ namespace TentsNTrails.Migrations
             db.SaveChanges();
             */
 
+        }
+
+
+        /// <summary>
+        /// Seed the db with some Connections and ConnectionRequests.
+        /// </summary>
+        /// <param name="db">The db to seed.</param>
+        public void AddConnections(ApplicationDbContext db)
+        {
+            User fancyman55 = db.Users.SingleOrDefault(u => u.UserName.Equals("fancyman55"));
+            User hatersGonnaHate = db.Users.SingleOrDefault(u => u.UserName.Equals("hatersGonnaHate"));
+            User morningmist = db.Users.SingleOrDefault(u => u.UserName.Equals("morningmist"));
+            User pretzles = db.Users.SingleOrDefault(u => u.UserName.Equals("pretzles"));
+            User jgarcia = db.Users.SingleOrDefault(u => u.UserName.Equals("jgarcia"));
+            User pandaPal = db.Users.SingleOrDefault(u => u.UserName.Equals("pandaPal"));
+
+
+            // Connections
+            List<Connection> connections = new List<Connection>();
+            connections.Add(new Connection(fancyman55, morningmist));
+            connections.Add(new Connection(fancyman55, jgarcia));
+            connections.Add(new Connection(fancyman55, pandaPal));
+            connections.Add(new Connection(pretzles, pandaPal));
+            connections.Add(new Connection(pretzles, hatersGonnaHate));
+            connections.Add(new Connection(morningmist, jgarcia));
+            /*
+            connections.ForEach(c =>
+            {
+                int count = db.Connections.Where(c2 =>
+                    c.User1.Id.Equals(c2.User1.Id) &&
+                    c.User2.Id.Equals(c2.User2.Id)
+                    ).Count();
+                if (count == 0) db.Connections.Add(c); 
+            });
+             * */
+            connections.ForEach(s => db.Connections.AddOrUpdate(c => new { c.User1_Id, c.User2_Id }, s));
+            db.SaveChanges();
+
+            // ConnectionRequests.
+            List<ConnectionRequest> connectionRequests = new List<ConnectionRequest>();
+            connectionRequests.Add(new ConnectionRequest(pretzles, morningmist));
+            connectionRequests.Add(new ConnectionRequest(pretzles, jgarcia));
+            connectionRequests.Add(new ConnectionRequest(morningmist, pandaPal));
+            connectionRequests.Add(new ConnectionRequest(pandaPal, hatersGonnaHate));
+            connectionRequests.Add(new ConnectionRequest(hatersGonnaHate, fancyman55));
+            connectionRequests.Add(new ConnectionRequest(fancyman55, pretzles));
+            /*
+            connectionRequests.ForEach(c =>
+            {
+                int count = db.ConnectionRequests.Where(c2 => 
+                    c.Sender.Id.Equals(c2.Sender.Id) && 
+                    c.RequestedUser.Id.Equals(c2.RequestedUser.Id)
+                    ).Count();
+                if (count == 0) db.ConnectionRequests.Add(c); 
+            });
+             * */
+            connectionRequests.ForEach(s => db.ConnectionRequests.AddOrUpdate(c => new { c.RequestedUser_Id, c.Sender_Id }, s));
+            db.SaveChanges();
+
+
+            //notifications
+            List<FriendNotification> notifications = new List<FriendNotification>();
+            foreach (ConnectionRequest request in connectionRequests)
+            {
+                notifications.Add(FriendNotification.CreateRequestNotification(request.RequestedUser, request.Sender));
+            }
+            foreach (Connection connection in connections)
+            {
+                notifications.Add(FriendNotification.CreateConfirmNotification(connection.User1, connection.User2));
+            }
+            notifications.Add(FriendNotification.CreateDenyNotification(morningmist, hatersGonnaHate));
+            notifications.Add(FriendNotification.CreateDenyNotification(jgarcia, hatersGonnaHate));
+            /*
+            notifications.ForEach(n =>
+            {
+                int count = db.FriendNotifications.Where(n2 =>
+                    n.User.Id.Equals(n2.User.Id) &&
+                    n.PotentialFriend.Id.Equals(n2.PotentialFriend.Id) &&
+                    n.Description.Equals(n2.Description)
+                    ).Count();
+                if (count == 0) db.FriendNotifications.Add(n);
+            });
+            */
+            notifications.ForEach(s => db.FriendNotifications.AddOrUpdate(n => new { n.UserID, n.PotentialFriend_Id, n.Description  }, s));
+            db.SaveChanges();
         }
 
         // ******************************************
@@ -307,8 +393,13 @@ namespace TentsNTrails.Migrations
             System.Diagnostics.Debug.WriteLine("Adding Recreations ...");
             var recreations = new List<Recreation>
             {
+                new Recreation { Label = "Biking"},
+                new Recreation { Label = "Camping"},
+                new Recreation { Label = "Fishing"},
                 new Recreation { Label = "Hiking"},
-                new Recreation { Label = "Camping"}               
+                new Recreation { Label = "Swimming"},
+                new Recreation { Label = "Skiing"},
+                new Recreation { Label = "Watersports"},
             };
             foreach (Recreation r in recreations)
             {
@@ -338,7 +429,6 @@ namespace TentsNTrails.Migrations
             int bryc_ID = db.Locations.Where(l => l.Label.Contains("Bryce Canyon")).Single().LocationID;
 
             // add RecreationLocation data
-            System.Diagnostics.Debug.WriteLine("Adding LocationRecreations ...");
             var locationrecreations = new List<LocationRecreation>()
             {
                 new LocationRecreation { LocationID = mf_ID, RecreationID = hikeID, RecreationLabel = "Hiking", IsChecked = true},
@@ -408,14 +498,16 @@ namespace TentsNTrails.Migrations
                     ReviewDate = now, 
                     Rating = like,
                     Comment = "One of my favorite places to go hiking with my wife.",
-                    User = fancyman55
+                    User = fancyman55,
+                    User_Id = fancyman55.Id
                 },
                 new Review { 
                     LocationID = multnomah_falls_ID, 
                     ReviewDate = now, 
                     Rating = like,
                     Comment = "It's really nice here.",
-                    User = fancyman55
+                    User = fancyman55,
+                    User_Id = fancyman55.Id
                 },
 
                 // morningmist
@@ -423,33 +515,38 @@ namespace TentsNTrails.Migrations
                     LocationID = silver_falls_ID, 
                     ReviewDate = now, 
                     Rating = like,
-                    User = morningmist
+                    User = morningmist,
+                    User_Id = morningmist.Id
                 },
                 new Review { 
                     LocationID = multnomah_falls_ID, 
                     ReviewDate = now, 
                     Rating = like,
-                    User = morningmist
+                    User = morningmist,
+                    User_Id = morningmist.Id
                 },
                 new Review { 
                     LocationID = grand_canyon_ID, 
                     ReviewDate = now, 
                     Rating = like,
                     Comment = "Such a gorgeous view!",
-                    User = morningmist
+                    User = morningmist,
+                    User_Id = morningmist.Id
                 },
                 new Review { 
                     LocationID = zion_park_ID, 
                     ReviewDate = now, 
                     Rating = like,
                     Comment = "The colors present are simply breathtaking.  A must see for any outdoors enthusiast.",
-                    User = morningmist
+                    User = morningmist,
+                    User_Id = morningmist.Id
                 },
                 new Review { 
                     LocationID = santiam_park_ID, 
                     ReviewDate = now, 
                     Rating = like,
-                    User = morningmist
+                    User = morningmist,
+                    User_Id = morningmist.Id
                 },
 
                 // hatersGonnaHate
@@ -457,28 +554,32 @@ namespace TentsNTrails.Migrations
                     LocationID = silver_falls_ID, 
                     ReviewDate = now, 
                     Rating = dislike,
-                    User = hatersGonnaHate
+                    User = hatersGonnaHate,
+                    User_Id = hatersGonnaHate.Id
                 },
                 new Review { 
                     LocationID = multnomah_falls_ID, 
                     ReviewDate = now, 
                     Rating = dislike,
                     Comment = "I hate waterfalls.",
-                    User = hatersGonnaHate
+                    User = hatersGonnaHate,
+                    User_Id = hatersGonnaHate.Id
                 },
                 new Review { 
                     LocationID = grand_canyon_ID, 
                     ReviewDate = now, 
                     Rating = like,
                     Comment = "I hate canyons.",
-                    User = hatersGonnaHate
+                    User = hatersGonnaHate,
+                    User_Id = hatersGonnaHate.Id
                 },
                 new Review { 
                     LocationID = zion_park_ID, 
                     ReviewDate = now, 
                     Rating = like,
                     Comment = "Even I can't hate this, just go and see for yourself.",
-                    User = hatersGonnaHate
+                    User = hatersGonnaHate,
+                    User_Id = hatersGonnaHate.Id
                 },
 
                 // pretzles
@@ -486,35 +587,30 @@ namespace TentsNTrails.Migrations
                     LocationID = silver_falls_ID, 
                     ReviewDate = now, 
                     Rating = like,
-                    User = pretzles
+                    User = pretzles,
+                    User_Id = pretzles.Id
                 },
                 new Review { 
                     LocationID = multnomah_falls_ID, 
                     ReviewDate = now, 
                     Rating = like,
                     Comment = "When I get the chance, I love to mozey on down here.  It's so nice to walk across the bridge.  In my age, it's getting hard to walk up the high distance, though.",
-                    User = pretzles
+                    User = pretzles,
+                    User_Id = pretzles.Id
                 },
                 new Review { 
                     LocationID = grand_canyon_ID, 
                     ReviewDate = now, 
                     Rating = like,
                     Comment = "What a national symbol of America, go team USA!",
-                    User = pretzles
+                    User = pretzles,
+                    User_Id = pretzles.Id
                 }
 
             };
 
-            
-            reviews.ForEach(r => {
-                try {
-                    db.Reviews.AddOrUpdate(s => s.Comment, r);
-                }
-                catch (InvalidOperationException ex)
-                {
-                    System.Diagnostics.Debug.WriteLine("{0}: Unable to add or update Review. ({1})",  ex.ToString(), ex.Message);
-                }
-            });
+
+            reviews.ForEach(s => db.Reviews.AddOrUpdate(r => new { r.LocationID, r.User_Id }, s));
             db.SaveChanges();
         }
 

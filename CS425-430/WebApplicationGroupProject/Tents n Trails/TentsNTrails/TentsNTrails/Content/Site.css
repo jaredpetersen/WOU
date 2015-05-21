@@ -26,7 +26,8 @@ textarea {
 
 html.main {
     background-color: #000000;
-    background: url("green_forest.jpg") no-repeat center center fixed;
+    background: #ffffff;
+    background: url("green_forest.jpg") no-repeat center center fixed;/**/
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -42,10 +43,20 @@ html.main {
 .navbar-nav > li > a,
 a.navbar-brand:link,
 a.navbar-brand:visited {
+    /*
     padding: 10px 15px 10px 15px;
+
+    */
     line-height: 15px;
     text-decoration: none;
 }
+
+/*---- nav text color ----*/
+navbar-brand,
+.navbar-inverse .navbar-nav>li>a {
+  color: #b7b7b7;
+}
+
 
 .navbar-brand {
     padding-top: 7px;
@@ -61,28 +72,39 @@ a.navbar-brand:visited {
     color: rgb(150, 150, 150);
 }
 
-/*.footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 30px;
+.custom-footer {
+    position:fixed;
+    bottom:0; 
+    left:0; 
+    width:100%; 
+    min-height: 20px;
     background-color: rgba(30, 30, 30, 0.7);
-    color: rgb(150, 150, 150);
+    color: #b7b7b7;
+    text-decoration: none;
 }
 
-.footer > .container {
-    padding-right: 15px;
-    padding-left: 15px;
-}*/
+.custom-footer a:link{
+    text-decoration: none;
+    color: #b7b7b7;
+}
 
-/*.btn-xlarge {
-    padding: 18px 28px;
-    font-size: 22px; 
-    line-height: normal;
-    -webkit-border-radius: 8px;
-       -moz-border-radius: 8px;
-            border-radius: 8px;
-}*/
+
+.custom-footer a:hover{
+    color:#ffffff;
+}
+
+/***************************************/
+/* Fix nav-bar
+/***************************************/
+.navbar-nav > li > a, 
+.navbar-brand {
+    padding-top:12px !important; 
+    padding-bottom:8px !important;
+    height: 35px;
+}
+.navbar {
+    min-height:40px !important;
+}
 
 tr .review-row {
     border-style: solid;
@@ -132,6 +154,11 @@ table.reviews > tbody > tr#review {
 a:link {
     color: rgb(0, 0, 0);
     text-decoration: underline;
+}
+.dropdown-menu>li>a,
+.dropdown-menu>li>a:link,
+.dropdown-menu>li>a:visited {
+    text-decoration: none;
 }
 
 /* visited link */
@@ -190,10 +217,10 @@ table.centered {
     text-align: center;
 }
 
-    table.centered > tbody > tr > th {
-        text-align: center;
-        border-top: 0;
-    }
+table.centered > tbody > tr > th {
+    text-align: center;
+    border-top: 0;
+}
 
 table.no-top > tbody > tr > th {
     border-top: 0;
@@ -210,14 +237,18 @@ table > tbody > tr > th {
     background: rgba(255, 255, 255, 0.7);
     text-align: center;
     vertical-align: middle;
-    /*border-color: #000000;*/
-    /*border-width: 1px;*/
-    /*border-style: solid;*/
-    margin-top: 10%;
+    margin-top: 5%;
     margin-bottom: 19%;
-    margin-right: 30%;
-    margin-left: 30%;
+    margin-right: auto;
+    margin-left: auto;
+    max-width:500px;
     padding: 13px 30px 30px 30px;
+}
+
+.home-search-btn-group {
+    max-width:500px;
+    margin: 0 auto;
+
 }
 
 html.home {
@@ -235,29 +266,57 @@ html.home > body > div.home {
     height: inherit;
 }
 
-h1.home-title {
-    font-size: 50px;
+.home-title {
+    margin:0 auto;
     color: rgba(10, 10, 10, 0.9);
+}
+
+.home-title-small {
+    font-size: 2.9em;
+
+}
+.home-title-large {
+    font-size: 5.0em;
+}
+
+.home-title-dynamic {
+    font-size: 320%;
+    font-size: 5.5vw;
+}
+
+.home-line-break {
+    font-size: 2em;
+}
+.home-line-break-dynamic {
+    font-size: 150%;
+    font-size: 2.5vw;
 }
 
 .input-home {
     max-width: inherit;
+    text-overflow: ellipsis;
 }
 
 .home-buttons {
-    margin: 0% 25% 1% 25%;
-    padding: 10px;
     background: rgba(255, 255, 255, 0.5);
+    padding:7px;
+    margin-left:0px;
+    margin-right:0px;
+    margin-top:23%;
+    margin-bottom:20%;
+}
+
+.home-btn-column {
+    padding:7px 10px;
 }
 
 .home-btn {
-    width: 31.33%;
-    margin-left: 1%;
-    margin-right: 1%;
-    float: left;
+    display:inline-block;
+    width: 100%;
+    padding: 10px;
+
     border: none;
     background-color: rgba(255, 255, 255, 0.6);
-    padding: 10px;
 }
 
 
@@ -359,6 +418,12 @@ dl.dl-summary > dd {
      font-weight: bold;
 }
 
+no-wrap-medium-weight{
+    white-space: nowrap;
+    font-weight: bold;
+    color:rgba(0, 0, 0, 0.61);
+}
+
 #recreation.badge {
     font-weight:normal;
     background-color:#3251B5;
@@ -367,15 +432,16 @@ dl.dl-summary > dd {
 
 
 /*****************************************************************************/
-/* LABEL (used for Recreation & NaturalFeatures on Location/Details)         */
+/* TAG (used for Recreation & NaturalFeatures on Location/Details)         */
 /*****************************************************************************/
-.label {
+.tag {
     display:inline-block;
     padding: .3em .7em .4em;
     margin:2px;
     font-size: 75%;
-    font-weight: bold;
+    font-weight: lighter;
     line-height: 1;
+    background: rgba(100, 100, 100, 0.40);
     color: #ffffff;
     text-align: center;
     white-space: nowrap;
@@ -383,40 +449,194 @@ dl.dl-summary > dd {
     border-radius: .25em;
 }
 
-.label-recreation {
+.tag-normal-size {
+    font-size: 100%;
+    font-weight: normal;
+}
+
+.tag-disabled {
+    color: #d3d3d3;
+}
+
+.tag-recreation {
     background: rgba(51, 204, 255, 0.5);
 }
 
-.label-natural-feature {
+.tag-natural-feature {
     background: rgba(51, 204, 51, 0.5);
 }
 
-/* unvisited link */
-.label a:link{
+.tag a:link{
     color:#FFFFFF;
      text-decoration: none;
      font-weight:lighter;
 }
 
-/* visited link */
-.label a:visited {
+.tag a:visited {
      color:#FFFFFF;
      text-decoration: none;
      font-weight:lighter;
 }
 
-/* mouse over link */
-.label a:hover {
+.tag a:hover {
      color:#FFFFFF;
      text-decoration: underline;
      font-weight:lighter;
 }
 
-/* selected link */
-.label a:active {
+.tag a:active {
      color:#FFFFFF;
      text-decoration: underline;
      font-weight:normal;
 }
 
+.tag-button:hover {
+     color:#FFFFFF;
+     background: rgba(100, 100, 100, 0.60);
+     /*text-decoration: underline;*/
+     font-weight:lighter;
+}
 
+/* Special styling for cancel button of a tag. */
+.tag a.a-cancel {
+    color: #ddd;
+    font-weight: bold;
+    margin: 0em 0.4em 0em 0em;
+    padding: 0em;
+    text-decoration: none;
+}
+
+.tag a.a-cancel:hover {
+        color: #fff;
+}
+
+/*******************************************************************************************/
+/* NOTIFICATION BADGES                                                                     */
+/*******************************************************************************************/
+.badge-notification {
+    background: rgba(135, 252, 126, 0.50);
+    color: #eeeeee;
+}
+
+.badge-notification:hover {
+    background:rgba(135, 252, 126, 0.65);
+    color: #ffffff;
+}
+
+.badge-notification-no-unread {
+    background: rgba(173, 173, 173, 0.50);
+    color: #dddddd;
+}
+
+.badge-notification-no-unread:hover {
+    background:rgba(173, 173, 173, 0.65);
+    color: #eeeeee;
+}
+
+/*******************************************************************************************/
+/* MESSAGE BADGES                                                                          */
+/*******************************************************************************************/
+.badge-message {
+    background:rgb(104, 195, 104);
+    color: #eeeeee;
+}
+
+a:hover .badge-message {
+    background:rgb(111, 213, 111);
+    color: #ffffff;
+}
+
+.badge-message-no-unread {
+    background: rgba(173, 173, 173, 1.0);
+    color: #eeeeee;
+}
+
+a:hover .badge-message-no-unread {
+    background:rgb(180, 180, 180);
+    color: #ffffff;
+}
+
+/***********************/
+/* Tag Form Styling    */
+/***********************/
+
+.tag-form-div {
+    margin-left:0px;
+    margin-bottom: 7px;
+}
+
+.tag-form-input {
+    /*margin-top:7px;*/
+}
+
+/* Used to hide non-matching search results. */
+.hidden {
+	display: none;
+}
+
+
+select#location-select option,
+select#difficulty-select option { 
+    color: black;
+}
+
+select#location-select,
+select#difficulty-select{
+    color: #999999;
+}
+
+select#location-select option:first-child
+select#difficulty-select option:first-child{
+  color: #999999 !important;
+}
+/******************************************
+A nice floating shadow box that mimics
+dropdown menus.
+******************************************/
+.search-results{
+	list-style-type: none;
+    position:relative;
+    z-index: 1000;
+    float: left;
+    min-width: 160px;
+    padding: 5px 0;
+    margin: 2px 0 0;
+    font-size: 14px;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+            background-clip: padding-box;
+    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 4px;
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, .175);	
+}
+
+/* Make a ul scrollable. */
+.scrollable-menu {
+	height: auto;
+	max-height: 195px;
+	overflow-x:hidden;
+}
+
+.search-input{
+    max-width:300px;	    
+}
+
+.tag-form-div {
+    max-width:350px;	    
+}
+
+#tags-dropdown-button,
+#SelectedRecreations-dropdown-button,
+#SelectedFeatures-dropdown-button {
+	border-top-right-radius: 4px;
+	border-bottom-right-radius: 4px;
+
+    /** hack to fix alignment on small screen sizes **/
+    /*
+    margin-right: 20px;  doesn't work :-P    
+    */
+}

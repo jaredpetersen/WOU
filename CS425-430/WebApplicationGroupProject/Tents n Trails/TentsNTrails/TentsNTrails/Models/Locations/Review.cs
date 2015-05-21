@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TentsNTrails.Models
 {
@@ -28,6 +29,9 @@ namespace TentsNTrails.Models
             if (Comment.Length < CommentPreviewLength) return Comment;
             else return Comment.Substring(0, CommentPreviewLength - 3) + "...";            
         }
+
+        [ForeignKey("User")]
+        public string User_Id { get; set; }
 
         public virtual User User { get; set; }
         public virtual Location Location { get; set; }

@@ -91,14 +91,23 @@ namespace TentsNTrails.Controllers
         {
             if (events.Date < DateTime.Now)
             {
-                ModelState.AddModelError("", "The date must be in the future.");
+                ModelState.AddModelError("Date", "The date must be in the future.");
             }
 
             if (ModelState.IsValid)
             {
                 events.Organizer = manager.FindById(User.Identity.GetUserId());
+
                 db.Events.Add(events);
                 db.SaveChanges();
+
+                EventParticipants ep = new EventParticipants();
+                ep.EventParticipationID = events.EventID;
+                ep.Event = db.Events.Where(e => e.EventID == events.EventID).ToList().First();
+                ep.Participant = events.Organizer;
+                db.EventParticipants.Add(ep);
+                db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
 

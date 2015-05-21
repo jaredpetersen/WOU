@@ -206,7 +206,10 @@ namespace TentsNTrails.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
+
             string thisUser = User.Identity.GetUserId();
+            /*
+            // i commented out this code as it was returning double the friends that 
             var connections = db.Connections.Where(u => u.User1.Id == thisUser || u.User2.Id == thisUser).ToList();
             List<User> userList = new List<User>();
             foreach (Connection c in connections)
@@ -223,6 +226,20 @@ namespace TentsNTrails.Controllers
                 }
             }
             var users = userList.AsQueryable();
+             */
+            // Union Connection where the current User matches either User1 or User2, but select the other one (the connected User) 
+
+            var users =
+                db.Connections.Where(c =>
+                    c.User1.Id.Equals(thisUser)
+                )
+                .Select(c => c.User2)
+                .Union(
+                    db.Connections.Where(c =>
+                        c.User2.Id.Equals(thisUser)
+                    )
+                    .Select(c => c.User1)
+                );
 
             int pageSize = 8;
             int pageNumber = (page ?? 1);
@@ -270,7 +287,7 @@ namespace TentsNTrails.Controllers
             {
                 db.Entry(user).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Manage");
             }
             return View(user);
         }
@@ -542,7 +559,7 @@ namespace TentsNTrails.Controllers
                 var result = await manager.UpdateAsync(user);
                 System.Diagnostics.Debug.WriteLine("result.Succeeded: " + result.Succeeded);
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Manage");
             }
 
             return View(viewModel);

@@ -12,6 +12,7 @@ namespace TentsNTrails.Models
         public string LastName { get; set; }
         public string Email { get; set; }
         public bool Private { get; set; }
+        public string Id { get; set; }
         public List<UserRecreation> UserActivities { get; set; }
         //public IList<UserLoginInfo> Logins { get; set; }
         //public string PhoneNumber { get; set; }
@@ -92,7 +93,30 @@ namespace TentsNTrails.Models
         [Display(Name = "Private:")]
         public bool NewIsPrivate { get; set; }
     }
+    /*
+     * Possible refactoring to make code style more elegant and consistent.
+    /// <summary>
+    /// Used to store info on if a Recreation is selected.
+    /// </summary>
+    public class EditUserRecreationViewModel
+    {
+        public Recreation Recreation { get; set; }
+        public bool IsChecked { get; set; }
+    }
 
+    /// <summary>
+    /// Used to chagne a user's activities
+    /// </summary>
+    public class ChangeActivitiesViewModel
+    {
+        public User User { get; set; }
+        public List<EditUserRecreationViewModel> UserRecreations { get; set; }
+    }
+     */
+
+    /// <summary>
+    /// The current model.
+    /// </summary>
     public class ChangeActivitiesViewModel
     {
         public List<UserRecreation> RecOptions { get; set; }

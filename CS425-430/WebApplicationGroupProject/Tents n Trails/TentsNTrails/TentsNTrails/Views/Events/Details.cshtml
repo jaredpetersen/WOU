@@ -147,14 +147,14 @@
         {
             <p>
                 Be the
-                <u>@Html.ActionLink("first", "Create", "EventComments", new { EventID = Model.EventID, redirect = true }, null)</u>
+                <u>@Html.ActionLink("first", "Create", "EventComments", new { eventID = Model.EventID }, null)</u>
                 to comment.
             </p>
         }
         else
         {
             <p>
-                @Html.ActionLink("Write New Comment", "Create", "EventComments", new { EventID = Model.EventID, redirect = true }, null)
+                @Html.ActionLink("Write New Comment", "Create", "EventComments", new { eventID = Model.EventID }, null)
             </p>
             <table class="reviews">
                 @foreach (var item in Model.EventComments)
@@ -203,11 +203,15 @@
         }
     </div>
 </div>
-@if (User.IsInRole("Admin") || User.Identity.IsAuthenticated && User.Identity.GetUserName().Equals(Model.Organizer.UserName))
-{
+
     <p>
-        @Html.ActionLink("Edit", "Edit", new { id = Model.EventID }) |
-        @Html.ActionLink("Delete", "Delete", new { id = Model.EventID }) |
-        @Html.ActionLink("Back to List", "Index")
+        @if (User.IsInRole("Admin") || User.Identity.IsAuthenticated && User.Identity.GetUserName().Equals(Model.Organizer.UserName))
+        {
+            Html.ActionLink("Edit", "Edit", new { id = Model.EventID });
+            Html.Raw(" | ");
+            Html.ActionLink("Delete", "Delete", new { id = Model.EventID });
+            Html.Raw(" | ");
+        }
+        @Html.ActionLink("Back to Events", "Index")
     </p>
-}
+
