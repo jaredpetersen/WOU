@@ -2,5 +2,4 @@
 Uses state-space search to solve the 16 Puzzle
 
 # Screenshots
-![Input Example](/screenshots/16puzzleInput.png?raw=true)
-![Output Example](/screenshots/16puzzleOutput.png?raw=true)
+<img src="/CS345/Lab1/screenshots/16puzzleInput.png?raw=true" width="50%" height="50%" alt="Input Example"/><img src="/CS345/Lab1/screenshots/16puzzleOutput.png?raw=true" width="50%" height="50%" alt="Output Example"/>
