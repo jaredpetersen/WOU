@@ -40,15 +40,12 @@ public class Globals{
         metricsFragment = fragment;
     }
 
-    // Refresh the fragment data
+    // Get the fragment data
     public CollectionFragment getCollection()
     {
         return collectionFragment;
     }
-    public MetricsFragment getMetrics()
-    {
-        return metricsFragment;
-    }
+    public MetricsFragment getMetrics() { return metricsFragment; }
 
     public boolean getCollectionLoadedStatus()
     {
@@ -62,10 +59,6 @@ public class Globals{
     public void setCollectionLoadedStatus(boolean status)
     {
         collectionLoaded = status;
-    }
-    public void setMetricsLoadedStatus(boolean status)
-    {
-        metricsLoaded = status;
     }
 
     public static synchronized Globals getInstance(){

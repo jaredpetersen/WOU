@@ -86,24 +86,59 @@ public class EditCollection extends ActionBarActivity implements View.OnClickLis
 
             case R.id.incomplete_button:
                 addToCollection("1");
-                statusTV.setText("Incomplete");
-                g.setCollectionLoadedStatus(false);
+                if (!status.equals("Incomplete"))
+                {
+                    g.getMetrics().setIncomplete(g.getMetrics().incompleteCount + 1);
+                    g.getMetrics().resetData();
+                }
+                status = "Incomplete";
+                statusTV.setText(status);
                 //g.getCollection().loadCollection();
+                g.getMetrics().setIncomplete(g.getMetrics().incompleteCount + 1);
                 break;
 
             case R.id.beat_button:
                 addToCollection("2");
-                statusTV.setText("Beat");
+                if (!status.equals("Beat"))
+                {
+                    g.getMetrics().setBeat(g.getMetrics().beatCount + 1);
+                    g.getMetrics().resetData();
+                }
+                status = "Beat";
+                statusTV.setText(status);
                 break;
 
             case R.id.complete_button:
                 addToCollection("3");
-                statusTV.setText("Complete");
+                if (!status.equals("Complete"))
+                {
+                    g.getMetrics().setComplete(g.getMetrics().incompleteCount + 1);
+                    g.getMetrics().resetData();
+                }
+                status = "Complete";
+                statusTV.setText(status);
                 break;
 
             case R.id.unowned_button:
                 removeFromCollection();
-                statusTV.setText("Unowned");
+                if (status.equals("Beat"))
+                {
+                    g.getMetrics().setBeat(g.getMetrics().beatCount - 1);
+                    g.getMetrics().resetData();
+                }
+                else if (status.equals("Incomplete"))
+                {
+                    g.getMetrics().setIncomplete(g.getMetrics().incompleteCount - 1);
+                    g.getMetrics().resetData();
+                }
+                else if (status.equals("Complete"))
+                {
+                    g.getMetrics().setComplete(g.getMetrics().completeCount - 1);
+                    g.getMetrics().resetData();
+
+                }
+                status = "Unowned";
+                statusTV.setText(status);
                 break;
 
             default:
@@ -127,7 +162,9 @@ public class EditCollection extends ActionBarActivity implements View.OnClickLis
         client.post(queryAddCollectionURL, params,
                 new JsonHttpResponseHandler() {
                     @Override
-                    public void onSuccess(JSONObject jsonObject) { }
+                    public void onSuccess(JSONObject jsonObject)
+                    {
+                    }
 
                     @Override
                     public void onFailure(int statusCode, Throwable throwable, JSONObject error) {
