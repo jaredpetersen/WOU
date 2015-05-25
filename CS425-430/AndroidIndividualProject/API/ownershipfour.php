@@ -17,9 +17,14 @@ if (isset($_GET['key'])) {
 			// Default user is just the initial
 			$user = 0;
 		}
-
-		// SQL Statement
-		$sql = "SELECT status, count(*) as gameCount FROM OwnedGames, CompletionStatus WHERE OwnedGames.completionStatusId = CompletionStatus.completionStatusId and OwnedGames.userId = $user and OwnedGames.completionStatusId = $status group by status order by status asc";
+		
+		if ($status == 4) {
+			$sql = "SELECT status, count(*) as gameCount FROM OwnedGames, CompletionStatus WHERE OwnedGames.completionStatusId = CompletionStatus.completionStatusId and OwnedGames.userId = $user group by status order by status asc";
+		}
+		else {
+			// SQL Statement
+			$sql = "SELECT status, count(*) as gameCount FROM OwnedGames, CompletionStatus WHERE OwnedGames.completionStatusId = CompletionStatus.completionStatusId and OwnedGames.userId = $user and OwnedGames.completionStatusId = $status group by status order by status asc";
+		}
 
 		// Create connection
 		$conn = new mysqli($servername, $dbusername, $dbpassword, $dbname);
