@@ -2,4 +2,4 @@
 Uses backtracking to solve the N Queens problem
 
 # Screenshots
-![Example](/screenshots/example.png?raw=true)
+![Example](/CS345/Lab2/screenshots/example.png?raw=true)
