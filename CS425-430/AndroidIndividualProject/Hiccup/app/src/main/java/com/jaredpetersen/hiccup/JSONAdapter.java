@@ -105,6 +105,12 @@ public class JSONAdapter extends BaseAdapter
         notifyDataSetChanged();
     }
 
+    public void clearListView()
+    {
+        mJsonArray = new JSONArray();
+        notifyDataSetChanged();
+    }
+
     // this is used so you only ever have to do
     // inflation and finding by ID once ever per View
     private static class ViewHolder

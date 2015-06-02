@@ -69,11 +69,7 @@ public class MainActivity extends ActionBarActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        else if (id == R.id.action_logout) {
+        if (id == R.id.action_logout) {
             // This will delete the stored credentials and return to the login activity
             finish();
             Intent i = new Intent(MainActivity.this, LoginActivity.class);

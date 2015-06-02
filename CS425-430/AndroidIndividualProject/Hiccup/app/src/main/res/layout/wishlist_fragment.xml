@@ -10,6 +10,6 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:textSize="26dp"
-        android:text="TextView" />
+        android:text="Wishlist -- Coming Soon!" />
 
 </LinearLayout>

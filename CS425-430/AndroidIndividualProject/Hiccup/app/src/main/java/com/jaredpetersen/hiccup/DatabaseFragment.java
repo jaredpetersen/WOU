@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,7 +80,18 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener, 
     public void onClick(View v)
     {
         // Received a search request, process the search on the database
-        searchDatabase(mainEditText.getText().toString());
+        String searchQuery = mainEditText.getText().toString();
+        Log.e("hookamooka", "asdfasdfas=" + TextUtils.isEmpty(searchQuery));
+        if (TextUtils.isEmpty(searchQuery))
+        {
+            resultsTextView.setText("No results Found");
+            mJSONAdapter.clearListView();
+        }
+        else
+        {
+            resultsTextView.setText("");
+            searchDatabase(searchQuery);
+        }
     }
 
     @Override
@@ -145,6 +157,7 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener, 
                             if (jsonObject.optJSONArray("results").isNull(0)) {
                                 // No items, let the user know
                                 resultsTextView.setText("No Results Found");
+                                mJSONAdapter.clearListView();
                             } else {
                                 // If items exist display them
                                 // If not, empty out the ListView
@@ -154,6 +167,7 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener, 
                         else
                         {
                             resultsTextView.setText("No Results Found");
+                            mJSONAdapter.clearListView();
                         }
                     }
 

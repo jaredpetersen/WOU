@@ -346,15 +346,6 @@ public class SlidingTabLayout extends HorizontalScrollView
             // Reload the Collection Fragment ListView
             Globals g = Globals.getInstance();
             g.getCollection().loadCollection();
-            /*if (g.getMetrics() != null)
-            {
-                Log.d("hookamooka", "Metrics is not null");
-                g.getMetrics().setData();
-            }
-            else
-            {
-                Log.d("hookamooka", "Metrics is null");
-            }*/
         }
 
     }
