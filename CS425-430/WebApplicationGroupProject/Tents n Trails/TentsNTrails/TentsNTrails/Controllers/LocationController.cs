@@ -44,7 +44,15 @@ namespace TentsNTrails.Controllers
 
             // ViewModel
             LocationIndexViewModel viewModel = new LocationIndexViewModel();
-            viewModel.Recreations = db.Recreations.ToList();
+
+            var defaultRec = Enumerable.Repeat(new SelectListItem
+            {
+                Value = "-1",
+                Text = "Recreation Type"
+            }, count: 1);
+
+            var recList = new SelectList(db.Recreations, "RecreationID", "Label");
+            viewModel.Recreations = defaultRec.Concat(recList);
 
             // *************************************************
             // filter by Recreation
@@ -177,7 +185,7 @@ namespace TentsNTrails.Controllers
         /// <returns>A list of Locations.</returns>
         public List<Location> GetPersonalRecommendations(int amount)
         {
-            //System.Diagnostics.Debug.WriteLine(String.Format("GetPersonalRecommendations({0})", amount));
+            System.Diagnostics.Debug.WriteLine(String.Format("GetPersonalRecommendations({0})", amount));
             // ensure user is logged in.
             if (!User.Identity.IsAuthenticated)
             {
@@ -187,96 +195,47 @@ namespace TentsNTrails.Controllers
             User user = db.Users.Find(User.Identity.GetUserId());
 
             // get all Recreations the user partakes in.
-            var userActivities = db.UserRecreations.Where(ur => ur.User.Equals(user.Id)).Select(r => r.Recreation);
+            IQueryable<Recreation> userActivities = db.UserRecreations
+                .Where(ur => ur.User.Equals(user.Id))
+                .Select(r => r.Recreation);
              
             // get all positively reviewed Locations by the user
-            var reviews = db.Reviews.Where(r =>
+            IQueryable<Review> reviews = db.Reviews.Where(r =>
                     r.User.Id.Equals(user.Id)
                 );
 
             // get all matching bookmarked Locations by the user
-            var bookmarkedLocations = db.LocationFlags.Where(f =>
+            IQueryable<Location> bookmarkedLocations = db.LocationFlags.Where(f =>
                     f.User.Id.Equals(user.Id)
-                    && f.Flag == Flag.HaveBeen
-                    || f.Flag == Flag.WantToGo
+                    && (f.Flag == Flag.HaveBeen
+                    || f.Flag == Flag.WantToGo)
                 ).Select(f => f.Location);
 
             // union the locations.
             IQueryable<Location> locations = null;
 
-            // case 1: use has bookmarks and reviews
-            if (bookmarkedLocations.Count() != 0 && reviews.Count() != 0)
-            {
-                if (userActivities.Count() > 0)
-                {
-                    locations = reviews
-                        .Where(r => r.Rating)
-                        .Select(r=> r.Location)
-                        .Union(bookmarkedLocations)
-                        .Where(l => l.Recreations.Intersect(userActivities).Count() > 0);
-                }
-                else
-                {
-                    locations = reviews
-                        .Where(r => r.Rating)
-                        .Select(r => r.Location)
-                        .Union(bookmarkedLocations);
-                }
-                
-            }
-            // case 2: user has no bookmarks
-            else if (bookmarkedLocations.Count() == 0 && reviews.Count() != 0) 
-            {
-                if (userActivities.Count() > 0)
-                {
-                    locations = reviews
-                        .Where(r => r.Rating)
-                        .Select(r => r.Location)
-                        .Where(l => l.Recreations.Intersect(userActivities).Count() > 0);
-                }
-                else
-                {
-                    locations = reviews
-                        .Where(r => r.Rating)
-                        .Select(r => r.Location); 
-                }
-            }
+            System.Diagnostics.Debug.WriteLine(String.Format("{0} bookmarks, {1} reviews, {2} recreations", bookmarkedLocations.Count(), reviews.Count(), userActivities.Count()));
 
-            // case 3: user has no reviews
-            else if (reviews.Count() == 0)
-            {
-                if (userActivities.Count() > 0)
-                {
-                    locations = bookmarkedLocations.Where(l => 
-                        l.Recreations.Intersect(userActivities).Count() > 0);
-                }
-                else
-                {
-                    locations = bookmarkedLocations;
-                }
-            }
-            // case 4: user has no bookmarks or reviews
-            else
-            {
-                if (userActivities.Count() > 0)
-                {
-                    locations = db.Locations.Where(l =>
-                        l.Recreations.Intersect(userActivities).Count() > 0);
-                }
-                else
-                {
-                    locations = db.Locations.Select(l => l);
-                }
-            }
+            // union the bookmarkedLocations and the reviewed locations.
+            locations = bookmarkedLocations.Union(reviews.Select(r => r.Location));
 
-            var states = locations.Select(u => u.StateID);
+            // get the states of those locations
+            IQueryable<string> states = locations.Select(u => u.StateID);
 
-            // finally, get all locations in the states of the result that are not already in result, or have reviews.
-            var result = db.Locations.Where(l =>
-                   states.Contains(l.StateID)
-                   && !locations.Contains(l)
-                   && !reviews.Select(r => r.LocationID).Contains(l.LocationID)
-               );
+            // finally, get ALL locations that contain one of the user's rec types, UNIONED with locations are IN the states of the result that are NOT in result, AND are NOT reviewed by the user.
+            IQueryable<Location> result;
+
+            result = userActivities
+                .SelectMany(r => r.RecOptions)
+                .Select(lr => lr.Location)
+                .Union(db.Locations.Where(l =>
+                    states.Contains(l.StateID)
+                    && !locations.Contains(l)
+                )
+            ).Where(l => 
+                !reviews.Select(r => r.Location)
+                .Contains(l)
+            );          
 
             return SortByRatingAndTake(result, amount);
         }
@@ -313,8 +272,13 @@ namespace TentsNTrails.Controllers
                 .SelectMany(review => review)
                 .Where(review => review.Rating);
 
+            // get user's own reviews.
+            var userReviews = db.Reviews.Where(r => r.User.Id.Equals(currentUser.Id));
+
+            // select all locations that are positively reviewed, but the user hasn't reviewed them yet.
             var locations = positiveReviews
                 .Select(r => r.Location)
+                .Where(l => !userReviews.Select(r => r.LocationID).Contains(l.LocationID))
                 .Distinct();
 
             return SortByRatingAndTake(locations, amount);
@@ -333,6 +297,7 @@ namespace TentsNTrails.Controllers
                 l.Reviews.Where(r => r.Rating).Count()
                 / ( (double) (l.Reviews.Count() == 0 ? 1 : l.Reviews.Count()) )
             )
+            .ThenByDescending(l => l.Reviews.Where(r => r.Rating).Count())
             .Take(amount)
             .ToList();
         }
@@ -609,18 +574,12 @@ namespace TentsNTrails.Controllers
         [Authorize]        
         public ActionResult Create()
         {
-            //Set up LocationRecreation Options
-            List<LocationRecreation> locRecList = new List<LocationRecreation>();
-            foreach (var rec in db.Recreations)
-            {
-                LocationRecreation lr = new LocationRecreation();
-                lr.RecreationID = rec.RecreationID;
-                lr.RecreationLabel = rec.Label;
-                locRecList.Add(lr);
-            }
-
             CreateLocationViewModel viewModel = new CreateLocationViewModel();
-            viewModel.RecOptions = locRecList;
+            viewModel.SelectedRecreations = new List<String>();
+            viewModel.AllRecreations = db.Recreations
+                .Select(r => r.Label)
+                .ToList();
+
             viewModel.SelectedFeatures = new List<string>();
             viewModel.AllNaturalFeatures = db.NaturalFeatures
                 .Select(nf => nf.Name)
@@ -641,18 +600,10 @@ namespace TentsNTrails.Controllers
         {
             Location location = new Location();
 
-            bool foundRecreation = false;
-            foreach (var locRec in model.RecOptions)
+            string country = Location.ReverseGeocodeCountry(model.Latitude, model.Longitude);
+            if (!country.Equals("US") || country.Equals(null) || country.Equals(""))
             {
-                if (locRec.IsChecked)
-                {
-                    foundRecreation = true;
-                }
-            }
-            // if they didn't choose any recreations, give an error
-            if (!foundRecreation)
-            {
-                ModelState.AddModelError("Recreations", "You must choose at least one recreation type.");
+                ModelState.AddModelError("Longitude", "The location must be within the United States of America.");
             }
 
             if (ModelState.IsValid)
@@ -663,6 +614,7 @@ namespace TentsNTrails.Controllers
                 location.Longitude = model.Longitude;
                 location.Description = model.Description;
                 location.Difficulty = (Location.DifficultyRatings) model.Difficulty;
+                
                 // initialize DateTime Stamps
                 location.DateCreated = DateTime.UtcNow;
                 location.DateModified = location.DateCreated;
@@ -670,7 +622,7 @@ namespace TentsNTrails.Controllers
                 location.Rating();
                 location.UpVotes();
                 location.DownVotes();
-
+                 
                 string abbrev = Location.ReverseGeocodeState(location);
                 location.State = db.States.Where(s => s.StateID.Equals(abbrev)).SingleOrDefault();
                 
@@ -679,7 +631,8 @@ namespace TentsNTrails.Controllers
                 db.SaveChanges();//must save before we move on so that location gets an ID
 
                 // edit Recreations
-                EditRecreationsFor(location, model.RecOptions);
+                System.Diagnostics.Debug.WriteLine("SelectedRecreations = " + GetArrayFormattedString(model.SelectedFeatures));
+                EditRecreationsFor(location, model.SelectedRecreations);
 
                 // edit NaturalFeatures
                 System.Diagnostics.Debug.WriteLine("SelectedFeatures = " + GetArrayFormattedString(model.SelectedFeatures));
@@ -694,8 +647,11 @@ namespace TentsNTrails.Controllers
             viewModel.Latitude = model.Latitude;
             viewModel.Longitude = model.Longitude;
             viewModel.Description = model.Description;
-            viewModel.RecOptions = model.RecOptions;
             viewModel.Difficulty = model.Difficulty;
+            viewModel.SelectedRecreations = model.SelectedRecreations ?? new List<String>();
+            viewModel.AllRecreations = db.Recreations
+                .Select(r => r.Label)
+                .ToList();
             viewModel.SelectedFeatures = model.SelectedFeatures ?? new List<String>();
             viewModel.AllNaturalFeatures = db.NaturalFeatures
                 .Select(nf => nf.Name)
@@ -750,31 +706,18 @@ namespace TentsNTrails.Controllers
             }
 
             // *********************************************************
-            // get LocationRecreations
-            // *********************************************************
-            var selectedRecreations = db.LocationRecreations
-                .Where(lr => lr.LocationID == location.LocationID)
-                .Select(lr => lr.Recreation);
-
-            var allLocationRecreations = new List<LocationRecreation>();
-            foreach (var rec in db.Recreations)
-            {
-                LocationRecreation lr = new LocationRecreation();
-                lr.RecreationID = rec.RecreationID;
-                lr.RecreationLabel = rec.Label;
-
-                // check if selected.
-                var result = selectedRecreations.SingleOrDefault(r => rec.RecreationID == r.RecreationID);
-                if (result != null) lr.IsChecked = true;
-                else lr.IsChecked = false;
-                allLocationRecreations.Add(lr);
-            }
-
-            // *********************************************************
             // Create and populate the ViewModel.
             // *********************************************************
             EditLocationViewModel viewModel = new EditLocationViewModel(location);
-            viewModel.RecOptions = allLocationRecreations;
+
+            viewModel.SelectedRecreations = location.RecOptions
+                .Select(lr => lr.Recreation)
+                .Select(r => r.Label)
+                .ToList();
+            viewModel.AllRecreations = db.Recreations
+                .Select(r => r.Label)
+                .ToList();
+
             viewModel.SelectedFeatures = location.LocationFeatures
                 .Select(lf => lf.NaturalFeature)
                 .Select(nf => nf.Name)
@@ -796,7 +739,7 @@ namespace TentsNTrails.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "LocationID,Label,Latitude,Longitude,DateCreated,Rating,Description,Difficulty,SelectedFeatures")] EditLocationViewModel viewModel)
+        public ActionResult Edit([Bind(Include = "LocationID,Label,Latitude,Longitude,DateCreated,Rating,Description,Difficulty,SelectedRecreations,SelectedFeatures")] EditLocationViewModel viewModel)
         {
             // ensure SelectedFeatures is not null if no values passed.
             viewModel.SelectedFeatures = viewModel.SelectedFeatures ?? new List<string>();
@@ -820,17 +763,21 @@ namespace TentsNTrails.Controllers
                 db.SaveChanges();
 
                 // edit Recreations
-                System.Diagnostics.Debug.WriteLine("Editing Recreations does not work, will be implemented next sprint.");
-                //EditRecreationsFor(location, viewModel.RecOptions);
+                System.Diagnostics.Debug.WriteLine("SelectedRecreations = " + GetArrayFormattedString(viewModel.SelectedRecreations));
+                EditRecreationsFor(location, viewModel.SelectedRecreations);
 
                 // edit NaturalFeatures
                 System.Diagnostics.Debug.WriteLine("SelectedFeatures = " + GetArrayFormattedString(viewModel.SelectedFeatures));
                 EditNaturalFeaturesFor(location, viewModel.SelectedFeatures ?? new List<string>());
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", new { id = location.LocationID });
             }
 
             ModelState.AddModelError("Overall", "You are missing one or more required fields.");
+            viewModel.SelectedRecreations = viewModel.SelectedRecreations ?? new List<string>();
+            viewModel.AllRecreations = db.Recreations
+                .Select(r => r.Label)
+                .ToList();
             viewModel.AllNaturalFeatures = db.NaturalFeatures
                 .Select(nf => nf.Name)
                 .ToList();
@@ -1195,86 +1142,110 @@ namespace TentsNTrails.Controllers
         /// <param name="query">The search string the user has typed into the search field.  If empty, all Locations are returned.</param>
         /// <param name="page">The current page of results that is being accessed.</param>
         /// <returns>The Location/Browse view, which shows all Locations with paging.</returns>
-        public ActionResult Browse(int? recreationID, string sortOrder, string currentFilter, string query, int? page)
+        public ActionResult Browse(String query)
         {
-            // ViewModel
-            BrowseLocationsViewModel viewModel = new BrowseLocationsViewModel();
-            viewModel.Recreations = db.Recreations.ToList();
-            var locations = new List<Location>();
+            var defaultRec = Enumerable.Repeat(new SelectListItem
+                            {
+                                Value = "-1",
+                                Text = "Recreation Type"
+                            }, count: 1);
 
-            // *************************************************
-            // filter by Recreation
-            // *************************************************            
-            if (recreationID.HasValue)
-            {
-                List<LocationRecreation> locationRecreations = db.LocationRecreations
-                    .Include(lr => lr.Location)
-                    .Where(lr => lr.RecreationID == recreationID)
-                    .ToList();
-                foreach (LocationRecreation lr in locationRecreations)
-                {
-                    locations.Add(lr.Location);
-                    ViewBag.Recreation = lr;
-                }
-            }
-            else
-            {
-                locations = db.Locations
-                    .Include(l => l.Recreations)
-                    .ToList();
-            }
-
-            int count = locations.Count();
-
-            // *************************************************
-            // sort by name, rating, and difficulty
-            // *************************************************
-            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.RatingSortParm = sortOrder == "Rating" ? "rating_desc" : "Rating";
-            ViewBag.DifficultySortParm = sortOrder == "difficulty_desc" ? "Difficulty" : "difficulty_desc";
-
+            var recList = new SelectList(db.Recreations, "RecreationID", "Label");
+            List<Location> locs = db.Locations.ToList();
             if (!String.IsNullOrEmpty(query))
             {
-                page = 1;
-                locations = SearchFor(query);
                 ViewBag.SearchString = query;
+                locs = SearchFor(query);
 
-                if (locations.Count == 1)
+                if (locs.Count == 1)
                 {
                     // If the search returns only one result, just go to the details page automatically
-                    return RedirectToAction("Details/" + locations.ElementAt(0).LocationID, "Location");
+                    return RedirectToAction("Details/" + locs.ElementAt(0).LocationID, "Location");
                 }
             }
-            switch (sortOrder)
+
+            BrowseLocationsViewModel viewModel = new BrowseLocationsViewModel
             {
-                case "name_desc":
-                    locations = locations.OrderByDescending(l => l.Label).ToList();
-                    break;
-                case "Rating":
-                    locations = locations.OrderBy(l => l.Rating()).ToList();
-                    break;
-                case "rating_desc":
-                    locations = locations.OrderByDescending(l => l.Rating()).ToList();
-                    break;
-                case "Difficulty":
-                    locations = locations.OrderBy(l => l.Difficulty).ToList();
-                    break;
-                case "difficulty_desc":
-                    locations = locations.OrderByDescending(l => l.Difficulty).ToList();
-                    break;
-                default:
-                    locations = locations.OrderBy(l => l.Label).ToList();
-                    break;
+                Recreations = defaultRec.Concat(recList),
+                Locations = locs.ToPagedList(1,10)
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        // POST: Location/Browse
+        public ActionResult Browse(BrowseLocationsViewModel model)
+        {
+            BrowseLocationsViewModel viewModel = new BrowseLocationsViewModel();
+            List<Location> locs = db.Locations.ToList();
+
+            if (!String.IsNullOrEmpty(model.query))
+            {
+                model.page = 1;
+                ViewBag.SearchString = model.query;
+                locs = SearchFor(model.query);
+
+                if (locs.Count == 1)
+                {
+                    // If the search returns only one result, just go to the details page automatically
+                    return RedirectToAction("Details/" + locs.ElementAt(0).LocationID, "Location");
+                }
             }
+
+            if (model.recreationID >= 0)
+            {
+                ViewBag.Recreation = db.Recreations
+                                    .Where(r => r.RecreationID == model.recreationID)
+                                    .First()
+                                    .Label;
+
+                List<Location> l = new List<Location>();
+                if (!String.IsNullOrEmpty(model.query))
+                {
+                    foreach (var item in locs)
+                    {
+                        foreach (var rec in item.RecOptions)
+                        {
+                            if (rec.RecreationID == model.recreationID)
+                            {
+                                l.Add(item);
+                            }
+                        }
+                    }
+                    locs = l;
+                }
+                else
+                {
+                    List<LocationRecreation> locationRecreations = db.LocationRecreations
+                    .Include(lr => lr.Location)
+                    .Where(lr => lr.RecreationID == model.recreationID)
+                    .ToList();
+                    foreach (LocationRecreation lr in locationRecreations)
+                    {
+                        locs.Add(lr.Location);
+                    }
+                }
+            }
+
+            // we repopulate the Recreations collection because only the selected
+            // criteria was passed when the form was submitted
+            var defaultRec = Enumerable.Repeat(new SelectListItem
+            {
+                Value = "-1",
+                Text = "Recreation Type"
+            }, count: 1);
+
+            var recList = new SelectList(db.Recreations, "RecreationID", "Label");
+
+            viewModel.Recreations = defaultRec.Concat(recList);
 
             // PAGING
             int pageSize = 10;
-            int pageNumber = (page ?? 1);
-            viewModel.Locations = locations.ToPagedList(pageNumber, pageSize); ;
+            int pageNumber = (model.page ?? 1);
+            viewModel.Locations = locs.ToPagedList(pageNumber, pageSize); ;
 
-            // *************************************************
-            // calculate center of map display
-            // *************************************************            
+            // calculate center of map display          
             Location center = Location.GetLatLongCenter(viewModel.Locations.ToList());
             System.Diagnostics.Debug.WriteLine("centerLatitude:  " + center.Latitude);
             System.Diagnostics.Debug.WriteLine("centerLongitude: " + center.Longitude);
@@ -1448,6 +1419,25 @@ namespace TentsNTrails.Controllers
             ReviewSavedSuccess,
             MergeLocationSuccess,
             Error
+        }
+
+        // ************************************************************************************************************
+        // GOOGLE MAPS
+        // ************************************************************************************************************
+
+        /// <summary>
+        /// Render a Google Map in a div with the specified attributes.
+        /// (Note: this only works for regular locations; for non-standard views, use the script tags directly in the view.)
+        /// </summary>
+        /// <param name="height">the height of the map.</param>
+        /// <param name="width">the width of the map.</param>
+        /// <param name="minZoom">the minimum zoom on loading.</param>
+        /// <param name="center">The center of the map.</param>
+        /// <param name="locations">The list of locations to render as markers on this map.</param>
+        public ActionResult GoogleMap(int height, int width, int minZoom, Location center, ICollection<Location> locations)
+        {
+            MapViewModel viewModel = new MapViewModel(height, width, minZoom, center, locations);
+            return PartialView(viewModel);
         }
 
         // ************************************************************************************************************
@@ -1643,42 +1633,149 @@ namespace TentsNTrails.Controllers
             {
                 return HttpNotFound();
             }
-            /*
-            EditNaturalFeaturesViewModel viewModel = new EditNaturalFeaturesViewModel();
+            EditRecreationsViewModel viewModel = new EditRecreationsViewModel();
+            viewModel.Location = location;
             viewModel.LocationID = location.LocationID;
             viewModel.LocationLabel = location.Label;
-            viewModel.SelectedFeatures = location.LocationFeatures
-                .Select(lf => lf.NaturalFeature)
-                .Select(nf => nf.Name)
+            viewModel.SelectedRecreations = location.RecOptions
+                .Select(lr => lr.Recreation)
+                .Select(r => r.Label)
                 .ToList();
-            viewModel.AllNaturalFeatures = db.NaturalFeatures
-                .Select(nf => nf.Name)
+            viewModel.AllRecreations = db.Recreations
+                .Select(r => r.Label)
                 .ToList();
             return View(viewModel);
-             */
-            return View();
         }
 
         /// <summary>
-        /// Helper method to edit the Recreations for a given Location.
+        /// HttpPost NaturalFeatures/EditNaturalFeatures/5
         /// </summary>
-        /// <param name="location">The location to edit the Recreations for.</param>
-        public void EditRecreationsFor(Location location, List<LocationRecreation> recOptions)
+        /// <param name="viewModel">The model to validate.</param>
+        /// <returns>A redirect to location details if successful, else back to EditNaturalFeatures.</returns>
+        [Authorize]
+        [HttpPost]
+        public ActionResult EditRecreations([Bind(Include = "LocationID, LocationLabel, AllRecreations, SelectedRecreations")] EditRecreationsViewModel viewModel)
         {
-            List<LocationRecreation> locrecList = new List<LocationRecreation>();
-            foreach (var locRec in recOptions)
-            {
-                if (locRec.IsChecked)
-                {
-                    LocationRecreation lr = locRec;
+            System.Diagnostics.Debug.WriteLine("post Location/EditRecreations(viewModel)");
+            System.Diagnostics.Debug.WriteLine("SelectedRecreations = " + GetArrayFormattedString(viewModel.SelectedRecreations));
 
-                    int latestID = db.Locations.Where(l => l.Label == location.Label).ToList().First().LocationID;
-                    Location tempL = db.Locations.Find(latestID); //get the last Location entered
-                    lr.LocationID = tempL.LocationID;
-                    db.LocationRecreations.Add(lr);
+            // check for no SelectedFeatures.
+            if (viewModel.SelectedRecreations == null) viewModel.SelectedRecreations = new List<string>();
+            Location location = db.Locations.Find(viewModel.LocationID);
+            // save all changes to the db.
+            if (ModelState.IsValid)
+            {
+                System.Diagnostics.Debug.WriteLine("ModelState is valid.");
+                EditRecreationsFor(location, viewModel.SelectedRecreations);
+                return RedirectToAction("Details", "Location", new { id = viewModel.LocationID });
+            }
+
+            // **********************************************************
+            // a model state error occurred, redirect back to edit view.
+            // **********************************************************                
+            System.Diagnostics.Debug.WriteLine("ModelState is INVALID.");
+
+            // reload AllNaturalFeatures from the db.
+            viewModel.Location = location;
+            viewModel.AllRecreations = db.Recreations
+                .Select(nf => nf.Label)
+                .ToList();
+
+            return View(viewModel);
+        }
+
+        /// <summary>
+        /// Helper method to edit the Recreations of the specified Location by modifying
+        /// the entries of the bridge entity LocationRecreations.
+        /// </summary>
+        ///<param name="location">The Location to modify the associated Recreations of.</param>
+        /// <param name="SelectedRecreations">
+        /// <para>        
+        /// The labels of which Recreations to associate.
+        /// </para><para>
+        /// Any labels which don't match an existing Recreation will be
+        /// added as a new Recreation.  
+        /// </para><para>
+        /// Any Recreations which are associated with the Location
+        /// but are are not in this list will be removed from the Location.
+        /// </para><para>
+        /// Any Recreations which not are associated with the Location
+        /// but are in this list will be added to the Location.
+        /// </para><para>
+        /// All other Recreation associations will remain untouched. 
+        /// </para>
+        /// </param>
+        public void EditRecreationsFor(Location location, ICollection<string> SelectedRecreations)
+        {
+            int locationID = location.LocationID;
+
+            System.Diagnostics.Debug.WriteLine("ModelState is valid.");
+
+            // 1) - Set aside all previous LocationRecreations for comparison.
+            var associated = db.LocationRecreations
+                .Include(lr => lr.Recreation)
+                .Where(lr => lr.LocationID == locationID)
+                .ToList();
+
+            // ****************************************************
+            // 2) - Add any new Recreations.
+            // ****************************************************
+            int newRecCount = 0;
+            foreach (string label in SelectedRecreations)
+            {
+                var match = db.Recreations.SingleOrDefault(r => r.Label.Equals(label));
+                if (match == null)
+                {
+                    db.Recreations.Add(new Recreation(label));
+                    newRecCount++;
                 }
             }
             db.SaveChanges();
+            System.Diagnostics.Debug.WriteLine(String.Format("successfully added {0} new Recreations.", newRecCount));
+
+
+            // get all Recreations to iterate over.
+            var selected = db.Recreations
+                .Where(nf => SelectedRecreations.Contains(nf.Label))
+                .ToList();
+
+
+            // ****************************************************
+            // 3) - Remove any LocationRecreations that are currently 
+            //      associated, but aren't selected.
+            // ****************************************************
+            int removedLrCount = 0;
+            foreach (LocationRecreation item in associated)
+            {
+                var result = selected.SingleOrDefault(lr => lr.RecreationID == item.RecreationID);
+                if (result == null)
+                {
+                    System.Diagnostics.Debug.WriteLine(String.Format("'{0}' is associated with '{1}', but needs to be removed.", item.Recreation.Label, location.Label));
+                    db.LocationRecreations.Remove(item);
+                    removedLrCount++;
+                }
+            }
+            db.SaveChanges();
+            System.Diagnostics.Debug.WriteLine(String.Format("successfully removed {0} LocationRecreations from {1}.", removedLrCount, location.Label));
+
+
+            // ****************************************************
+            // 4) - Add any LocationRecreations that are currently 
+            //      selected, but aren't associated.
+            // ****************************************************
+            int addedRlCount = 0;
+            foreach (Recreation item in selected)
+            {
+                var result = associated.SingleOrDefault(lr => lr.RecreationID == item.RecreationID);
+                if (result == null)
+                {
+                    System.Diagnostics.Debug.WriteLine(String.Format("'{0}' is not associated with '{1}', but needs to be added.", item.Label, location.Label));
+                    db.LocationRecreations.Add(new LocationRecreation(locationID, item.RecreationID));
+                    addedRlCount++;
+                }
+            }
+            db.SaveChanges();
+            System.Diagnostics.Debug.WriteLine(String.Format("successfully added {0} new LocationRecreations for {1}.", addedRlCount, location.Label));
         }
     }
 }

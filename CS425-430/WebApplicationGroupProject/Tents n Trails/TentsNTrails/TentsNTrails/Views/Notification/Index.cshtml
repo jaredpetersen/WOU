@@ -35,7 +35,7 @@
     {
         <tr class="review-row">
             <td>
-                <div id="review">
+                <div id="review" class="notification@(!item.IsRead ? " unread-message" : "")">
                     @{Html.RenderAction("Summary", "Notification", new { id = item.NotificationID });}
                 </div>
             </td>

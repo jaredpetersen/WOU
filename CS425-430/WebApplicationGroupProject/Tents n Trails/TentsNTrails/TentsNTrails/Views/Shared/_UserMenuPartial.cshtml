@@ -7,14 +7,14 @@
     <ul class="dropdown-menu" id="noUnderline">
         <li>
             <a href="@Url.Action("Index", "Message")" title="My Messages">
-                My Messages&nbsp;@{Html.RenderAction("UnreadCount", "Message");}
+                Messages&nbsp;@{Html.RenderAction("UnreadCount", "Message");}
             </a>
         </li>
-        <li>@Html.ActionLink("My Reviews", "Index", "Review")</li>
-        <li>@Html.ActionLink("My Bookmarked Locations", "Index", "LocationFlag")</li>
-        <li>@Html.ActionLink("My Connections", "Connections", "Profile")</li>
+        <li>@Html.ActionLink("Reviews", "Index", "Review")</li>
+        <li>@Html.ActionLink("Bookmarked Locations", "Index", "LocationFlag")</li>
+        <li>@Html.ActionLink("Connections", "Connections", "Profile")</li>
         @*<li><a href="@Url.Action("Index", "Profile")"><span class="glyphicon glyphicon-user"></span> My Profile</a></li>*@
-        <li>@Html.ActionLink("My Profile", "Index", "Profile")</li>
+        <li>@Html.ActionLink("Profile", "Index", "Profile")</li>
         @if (Request.IsAuthenticated && User.IsInRole("Admin"))
         {
             <li class="divider"></li>

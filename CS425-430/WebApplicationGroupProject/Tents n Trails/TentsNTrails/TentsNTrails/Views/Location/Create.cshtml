@@ -1,14 +1,34 @@
 ﻿@model TentsNTrails.Models.CreateLocationViewModel
-
-<!-- Google Maps Scripting -->
-<script src="http://maps.googleapis.com/maps/api/js"></script>
-<script src="~/Scripts/location-create-google-map.js"></script>
-
+@using TentsNTrails.Models;
 @{
     ViewBag.Title = "Add a Location";
-    string inputName = "SelectedFeatures";
-    string formId = "createForm";
+    string recreationInputName = "SelectedRecreations";
+    string featureInputName = "SelectedFeatures";
+    string formId = "locationForm";
+    double centerLatitude  = Model.Latitude == 0  ? Location.CENTER.Latitude  : Model.Latitude;
+    double centerLongitude = Model.Longitude == 0 ? Location.CENTER.Longitude : Model.Longitude;
 }
+<script src="http://maps.googleapis.com/maps/api/js"></script>
+<script src="~/Scripts/google-map-setup.js"></script>
+<script>
+    var addMarkers = function(map, markers) {
+        @if (Model.Latitude != 0 && Model.Longitude != 0)
+        {
+            @:var marker = new google.maps.Marker({position: new google.maps.LatLng(@Model.Latitude, @Model.Longitude), map: map});
+            @:var infowindow = new google.maps.InfoWindow({content: 'Loading...'});
+            @:marker.html='<div class="label"><a>@Model.Label</a></div>';
+            @:google.maps.event.addListener(marker, 'click', function() {infowindow.setContent(this.html); infowindow.open(map,this);});
+            @:markers.push(marker);
+        }
+    };
+    var centerLat = @centerLatitude;
+    var centerLng = @centerLongitude;
+    var minZoom = 5;
+    var enableClickListener = true;
+    var ourMap = new TntMap(centerLat,centerLng, addMarkers, minZoom, enableClickListener);
+    ourMap.create();
+</script>
+
 
 <h2>Add Location</h2>
 <h4>Share a location with the community.</h4>
@@ -16,13 +36,20 @@
 @Html.ValidationMessage("Overall", new { @class = "text-danger" })
 
 <div class=" = row">
-    <div class="col-sm-12 col-md-6"> 
+    <div class="col-sm-12 col-md-12"> 
     @using (Html.BeginForm("Create", "Location", FormMethod.Post, new { id = formId })) 
     {
         @Html.AntiForgeryToken()
     
         <div class="form-horizontal">
+
+
+
+            <!-- SECTION 1 - Pick a Location -------------------------------------------------------------------------->
+            <br />
             <hr />
+            <h3>1. Pick a location</h3>
+
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
             <!-- NAME -->
@@ -63,11 +90,24 @@
                 </div>
             </div>
             
+
+
+            <!-- SECTION 2 - Describe the Location -------------------------------------------------------------------->
+            <br />
+            <hr />
+            <h3>2. Describe the location</h3>
+
+
             <!-- DESCRIPTION -->
+            <p>
+                <b>This may include </b>driving directions, any special facts, features, or history for this location
+                so that other users can have an idea of this location before they visit.
+            </p>
+
             <div class="form-group">
                 @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control", placeholder = "Include driving directions or any special facts, features, or history for this location." } })
+                    @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
                     @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -83,53 +123,77 @@
                 </div>
             </div>
   
+
+
+            <!-- SECTION 3 - Recreations ------------------------------------------------------------------------------>
+            <br />
+            <hr />
+            <h3>3. What can you do here?</h3>
+
             <!-- RECREATIONS -->
-            <div id="review">
-                <b>Recreation Type(s):</b>
-                Choose all the activities that can be done at this location.
-                @for (int i = 0; i < Model.RecOptions.Count; i++)
-                {
-                    @Html.HiddenFor(m => m.RecOptions[i].RecreationID)
-                    @Html.HiddenFor(m => m.RecOptions[i].RecreationLabel)
-                    <div class="form-group">
-                        <div class="col-md-2 control-label" style="font-weight: bold">
-                            @Html.DisplayFor(m => m.RecOptions[i].RecreationLabel, new { @class = "col-md-2 control-label" })
+            <p>
+                Choose all of the recreational activities that can be done at this location.
+            </p>
+            <div class="form-group">
+
+                <!-- LABEL -->
+                <label class="control-label col-md-2 tag-form-label">Recreations</label>
+                <div class="col-md-10">
+                    <div id="@recreationInputName-div" class="tag-form-div"></div>
+                    <div class="dropdown btn-group">
+                        <div class="input-group">
+                            <div class="input-group-btn">
+                                <!-- SEARCH -->
+                                <input id="@recreationInputName-input" class="form-control search-input" tabindex="1" data-toggle="dropdown" aria-expanded="true" type="text" placeholder="Search for a Recreation ..." autocomplete="off">
+
+                                <!-- DROPDOWN LIST -->
+                                <ul id="@recreationInputName-list" class="dropdown-menu scrollable-menu" role="menu" aria-labelledby="search-input">
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="">Add new</a></li>
+                                    @foreach (var recLabel in Model.AllRecreations)
+                                    {
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="">@recLabel</a></li>
+                                    }
+                                </ul>
+
+                                <!-- DROPDOWN-BUTTON -->
+                                <button id="@recreationInputName-dropdown-button" class="btn btn-default dropdown-button" type="button" data-toggle="dropdown" aria-expanded="true" title="dropdown">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="col-md-10">
-                            @Html.CheckBoxFor(m => m.RecOptions[i].IsChecked, new { @class = "form-control" })
-                        </div>
+                        @Html.ValidationMessage("SelectedRecreations", new { @class = "text-danger" })
                     </div>
-                }
-                @Html.ValidationMessage("Recreations", new { @class = "text-danger" })
+                </div>
             </div>
 
+
+
+            <!-- SECTION 4 - Natural Features ------------------------------------------------------------------------->
             <br />
+            <hr />
+            <h3>4. What can you find here?</h3>
 
-
-                    <p>
-                        <b>Enter any Natural Features for this Location.</b>
-                        <i>(Mountains, Lakes, etc)</i> <br/>
-                        This allows users to browse and search locations by the Natural Features it has.
-                    </p>
-
-
-            
             <!-- NATURAL FEATURES -->
+            <p>
+                <b>Enter any Natural Features for this Location.</b>
+                <i>(Mountains, Lakes, etc)</i> <br />
+                This allows users to browse and search locations by the Natural Features it has.
+            </p>
             <div class="form-group">
 
                 <!-- LABEL -->
                 <label class="control-label col-md-2 tag-form-label">Natural Features</label>
                 <div class="col-md-10">
-                    <div id="@inputName-div" class="tag-form-div"></div>
+                    <div id="@featureInputName-div" class="tag-form-div"></div>
                     <div class="dropdown btn-group">
                         <div class="input-group">
                             <div class="input-group-btn">
 
                                 <!-- SEARCH -->
-                                <input id="@inputName-input" class="form-control search-input" tabindex="1" data-toggle="dropdown" aria-expanded="true" type="text" placeholder="Search for a Natural Feature" autocomplete="off">
+                                <input id="@featureInputName-input" class="form-control search-input" tabindex="1" data-toggle="dropdown" aria-expanded="true" type="text" placeholder="Search for a Natural Feature ..." autocomplete="off">
 
                                 <!-- DROPDOWN LIST -->
-                                <ul id="@inputName-list" class="dropdown-menu scrollable-menu" role="menu" aria-labelledby="search-input">
+                                <ul id="@featureInputName-list" class="dropdown-menu scrollable-menu" role="menu" aria-labelledby="search-input">
                                     <li role="presentation"><a role="menuitem" tabindex="-1" href="">Add new</a></li>
                                     @foreach (var featureName in Model.AllNaturalFeatures)
                                     {
@@ -138,7 +202,7 @@
                                 </ul>
 
                                 <!-- DROPDOWN-BUTTON -->
-                                <button id="@inputName-dropdown-button" class="btn btn-default dropdown-button" type="button" data-toggle="dropdown" aria-expanded="true" title="dropdown">
+                                <button id="@featureInputName-dropdown-button" class="btn btn-default dropdown-button" type="button" data-toggle="dropdown" aria-expanded="true" title="dropdown">
                                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                                 </button>
 
@@ -176,35 +240,54 @@
 
 <script>
     var formId = '@formId';
-    var tagName = '@inputName';
-    var tagClass = 'tag tag-natural-feature';
 
-    var hiddenListSearch = new HiddenListSearch();
-    var hiddenFormControls = new HiddenFormControls();
+    // setup Recreations
+    var recTagName = '@recreationInputName';
+    var recTagClass = 'tag tag-recreation';
+    var recreationListSearch = new HiddenListSearch();
+    var recreationFormControls = new HiddenFormControls();
 
-    // load the tags from matching url values.
-    //hiddenFormControls.addUrlParametersHiddenInputAndTag(formId, tagName, tagClass);
+    // setup Features
+    var featureTagName = '@featureInputName';
+    var featureTagClass = 'tag tag-natural-feature';
+    var featureListSearch = new HiddenListSearch();
+    var featureFormControls    = new HiddenFormControls();
 
-    // custom onClickFunction for hiddenListSearch
-    var addTag = function (inputValue) {
-        hiddenFormControls.addTagParseCommasForceUnique(formId, tagName, inputValue, tagClass);
+    // custom onClickFunctions
+    var addNaturalFeatureTag = function (inputValue) {
+        featureFormControls.addTagParseCommasForceUnique(formId, featureTagName, inputValue, featureTagClass);
+    };
+    var addRecreationTag = function (inputValue) {
+        recreationFormControls.addTagParseCommasForceUnique(formId, recTagName, inputValue, recTagClass);
     };
 
-    // register the search input listeners.
-    hiddenListSearch.registerInputListenersFor(tagName, addTag);
 
-    //	set a custom show elment condition (require that tag does not already exist)
-    hiddenListSearch.setShowElementCondition(function (input) {
-        return !hiddenFormControls.tagWithValueExists(input, tagName);
+    // register the search input listeners.
+    recreationListSearch.registerInputListenersFor(recTagName, addRecreationTag);
+    featureListSearch.registerInputListenersFor(featureTagName, addNaturalFeatureTag);
+
+    //	prevent duplicate values
+    recreationListSearch.setShowElementCondition(function (input) {
+        return !recreationFormControls.tagWithValueExists(input, recTagName);
+    });
+    featureListSearch.setShowElementCondition(function (input) {
+        return !featureFormControls.tagWithValueExists(input, featureTagName);
     });
 
 
     // add the tags associated with the viewModel.
     @foreach (var feature in Model.SelectedFeatures)
 	{
-	    @:hiddenFormControls.addHiddenInputAndTag(formId, tagName, '@feature', tagClass);
-        	}
-    hiddenListSearch.initializeSearchResults(tagName);
+	    @:featureFormControls.addHiddenInputAndTag(formId, featureTagName, '@feature', featureTagClass);
+    }
+    @foreach (var recreation in Model.SelectedRecreations)
+    {
+        @:recreationFormControls.addHiddenInputAndTag(formId, recTagName, '@recreation', recTagClass);
+    }
+
+    // initialize dropdown contents to prevent showing values that begin selected.
+    recreationListSearch.initializeSearchResults(recTagName);
+    featureListSearch.initializeSearchResults(featureTagName);
 </script>
 
 @section Scripts {

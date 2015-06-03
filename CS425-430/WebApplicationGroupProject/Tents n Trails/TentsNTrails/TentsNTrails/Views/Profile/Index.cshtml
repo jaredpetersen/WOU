@@ -1,25 +1,15 @@
 ﻿@model TentsNTrails.Models.User
 @using Microsoft.AspNet.Identity
+@using TentsNTrails.Models
 
-<!-- Google Maps Scripting -->
+<!-- MAPS API -->
+<script type="text/javascript" src="~/Scripts/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="~/Scripts/jquery.nailthumb.1.1.js"></script>
+<link href="~/Content/jquery.nailthumb.1.1.css" type="text/css" rel="stylesheet" />
 <script src="http://maps.googleapis.com/maps/api/js"></script>
+<script src="~/Scripts/google-map-setup.js"></script>
 <script>
-    // Initialize the Map details.
-    function initialize() {
-
-        // center of map
-        var mapCenter = new google.maps.LatLng(@ViewBag.centerLatitude, @ViewBag.centerLongitude);
-        //var mapCenter = new google.maps.LatLng(39.8282, -98.5795);
-        // initialize map properties
-        var mapProp = {
-            center: mapCenter,
-            zoom: 4,
-            mapTypeId: google.maps.MapTypeId.ROADMAP // types include ROADMAP, SATELLITE, HYBRID, and TERRAIN
-        };
-
-        // get the map
-        var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
-        // add a marker to the map for each of the book mark types
+    var addMarkers = function(map, markers) {
         @foreach (var item in Model.BeenThereLocations)
         {
             @:console.log("latitude:" + @item.Location.Latitude + " longitude: " +  @item.Location.Longitude);
@@ -27,6 +17,7 @@
             @:var infowindow = new google.maps.InfoWindow({content: 'Loading...'});
             @:marker.html='<div><img id="location-image-preview" src="@Url.Content(item.Location.PreviewImageURL)" title="Preview Image" alt="Image of @item.Location.Label" style="width: 100px; height: auto; margin:0 auto;" /><br /><div class="label" text-align="center">@Html.ActionLink(item.Location.Label, "Details", "Location", new { id = item.Location.LocationID }, null)</div></div>';
             @:google.maps.event.addListener(marker, 'click', function() {infowindow.setContent(this.html); infowindow.open(map,this);});
+            @:markers.push(marker);
         }
         @foreach (var item in Model.WantToGoLocations)
         {
@@ -35,19 +26,24 @@
             @:var infowindow = new google.maps.InfoWindow({content: 'Loading...'});
             @:marker.html='<div><img id="location-image-preview" src="@Url.Content(item.Location.PreviewImageURL)" title="Preview Image" alt="Image of @item.Location.Label" style="width: 100px; height: auto; margin:0 auto;" /><br /><div class="label" text-align="center">@Html.ActionLink(item.Location.Label, "Details", "Location", new { id = item.Location.LocationID }, null)</div></div>';
             @:google.maps.event.addListener(marker, 'click', function() {infowindow.setContent(this.html); infowindow.open(map,this);});
+            @:markers.push(marker);
         }
         @foreach (var item in Model.GoAgainLocations)
         {
+            
             @:console.log("latitude:" + @item.Location.Latitude + " longitude: " +  @item.Location.Longitude);
             @:var marker = new google.maps.Marker({position: new google.maps.LatLng(@item.Location.Latitude, @item.Location.Longitude), map: map, icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'});
             @:var infowindow = new google.maps.InfoWindow({content: 'Loading...'});
             @:marker.html='<div><img id="location-image-preview" src="@Url.Content(item.Location.PreviewImageURL)" title="Preview Image" alt="Image of @item.Location.Label" style="width: 100px; height: auto; margin:0 auto;" /><br /><div class="label" text-align="center">@Html.ActionLink(item.Location.Label, "Details", "Location", new { id = item.Location.LocationID }, null)</div></div>';
             @:google.maps.event.addListener(marker, 'click', function() {infowindow.setContent(this.html); infowindow.open(map,this);});
+            @:markers.push(marker);
         }
-    }
-
-    // display the map
-    google.maps.event.addDomListener(window, 'load', initialize);
+    };
+    var centerLat = @Location.CENTER.Latitude;
+    var centerLng = @Location.CENTER.Longitude;
+    var minZoom = 6;
+    var ourMap = new TntMap(centerLat,centerLng, addMarkers, minZoom);
+    ourMap.create();
 </script>
 
 
@@ -135,8 +131,25 @@
                     <label>About Me:</label>
                 </dt>
                 <dd>
-                    @Html.DisplayFor(model => model.About)
+                    <div style="overflow:hidden; text-overflow:ellipsis">
+                        @Html.Raw(Model.GetDescriptionMarkup())
+                    </div>
                 </dd>
+
+                <dt>
+                    <label>@Html.ActionLink("Leaderboard Ranking:", "Index", "Leaderboard")</label>
+                </dt>
+                <dd>
+                    <span title="Overall Leaderboard" style="color: green;"><i class="glyphicon glyphicon-user"></i></span>
+                    @ViewBag.LeaderboardOverall
+                    &nbsp;&nbsp;
+                    <span title="Review Leaderboard" style="color: green;"><i class="glyphicon glyphicon-comment"></i></span>
+                    @ViewBag.LeaderboardReview
+                    &nbsp;&nbsp;
+                    <span title="Media Leaderboard" style="color: green;"><i class="glyphicon glyphicon-camera"></i></span>
+                    @ViewBag.onLeaderboardMedia
+                </dd>
+
             </dl>
         }
         else
@@ -369,40 +382,24 @@
                 {
                     <p>@Model.UserName has not uploaded any images.</p>
                 }
-                else if (ViewBag.ImagesCount > 5)
-                {
-                    <p>@Html.ActionLink("[See More]", "SeeMoreImages", "Profile", new { Username = Model.UserName, redirect = true }, null)</p>
-                    
-                <table class="table-responsive">
-                    <tr>
-                        <td class="thumbnail">
-                            @foreach (var item in Model.UserLocationImages)
-                            {
-                    <!-- DETAILS ACTION LINK-->
-                                <a href="@Url.Action("Details", "LocationImage", new { id = item.ImageID })">
-
-                                    <!-- IMAGE-->
-                                    <img id="@item.ImageID"
-                                         src="@Url.Content(item.ImageUrl)"
-                                         title="@item.Title"
-                                         alt="@item.AltText"
-                                         height="100"
-                                         width="100" />
-                                </a>
-                            }
-                        </td>
-                    </tr>
-                </table>
-                }
                 else
                 {
-
-                    <table class="table-responsive">
-                        <tr>
-                            <td class="thumbnail">
-                                @foreach (var item in Model.UserLocationImages)
-                                {
-                                    
+                    if (ViewBag.ImagesCount > 5)
+                    {
+                        <p>@Html.ActionLink("[See More]", "SeeMoreImages", "Profile", new { Username = Model.UserName, redirect = true }, null)</p>
+                    }
+                    <div class="row" align="center">
+                        <div class="col-xs-12">
+                            <style type="text/css" media="screen">
+                                .square-thumb {
+                                    width: 100px;
+                                    height: 100px;
+                                    margin: 5px;
+                                }
+                            </style>
+                            @foreach (var item in Model.UserLocationImages)
+                            {
+                                <div class="nailthumb-container square-thumb col-xs-2">
                                     <!-- DETAILS ACTION LINK-->
                                     <a href="@Url.Action("Details", "LocationImage", new { id = item.ImageID })">
 
@@ -410,16 +407,21 @@
                                         <img id="@item.ImageID"
                                              src="@Url.Content(item.ImageUrl)"
                                              title="@item.Title"
-                                             alt="@item.AltText"
-                                             height="100"
-                                             width="100" />
+                                             alt="@item.AltText" />
                                     </a>
-                                }
-                            </td>
-                        </tr>
-                    </table>
+                                </div>
+                            }
+                        </div>
+                    </div>
                 }
+                <!-- IMAGE-THUMBTNAIL SCRIPT -->
+                <script type="text/javascript">
+                    jQuery(document).ready(function () {
+                        jQuery('.nailthumb-container').nailthumb();
+                    });
+                </script>
             </dd>
+
         </dl>
 
         <!-- USER'S LOCATION VIDEOS -->

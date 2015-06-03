@@ -26,12 +26,14 @@ namespace TentsNTrails.Controllers
 
 
         // GET: EventParticipants
+        [Authorize(Roles = "Admin")]
         public ActionResult Index()
         {
             return View(db.EventParticipants.ToList());
         }
 
         // GET: EventParticipants/Details/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -47,6 +49,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: EventParticipants/Create
+        [Authorize(Roles = "Admin")]
         public ActionResult Create()
         {
             return RedirectToAction("Index", "Events", new { area = "" });
@@ -57,6 +60,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult Create(int? id, [Bind(Include = "EventParticipationID")] EventParticipants eventParticipants)
         {
             if (ModelState.IsValid)
@@ -77,6 +81,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: EventParticipants/Edit/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -96,6 +101,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit([Bind(Include = "EventParticipationID")] EventParticipants eventParticipants)
         {
             if (ModelState.IsValid)
@@ -108,6 +114,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: EventParticipants/Delete/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -125,6 +132,7 @@ namespace TentsNTrails.Controllers
         // POST: EventParticipants/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteConfirmed(int id)
         {
             var userID = User.Identity.GetUserId();

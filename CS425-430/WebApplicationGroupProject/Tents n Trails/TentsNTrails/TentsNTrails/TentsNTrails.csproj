@@ -310,6 +310,7 @@
     <Compile Include="Models\Locations\LocationFeature.cs" />
     <Compile Include="Models\Locations\NaturalFeature.cs" />
     <Compile Include="Models\Locations\NaturalFeatureViewModels.cs" />
+    <Compile Include="Models\Locations\RecreationViewModels.cs" />
     <Compile Include="Models\Users\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
     <Compile Include="Models\Users\LeaderboardViewModel.cs" />
@@ -359,11 +360,9 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Scripts\google-map-setup.js" />
     <Content Include="Scripts\hidden-form-controls.js" />
     <Content Include="Scripts\hidden-list-search.js" />
-    <Content Include="Scripts\location-details-google-map.js" />
-    <Content Include="Scripts\location-edit-google-map.js" />
-    <Content Include="Scripts\location-create-google-map.js" />
     <Content Include="Scripts\set-select-list-text-color.js" />
     <Content Include="WindowsAzure.Caching.MemcacheShim\AzureMemcacheService.exe" />
     <Content Include="WindowsAzure.Caching.MemcacheShim\CacheDumpGenerator.exe" />
@@ -383,6 +382,7 @@
     <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.WindowsFabric.Common.dll" />
     <Content Include="WindowsAzure.Caching.MemcacheShim\Microsoft.WindowsFabric.Data.Common.dll" />
     <Content Include="WindowsAzure.Caching.MemcacheShim\PerformanceCounters.xml" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
     <None Include="Microsoft.WindowsAzure.Caching\ClientPerfCountersInstaller.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -465,16 +465,13 @@
     <Content Include="Views\Review\Edit.cshtml" />
     <Content Include="Views\Review\Index.cshtml" />
     <Content Include="Views\Manage\ChangeEmail.cshtml" />
-    <Content Include="Views\Users\Create.cshtml" />
     <Content Include="Views\Users\Delete.cshtml" />
     <Content Include="Views\Users\Details.cshtml" />
-    <Content Include="Views\Users\Edit.cshtml" />
     <Content Include="Views\Users\Index.cshtml" />
     <Content Include="Views\Manage\ChangePrivacy.cshtml" />
     <Content Include="Views\Users\Ban.cshtml" />
     <Content Include="Views\LocationFlag\Create.cshtml" />
     <Content Include="Views\LocationFlag\Delete.cshtml" />
-    <Content Include="Views\LocationFlag\Details.cshtml" />
     <Content Include="Views\LocationFlag\Edit.cshtml" />
     <Content Include="Views\LocationFlag\Index.cshtml" />
     <Content Include="Views\Shared\_LayoutHome.cshtml" />
@@ -554,6 +551,8 @@
     <Content Include="Views\Shared\_FooterBody.cshtml" />
     <Content Include="Views\Shared\_FooterFixedBottom.cshtml" />
     <Content Include="Views\Shared\_Navbar.cshtml" />
+    <Content Include="Views\Location\GoogleMap.cshtml" />
+    <Content Include="Views\Events\Summary.cshtml" />
     <None Include="Web.AzureNightly.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -91,6 +91,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: NaturalFeatures/Create
+        [Authorize(Roles = "Admin")]
         public ActionResult Create()
         {
             return View();
@@ -101,6 +102,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult Create([Bind(Include = "ID,Name")] NaturalFeature naturalFeature)
         {
             if (ModelState.IsValid)
@@ -114,6 +116,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: NaturalFeatures/Edit/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -133,6 +136,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit([Bind(Include = "ID,Name")] NaturalFeature naturalFeature)
         {
             if (ModelState.IsValid)
@@ -145,6 +149,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: NaturalFeatures/Delete/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -383,6 +388,7 @@ namespace TentsNTrails.Controllers
         // POST: NaturalFeatures/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteConfirmed(int id)
         {
             NaturalFeature naturalFeature = db.NaturalFeatures.Find(id);

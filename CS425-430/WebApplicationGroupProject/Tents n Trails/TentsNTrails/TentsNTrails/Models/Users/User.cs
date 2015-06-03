@@ -28,6 +28,8 @@ namespace TentsNTrails.Models
         [Required]
         public String LastName { get; set; }
         public bool Private { get; set; }
+        [DataType(DataType.MultilineText)]
+        [StringLength(500, ErrorMessage = "The {0} cannot be more than {1} characters long.")]
         public string About { get; set; }
         private string profilePictureUrl;
         public string ProfilePictureUrl
@@ -101,6 +103,19 @@ namespace TentsNTrails.Models
                 total += UserLocationVideos.Count;
             }
             return total;
+        }
+
+        // Handles newlines in a string for html markup by replacing each with a <br> tag.
+        public string GetDescriptionMarkup()
+        {
+            if (About != null)
+            {
+                return About.Replace(Environment.NewLine, "<br />");
+            }
+            else
+            {
+                return "";
+            }
         }
     }
 }

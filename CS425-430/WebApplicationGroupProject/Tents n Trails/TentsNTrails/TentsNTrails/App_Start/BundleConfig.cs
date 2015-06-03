@@ -28,6 +28,7 @@ namespace TentsNTrails
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
+                      "~/Content/bootstrap-glyphicons.css",
                       "~/Content/jquery.nailthumb.1.1.css",
                       "~/Content/site.css"));
 

@@ -50,6 +50,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: Leaderboard/Details/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Details(string id)
         {
             if (id == null)

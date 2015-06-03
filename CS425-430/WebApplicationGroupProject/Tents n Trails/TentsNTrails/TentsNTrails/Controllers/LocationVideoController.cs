@@ -82,6 +82,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: LocationVideo/Edit/5
+        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -102,6 +103,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult Edit([Bind(Include = "VideoID,Description,EmbedCode,LocationID")] LocationVideo locationVideo)
         {
             if (ModelState.IsValid)
@@ -115,6 +117,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: LocationVideo/Delete/5
+        [Authorize]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -132,6 +135,7 @@ namespace TentsNTrails.Controllers
         // POST: LocationVideo/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult DeleteConfirmed(int id)
         {
             LocationVideo locationVideo = db.LocationVideos.Find(id);

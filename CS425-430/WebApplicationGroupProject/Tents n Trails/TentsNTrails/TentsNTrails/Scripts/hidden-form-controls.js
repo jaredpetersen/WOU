@@ -186,7 +186,7 @@ function HiddenFormControls() {
             console.log("add single value");
 
             // add the tag if it doesn't already exist.
-            if (!hiddenFormControls.tagWithValueExists(tagValue, tagName)) {
+            if (!self.tagWithValueExists(tagValue, inputName)) {
                 // console.log('tag with value: "' + tagValue + '" was NOT found.');
                 self.addHiddenInputAndTag(formId, inputName, tagValue, spanClass);
             }
@@ -203,7 +203,7 @@ function HiddenFormControls() {
                 if (delimitedValue.length > 0) {
 
                     // add if tag does not already exist.
-                    if (!hiddenFormControls.tagWithValueExists(delimitedValue, tagName)) {
+                    if (!self.tagWithValueExists(delimitedValue, inputName)) {
                         // console.log('tag with value: "' + delimitedValue + '" was NOT found.');
                         self.addHiddenInputAndTag(formId, inputName, delimitedValue, spanClass);
                     }

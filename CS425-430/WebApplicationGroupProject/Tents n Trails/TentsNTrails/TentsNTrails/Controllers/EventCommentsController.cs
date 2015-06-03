@@ -25,6 +25,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: EventComments
+        [Authorize(Roles = "Admin")]
         public ActionResult Index()
         {
             var eventComments = db.EventComments.Include(e => e.Event);
@@ -32,6 +33,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: EventComments/Details/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -47,6 +49,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: EventComments/Create
+        [Authorize(Roles = "Admin")]
         public ActionResult Create(int eventID)
         {
             EventComments comment = new EventComments();
@@ -60,6 +63,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult Create([Bind(Include = "EventCommentID,EventID,Comment")] EventComments eventComments)
         {
             eventComments.Author = manager.FindById(User.Identity.GetUserId());
@@ -75,6 +79,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: EventComments/Edit/5
+        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -95,6 +100,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult Edit([Bind(Include = "EventCommentID,Comment,Date,EventID")] EventComments eventComments)
         {
             if (ModelState.IsValid)
@@ -109,6 +115,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: EventComments/Delete/5
+        [Authorize]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -126,6 +133,7 @@ namespace TentsNTrails.Controllers
         // POST: EventComments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult DeleteConfirmed(int id)
         {
             EventComments eventComments = db.EventComments.Find(id);

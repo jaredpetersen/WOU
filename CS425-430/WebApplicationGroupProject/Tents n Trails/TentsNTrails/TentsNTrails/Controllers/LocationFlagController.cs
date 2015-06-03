@@ -55,22 +55,8 @@ namespace TentsNTrails.Controllers
             return View(viewModel);
         }
 
-        // GET: LocationFlag/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            LocationFlag locationFlag = db.LocationFlags.Find(id);
-            if (locationFlag == null)
-            {
-                return HttpNotFound();
-            }
-            return View(locationFlag);
-        }
-
         // GET: LocationFlag/Create
+        [Authorize]
         public ActionResult Create()
         {
             ViewBag.LocationID = new SelectList(db.Locations, "LocationID", "Label");
@@ -82,6 +68,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult Create([Bind(Include = "FlagID,LocationID,Flag")] LocationFlag locationFlag)
         {
             if (ModelState.IsValid)
@@ -96,6 +83,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: LocationFlag/Edit/5
+        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -116,6 +104,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult Edit([Bind(Include = "FlagID,LocationID,Flag")] LocationFlag locationFlag)
         {
             if (ModelState.IsValid)
@@ -129,6 +118,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: LocationFlag/Delete/5
+        [Authorize]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -146,6 +136,7 @@ namespace TentsNTrails.Controllers
         // POST: LocationFlag/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult DeleteConfirmed(int id)
         {
             LocationFlag locationFlag = db.LocationFlags.Find(id);

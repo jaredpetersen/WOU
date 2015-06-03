@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = "Natural Features";
     int padding = 7;
-}}
+}
 
 <h2>@ViewBag.Title</h2>
 <p>
@@ -31,6 +31,7 @@
             <div id="review" style="text-align:center">
                 <text class="no-wrap">
                     @Html.ActionLink(item.Name, "Details", new { id = item.ID })
+                    <span style="color:rgba(0, 0, 0, 0.61)">(@item.LocationFeatures.Count)</span>
                 </text>
             </div>
         </div>

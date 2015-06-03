@@ -16,12 +16,14 @@ namespace TentsNTrails.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Recreation
+        [Authorize(Roles = "Admin")]
         public ActionResult Index()
         {
             return View(db.Recreations.ToList());
         }
 
         // GET: Recreation/Details/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -37,6 +39,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: Recreation/Create
+        [Authorize(Roles = "Admin")]
         public ActionResult Create()
         {
             return View();
@@ -50,6 +53,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult Create([Bind(Include = "RecreationID,Label")] Recreation recreation)
         {
             if (ModelState.IsValid)
@@ -68,6 +72,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: Recreation/Edit/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -90,6 +95,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit([Bind(Include = "RecreationID,Label,DateCreated")] Recreation recreation)
         {
             if (ModelState.IsValid)
@@ -106,6 +112,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: Recreation/Delete/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -123,6 +130,7 @@ namespace TentsNTrails.Controllers
         // POST: Recreation/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteConfirmed(int id)
         {
             Recreation recreation = db.Recreations.Find(id);

@@ -132,3 +132,6 @@ C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrail
 C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\AzureNightly\TentsNTrails.Migrations.createStatesTable.resources
 C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\AzureNightly\TentsNTrails.csproj.GenerateResource.Cache
 C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\AzureNightly\TentsNTrails.dll
+C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\AzureNightly\TentsNTrails.Migrations.SentMessagesUpdate.resources
+C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\AzureNightly\TentsNTrails.Migrations.fixDeletedBySenderOrRecipient.resources
+C:\Users\jaredpetersen\Source\Workspaces\Tents n Trails\TentsNTrails\TentsNTrails\obj\AzureNightly\TentsNTrails.Migrations.AddNaturalFeatures.resources

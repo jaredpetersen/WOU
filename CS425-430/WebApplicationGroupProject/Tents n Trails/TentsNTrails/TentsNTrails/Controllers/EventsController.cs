@@ -9,6 +9,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using TentsNTrails.Models;
+using TentsNTrails.Controllers;
 
 namespace TentsNTrails.Controllers
 {
@@ -27,7 +28,7 @@ namespace TentsNTrails.Controllers
         // GET: Events
         public ActionResult Index()
         {
-            var events = db.Events.Include(e => e.Location).OrderByDescending(e => e.Date);
+            var events = db.Events.Include(e => e.Location).OrderBy(e => e.Date);
             ViewBag.centerLatitude = 39.8282;
             ViewBag.centerLongitude = -98.5795;
             return View(events.ToList());
@@ -176,6 +177,26 @@ namespace TentsNTrails.Controllers
             db.Events.Remove(events);
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        public PartialViewResult Summary(int? id, int? imageSize, string redirectAction, string redirectController)
+        {
+            // find location
+            Events events = db.Events
+                .Include(l => l.Location)
+                .Where(l => l.EventID == id)
+                .SingleOrDefault();
+
+            // error checking for null case
+            if (events == null) return PartialView(events);
+
+            ViewBag.Size = imageSize ?? 100;
+            ViewBag.redirectAction = redirectAction ?? "Index";
+            ViewBag.redirectController = redirectController ?? "Location";
+            //System.Diagnostics.Debug.WriteLine(String.Format("LocationController.Summary(LocationID: {0}) ViewBag.redirectAction:     {1}", id ?? -1, redirectAction ?? "Index"));
+            //System.Diagnostics.Debug.WriteLine(String.Format("LocationController.Summary(LocationID: {0}) ViewBag.redirectController: {1}", id ?? -1, redirectController ?? "Location"));
+            // done
+            return PartialView(events);
         }
 
         protected override void Dispose(bool disposing)

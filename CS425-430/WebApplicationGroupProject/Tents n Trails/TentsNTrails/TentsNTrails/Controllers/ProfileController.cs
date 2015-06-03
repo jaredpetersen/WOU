@@ -38,7 +38,7 @@ namespace TentsNTrails.Controllers
             ViewBag.HasSentRequest = false;
             ViewBag.HasRequests = false;
 
-            if (username != null) //Traveling to another user's profile
+            if (username != null && !username.Equals(profileUser.UserName)) //Traveling to another user's profile
             {
                 profileUser = db.Users.Where(user => user.UserName == username).First();
                 ViewBag.IsPrivate = profileUser.Private; //Tells the view what to display based on user settings
@@ -81,6 +81,51 @@ namespace TentsNTrails.Controllers
                 if(requests.Count() > 0)
                 {
                     ViewBag.HasRequests = true;
+                }
+            }
+
+            //add user rankings
+            var allUsers = db.Users.ToList();
+                // sort the users by their contributions, but only count it if they have at least 1 contribution
+            var topUsers = allUsers
+                .Where(u => u.TotalContributions() > 0)
+                .OrderByDescending(e => e.TotalContributions())
+                .ToList();
+
+            ViewBag.LeaderboardOverall = "Not Ranked";
+            for (int i = 0; i < topUsers.Count; i++)
+            {
+                if (topUsers.ElementAt(i).Id == profileUser.Id)
+                {
+                    ViewBag.LeaderboardOverall = i + 1;
+                }
+            }
+
+            var topReviewers = allUsers
+                .Where(u => u.TotalReviews() > 0)
+                .OrderByDescending(e => e.TotalReviews())
+                .ToList();
+
+            ViewBag.LeaderboardReview = "Not Ranked";
+            for (int i = 0; i < topReviewers.Count; i++)
+            {
+                if (topReviewers.ElementAt(i).Id == profileUser.Id)
+                {
+                    ViewBag.LeaderboardReview = i + 1;
+                }
+            }
+
+            var topMediaUploaders = allUsers
+                .Where(u => u.TotalMediaItems() > 0)
+                .OrderByDescending(e => e.TotalMediaItems())
+                .ToList();
+
+            ViewBag.onLeaderboardMedia = "Not Ranked";
+            for (int i = 0; i < topMediaUploaders.Count; i++)
+            {
+                if (topMediaUploaders.ElementAt(i).Id == profileUser.Id)
+                {
+                    ViewBag.onLeaderboardMedia = i + 1;
                 }
             }
 
@@ -262,6 +307,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: Profile/Edit/5
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit(string id)
         {
             if (id == null)
@@ -281,6 +327,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit([Bind(Include = "Id,EnrollmentDate,FirstName,LastName,Private,Email,EmailConfirmed,PasswordHash,SecurityStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEndDateUtc,LockoutEnabled,AccessFailedCount,UserName,About")] User user)
         {
             if (ModelState.IsValid)
@@ -363,12 +410,34 @@ namespace TentsNTrails.Controllers
         // The connection request is deleted.
         [Authorize]
         //[ValidateAntiForgeryToken]
-        public ActionResult DenyConnect(string username)
+        public ActionResult DenyConnect(string username, int? notificationID)
         {
             ConnectionRequest conn = new ConnectionRequest();
 
             if (ModelState.IsValid)
             {
+                //read notification
+                if (username == null)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
+
+                if (notificationID != null)
+                {
+                    Notification notification = db.Notifications.Find(notificationID);
+                    if (notification == null)
+                    {
+                        return HttpNotFound();
+                    }
+
+                    if (!notification.IsRead)
+                    {
+                        notification.IsRead = true;
+                        db.Entry(notification).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                }
+
                 if (username == null)
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -406,15 +475,32 @@ namespace TentsNTrails.Controllers
         // GET: Profile/ConfirmConnect?Username=username
         // Connects the two users and deletes the request from the request table.
         [Authorize]
-        public ActionResult ConfirmConnect(string username)
+        public ActionResult ConfirmConnect(string username, int? notificationID)
         {
             Connection conn = new Connection();
 
             if (ModelState.IsValid)
             {
+                //read notification
                 if (username == null)
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
+
+                if (notificationID != null)
+                {
+                    Notification notification = db.Notifications.Find(notificationID);
+                    if (notification == null)
+                    {
+                        return HttpNotFound();
+                    }
+
+                    if (!notification.IsRead)
+                    {
+                        notification.IsRead = true;
+                        db.Entry(notification).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
                 }
 
                 // Find the user IDs for the users that were passed in

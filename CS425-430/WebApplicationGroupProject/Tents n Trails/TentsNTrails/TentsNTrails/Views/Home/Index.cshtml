@@ -12,15 +12,10 @@
     <span class="home-title home-title-small visible-xs">tents<span style="color:#326400">n</span>trails</span>
     <span class="home-title home-title-large visible-lg">tents<span style="color:#326400">n</span>trails</span>
 
-    <!-- LINE BREAK (dynamic resizing) -->
-    <br />
-    <div class="home-line-break-dynamic visible-sm visible-md">&nbsp;</div>
-    <div class="home-line-break         visible-lg">&nbsp;</div>
-
     <!-- SEARCH -->
     <form method="get" action="/Location/Browse">
         <div class="input-group home-search-btn-group">
-            <input type="text" class="form-control input-home" name="query" placeholder="Search our locations to find your next adventure spot..." />
+            <input type="text" class="form-control input-home" name="query" placeholder="Search our locations to find your next adventure..." />
             <span class="input-group-btn">
                 <button class="btn btn-default" id="btn" type="submit">
                     <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
@@ -28,10 +23,10 @@
             </span>
         </div>
     </form>
-
 </div>
 
 <!-- BUTTONS -->
+<div class="home-buttons-container">
     <div class="row home-buttons">
         <div class="col-xs-12 col-sm-4 home-btn-column">
             <button class="home-btn" onclick="location.href='@Url.Action("Index", "Location")'">
@@ -49,17 +44,4 @@
             </button>
         </div>
     </div>
-
-@*
-    <div class="home-buttons container">
-        <button class="home-btn" onclick="location.href='@Url.Action("Index", "Location")'">
-            <span class="no-wrap">Find Locations &raquo</span>
-        </button>
-        <button class="home-btn" onclick="location.href='@Url.Action("Index", "Events")'">
-            <span class="no-wrap">Join Outdoor Events &raquo</span>
-        </button>
-        <button class="home-btn" onclick="location.href='@Url.Action("Index", "LocationFlag", new { })'">
-            <span class="no-wrap">See Bookmarks &raquo</span>
-        </button>
-    </div>
-*@
+</div>

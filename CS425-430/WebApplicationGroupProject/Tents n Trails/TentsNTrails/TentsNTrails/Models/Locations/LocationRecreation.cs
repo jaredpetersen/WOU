@@ -23,5 +23,21 @@ namespace TentsNTrails.Models
         public virtual Location Location { get; set; }
         public virtual Recreation Recreation { get; set; }
 
+
+        /// <summary>
+        /// Required default constructor (empty)
+        /// </summary>
+        public LocationRecreation() { }
+
+        /// <summary>
+        /// Create a new LocationRecreation.
+        /// </summary>
+        /// <param name="locationID">The index of the Location to associate.</param>
+        /// <param name="recreationID">The index of the Recreation to associate.</param>
+        public LocationRecreation(int locationID, int recreationID)
+        {
+            this.LocationID = locationID;
+            this.RecreationID = recreationID;
+        }
     }
 }

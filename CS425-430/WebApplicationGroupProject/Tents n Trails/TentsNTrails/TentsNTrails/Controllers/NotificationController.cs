@@ -12,12 +12,12 @@ using TentsNTrails.Models;
 
 namespace TentsNTrails.Controllers
 {
+    [Authorize]
     public class NotificationController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Notification
-        [Authorize]
         public ActionResult Index()
         {
             // get Notifications only for the current user.
@@ -31,6 +31,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: Notification/Details/5
+        [Authorize]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -146,6 +147,7 @@ namespace TentsNTrails.Controllers
         /// </summary>
         /// <param name="id">the id of the Notification to read.</param>
         /// <returns>A redirect to /Notification/Index.</returns>
+        [HttpPost]
         public ActionResult Read(int? id)
         {
             if (id == null)
@@ -168,7 +170,7 @@ namespace TentsNTrails.Controllers
 
 
         // POST: Notification/Delete/id
-        [Authorize]
+        [HttpPost]
         public ActionResult Delete(int id)
         {
             Notification notification = db.Notifications.Find(id);
@@ -179,6 +181,5 @@ namespace TentsNTrails.Controllers
             }
             return RedirectToAction("Index");
         }
-
     }
 }

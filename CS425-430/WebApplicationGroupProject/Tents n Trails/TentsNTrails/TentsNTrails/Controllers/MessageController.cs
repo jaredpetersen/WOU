@@ -136,6 +136,7 @@ namespace TentsNTrails.Controllers
 
         // GET: Message/MarkAsRead/5
         // This GET method should never be used but it's here just in case it's called
+        [Authorize]
         public ActionResult MarkAsRead()
         {
             return RedirectToAction("Index");
@@ -146,6 +147,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult MarkAsRead([Bind(Include = "MessageID,MessageText,TimeSent,IsRead")] Message message)
         {
             if (ModelState.IsValid)
@@ -159,6 +161,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: Message/Edit/5
+        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -178,6 +181,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult Edit([Bind(Include = "MessageID,MessageText,TimeSent,IsRead")] Message message)
         {
             if (ModelState.IsValid)

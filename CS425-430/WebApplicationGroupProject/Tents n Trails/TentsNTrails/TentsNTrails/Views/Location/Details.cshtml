@@ -5,33 +5,24 @@
 }
 
 <!-- MAPS API -->
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/jquery.nailthumb.1.1.js"></script>
+<link href="~/Content/jquery.nailthumb.1.1.css" type="text/css" rel="stylesheet" />
 <script src="http://maps.googleapis.com/maps/api/js"></script>
+<script src="~/Scripts/google-map-setup.js"></script>
 <script>
-    // Initialize the Map details.
-    function initialize() {
-
-        // make a new LatLong for the report's location
-        var reportLocation = new google.maps.LatLng(@Model.Latitude, @Model.Longitude);
-
-        // initialize map properties
-        var mapProp = {
-            center: reportLocation,
-            zoom: 7,
-            mapTypeId: google.maps.MapTypeId.ROADMAP // types include ROADMAP, SATELLITE, HYBRID, and TERRAIN
-        };
-
-        // get the map
-        var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
-
-        // add a marker to the map
-        var marker = new google.maps.Marker({position: reportLocation, map: map});
+    var addMarkers = function(map, markers) {
+        var marker = new google.maps.Marker({position: new google.maps.LatLng(@Model.Latitude, @Model.Longitude), map: map});
         var infowindow = new google.maps.InfoWindow({content: 'Loading...'});
-        marker.html='<div class="label"  ><a>@Model.Label</a></div>';
+        marker.html='<div class="label"><a>@Model.Label</a></div>';
         google.maps.event.addListener(marker, 'click', function() {infowindow.setContent(this.html); infowindow.open(map,this);});
-    }
-
-    // display the map
-    google.maps.event.addDomListener(window, 'load', initialize);
+        markers.push(marker);
+    };
+    var centerLat = @Model.Latitude;
+    var centerLng = @Model.Longitude;
+    var minZoom = 7;
+    var ourMap = new TntMap(centerLat,centerLng, addMarkers, minZoom);
+    ourMap.create();
 </script>
 
 @{
@@ -61,8 +52,8 @@
 
             @if (Model.State != null) 
             {
-            <dt>state</dt>
-            <dd>@Html.ActionLink(Model.State.Name, "Browse", new { query = Model.StateID }, new { title = String.Format("Browse all locations in {0}", Model.State.Name) })</dd>
+            <dt>State</dt>
+            <dd>@Html.ActionLink(Model.State.Name, "Browse", new { query = Model.State.Name }, new { title = String.Format("Browse all locations in {0}", Model.State.Name) })</dd>
             }
             <dt>@Html.DisplayNameFor(model => model.Latitude)</dt>
             <dd>@Html.DisplayFor(model => model.Latitude)</dd>
@@ -85,16 +76,14 @@
             <dt>Recreation Types</dt>
             <dd>
                 <div>
-                    <span class="tag tag-button">
-                        <a href="@Url.Action("EditRecreations", "Location", new { id = Model.LocationID })" title="Add or remove Recreations">
-                            <span class="glyphicon glyphicon-pencil"></span>
-                        </a>
-                    </span>
+                    <!--EDIT LINK-->
+                    <a href="@Url.Action("EditRecreations", "Location", new { id = Model.LocationID })" title="Add or remove Recreations">
+                        <span class="tag tag-button"><span class="glyphicon glyphicon-pencil"></span></span></a>
                     @{
                         var recreations = Model.RecOptions.Select(r => r.Recreation);
                         if (recreations.Count() == 0)
                         {
-                            <span class="tag tag-disabled" title="No Natural Features are associated with @Model.Label">None</span>
+                            <span class="tag tag-disabled" title="No Recreations are associated with @Model.Label">None</span>
                         }
                         else
                         {
@@ -113,11 +102,9 @@
             <dt>Natural Features</dt>
             <dd>
                 <div>
-                    <span class="tag tag-button">
-                        <a href="@Url.Action("EditNaturalFeatures", "Location", new { id = Model.LocationID })" title="Add or remove Natural Features">
-                            <span class="glyphicon glyphicon-pencil"></span>
-                        </a>
-                    </span>
+                    <!--EDIT LINK-->
+                    <a href="@Url.Action("EditNaturalFeatures", "Location", new { id = Model.LocationID })" title="Add or remove Natural Features">
+                        <span class="tag tag-button"><span class="glyphicon glyphicon-pencil"></span></span></a>
                     @{
                         var naturalFeatures = Model.LocationFeatures.Select(lf => lf.NaturalFeature);
                         if (naturalFeatures.Count() == 0)
@@ -245,7 +232,7 @@
             </div>
         }
 
-        <script type="text/javascript">
+        <script>
             jQuery(document).ready(function () {
                 jQuery('.nailthumb-container').nailthumb();
             });

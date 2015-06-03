@@ -5,6 +5,7 @@ using System.Web;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using PagedList;
+using System.Web.Mvc;
 
 // File holds all ViewModels associated with Location.
 
@@ -29,7 +30,7 @@ namespace TentsNTrails.Models
         public virtual ICollection<Location> MostRecentLocations { get; set; }
         public virtual ICollection<Location> PersonalRecommendations { get; set; }
         public virtual ICollection<Location> FriendRecommendations { get; set; }
-        public virtual ICollection<Recreation> Recreations { get; set; }
+        public virtual IEnumerable<SelectListItem> Recreations { get; set; }
     }
 
     /// <summary>
@@ -37,11 +38,15 @@ namespace TentsNTrails.Models
     /// </summary>
     public class BrowseLocationsViewModel
     {
+        //The resulting locations from the filter/search
         public virtual IPagedList<Location> Locations { get; set; }
         public virtual ICollection<Location> AllLocations { get; set; }
-        public virtual ICollection<Recreation> Recreations { get; set; }
+        // property used to hold the list of possible recreations shown in the dropdown
+        public virtual IEnumerable<SelectListItem> Recreations { get; set; }
 
-        public virtual int? recreationID { get; set; }
+        [Display(Name = "Recreation Filter")]
+        public virtual int recreationID { get; set; }
+        [Display(Name = "Search Query")]
         public virtual String query { get; set; }
         public virtual int? page { get; set; }
     }
@@ -87,13 +92,13 @@ namespace TentsNTrails.Models
 
         public DifficultyRatings Difficulty { get; set; }
 
-        // Location recreations
-        [Display(Name = "Recreation Tags")]
-        public List<LocationRecreation> RecOptions { get; set; }
-
-        public ICollection<String> SelectedFeatures { get; set; }
-        public ICollection<String> AllNaturalFeatures { get; set; }
-
+        [Required(ErrorMessage = "You must select at least one Recreation type.")]
+        public ICollection<string> SelectedRecreations { get; set; }
+        public ICollection<string> AllRecreations { get; set; }
+ 
+        public ICollection<string> SelectedFeatures { get; set; }
+        public ICollection<string> AllNaturalFeatures { get; set; }
+        
         /// <summary>
         /// Required default constructor
         /// </summary>
@@ -150,11 +155,43 @@ namespace TentsNTrails.Models
         [Required]
         public DifficultyRatings Difficulty { get; set; }
 
-        // Location recreations
-        [Display(Name = "Recreation Tags")]
-        public List<LocationRecreation> RecOptions { get; set; }
+        [Required(ErrorMessage = "You must select at least one Recreation type.")]
+        public ICollection<string> SelectedRecreations { get; set; }
+        public ICollection<string> AllRecreations { get; set; }
+        
+        public ICollection<string> SelectedFeatures { get; set; }
+        public ICollection<string> AllNaturalFeatures { get; set; }
 
-        public ICollection<String> SelectedFeatures { get; set; }
-        public ICollection<String> AllNaturalFeatures { get; set; }
     }
+
+    /// <summary>
+    /// Used to abstract away data needed for a map.
+    /// </summary>
+    public class MapViewModel
+    {
+        public int Height { get; set; }
+        public int Width { get; set; }
+        public int MinZoom { get; set; }
+        public Location Center { get; set; }
+        public ICollection<Location> Locations { get; set; }
+
+        /// <summary>
+        /// Create a MapViewModel, holding all data needed to render a map using the Google Maps API.
+        /// </summary>
+        /// <param name="height">the height of the map.</param>
+        /// <param name="width">the width of the map.</param>
+        /// <param name="minZoom">the minimum zoom on loading.</param>
+        /// <param name="center">The center of the map.</param>
+        /// <param name="locations">The list of locations to render as markers on this map.</param>
+        public MapViewModel(int height, int width, int minZoom, Location center, ICollection<Location> locations)
+        {
+            this.Height = height;
+            this.Width = width;
+            this.MinZoom = minZoom;
+            this.Center = center;
+            this.Locations = locations;
+        }
+
+    }
+
 }

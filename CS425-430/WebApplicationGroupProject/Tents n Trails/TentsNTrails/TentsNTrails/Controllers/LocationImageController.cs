@@ -293,6 +293,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: LocationImage/Edit/5
+        [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -314,6 +315,7 @@ namespace TentsNTrails.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult Edit([Bind(Include = "ImageID,Title,ImageUrl,DateTaken")] LocationImage locationImage)
         {
             if (ModelState.IsValid)
@@ -327,6 +329,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: LocationImage/Delete/5
+        [Authorize]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -344,6 +347,7 @@ namespace TentsNTrails.Controllers
         // POST: LocationImage/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult DeleteConfirmed(int id)
         {
             LocationImage locationImage = db.LocationImages.Find(id);

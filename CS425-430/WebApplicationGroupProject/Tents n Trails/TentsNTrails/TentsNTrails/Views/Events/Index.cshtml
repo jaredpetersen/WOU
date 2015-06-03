@@ -1,37 +1,26 @@
 ﻿@model IEnumerable<TentsNTrails.Models.Events>
+@using TentsNTrails.Models
 @using Microsoft.AspNet.Identity
 
-<!-- Google Maps Scripting -->
+ <!-- Google Maps Scripting -->
 <script src="http://maps.googleapis.com/maps/api/js"></script>
+<script src="~/Scripts/google-map-setup.js"></script>
 <script>
-    // Initialize the Map details.
-    function initialize() {
-
-        // center of map
-        var mapCenter = new google.maps.LatLng(@ViewBag.centerLatitude, @ViewBag.centerLongitude);
-        //var mapCenter = new google.maps.LatLng(39.8282, -98.5795);
-        // initialize map properties
-        var mapProp = {
-            center: mapCenter,
-            zoom: 4,
-            mapTypeId: google.maps.MapTypeId.ROADMAP // types include ROADMAP, SATELLITE, HYBRID, and TERRAIN
-        };
-
-        // get the map
-        var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
-
-        // add a markers to the map
+    var addMarkers = function(map, markers) {
         @foreach (var item in Model) {
             @:console.log("latitude:" + @item.Location.Latitude + " longitude: " +  @item.Location.Longitude);
-                    @:var marker = new google.maps.Marker({position: new google.maps.LatLng(@item.Location.Latitude, @item.Location.Longitude), map: map});
-                    @:var infowindow = new google.maps.InfoWindow({content: 'Loading...'});
-                    @:marker.html='<div class="label"  ><a>@item.Location.Label</a></div>';
-                    @:google.maps.event.addListener(marker, 'click', function() {infowindow.setContent(this.html); infowindow.open(map,this);});
-                        }
-    }
-
-    // display the map
-    google.maps.event.addDomListener(window, 'load', initialize);
+            @:var marker = new google.maps.Marker({position: new google.maps.LatLng(@item.Location.Latitude, @item.Location.Longitude), map: map});
+            @:var infowindow = new google.maps.InfoWindow({content: 'Loading...'});
+            @:marker.html='<div class="label"><a>@item.Name</a></div>';
+            @:google.maps.event.addListener(marker, 'click', function() {infowindow.setContent(this.html); infowindow.open(map,this);});
+            @:markers.push(marker);
+       }
+    };
+    var centerLat = @ViewBag.centerLatitude;
+    var centerLng = @ViewBag.centerLongitude;
+    var minZoom = 9;
+    var ourMap = new TntMap(centerLat,centerLng, addMarkers, minZoom);
+    ourMap.create();
 </script>
 
 @{
@@ -55,7 +44,7 @@
     </div>
 </div>
 
-<table class="table">
+@**<table class="table">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.Name)
@@ -96,4 +85,25 @@
     </tr>
 }
 
-</table>
+</table>**@
+
+
+<!-- LOCATIONS -->
+@{
+    int padding = 7;
+    int count = Model.Count();
+    for (int i = 0; i < count; i += 2)
+    {
+        <div class="row" style="padding: 0px @(padding)px 0px @(padding)px">
+            @for (int j = i; j < Math.Min(i + 2, count); j++)
+            {
+                Events item = Model.ToList()[j];
+                <div class="col-xs-12 col-md-6" style="padding: @(padding)px;">
+                    <div id="review" style="min-height: 124px; min-width:370px">
+                        @{ Html.RenderAction("Summary", "Events", new { id = item.EventID, redirectAction = "Index", redirectController = "Events" }); }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+}

@@ -20,6 +20,8 @@ namespace TentsNTrails.Models
      */
     public class Location
     {
+        public static readonly Location CENTER = new Location("Center of the United States", 39.8282, -98.5795);
+
         // for difficulty rating below
         public enum DifficultyRatings
         {
@@ -215,6 +217,40 @@ namespace TentsNTrails.Models
         }
 
         /// <summary>
+        /// Retrieve the Country for the specified Location using Google's Reverse Geocoding API.
+        /// Use this to check the value of a Location initially.  If not in the USA, we cannot add it.
+        /// </summary>
+        /// <returns>The coutry name of this Location.</returns>
+        public static string ReverseGeocodeCountry(double latitute, double longitude)
+        {
+            string country = null;
+            string requestUri = string.Format(GEOCODE_BASE_URI, latitute.ToString(), longitude.ToString());
+            using (WebClient wc = new WebClient())
+            {
+                string result = wc.DownloadString(requestUri);
+                var xmlElm = XElement.Parse(result);
+                var status = (from elm in xmlElm.Descendants()
+                              where elm.Name == "status"
+                              select elm).FirstOrDefault();
+
+                if (status.Value.ToLower().Equals("ok"))
+                {
+                    var res = xmlElm.Descendants("address_component")
+                        .Where(x => (string)x.Element("type") == "country")
+                        .Select(x => (string)x.Element("short_name")).FirstOrDefault();
+
+
+                    country = res.ToString();
+                }
+                else
+                {
+                    country = null;
+                }
+            }
+            return country;
+        }
+
+        /// <summary>
         /// Convenience method to calculate the centerpoint of latlong coordinates using trigonometry
         /// (solution used from http://stackoverflow.com/questions/6671183/calculate-the-center-point-of-multiple-latitude-longitude-coordinate-pairs)
         /// </summary>
@@ -228,11 +264,7 @@ namespace TentsNTrails.Models
             if (count == 0)
             {
                 // for now, use this: the below logic doesn't seem to be too accurate.  it is close, though ...
-                return new Location()
-                {
-                    Latitude = 39.8282,
-                    Longitude = -98.5795
-                };
+                return Location.CENTER;
             }
 
             double x = 0;
@@ -267,6 +299,27 @@ namespace TentsNTrails.Models
                 Latitude = centerLatitude,
                 Longitude = centerLongitude
             };
+        }
+
+        public Location() { }
+
+        public Location(string label, double latitude, double longitude)
+        {
+            this.Label = label;
+            this.Latitude = latitude;
+            this.Longitude = longitude;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.LocationID;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Location)
+                return ((Location)obj).LocationID == this.LocationID;
+            return false;
         }
     }
 }

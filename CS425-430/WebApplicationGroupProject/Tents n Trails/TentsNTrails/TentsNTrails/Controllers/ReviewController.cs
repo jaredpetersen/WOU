@@ -63,30 +63,7 @@ namespace TentsNTrails.Controllers
             return View(viewModelList);
         }
 
-        /*
         [Authorize]
-        // GET: Review
-        // Gets the reviews only for the current user
-        public ActionResult IndexOLD()
-        {
-            var currentUserName = manager.FindById(User.Identity.GetUserId()).UserName;
-            var reviews = db.Reviews.Include(r => r.Location);
-            // Get only reviews that have comments
-            var reviewList = reviews.Where(r => r.User.UserName == currentUserName)
-                                .Where(r => !r.Comment.Equals(""))
-                                .Where(r => r.Comment != null).ToList();
-            if (reviewList.Count == 0)
-            {
-                ViewBag.HasReviews = false;
-            }
-            else
-            {
-                ViewBag.HasReviews = true;
-            }
-            return View(reviewList);
-        }
-        */
-
         // GET: Review/Details/5
         public ActionResult Details(int? id)
         {
@@ -283,6 +260,7 @@ namespace TentsNTrails.Controllers
             return !(review.Comment == null || review.Comment.Equals(""));
         }
 
+        [Authorize]
         // GET: Review/Edit/5
         public ActionResult Edit(int? id)
         {
@@ -302,6 +280,7 @@ namespace TentsNTrails.Controllers
         // POST: Review/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "ReviewID,LocationID,ReviewDate,Difficulty,Rating,Comment")] Review review)
@@ -309,6 +288,8 @@ namespace TentsNTrails.Controllers
             if (ModelState.IsValid)
             {
                 db.Entry(review).State = EntityState.Modified;
+                review.ReviewDate = DateTime.Now;
+                review.User = manager.FindById(User.Identity.GetUserId());
                 db.SaveChanges();
                 return RedirectToAction("Details/" + review.LocationID, "Location", new { Message = LocationController.LocationMessageId.ReviewSavedSuccess });
             }
@@ -318,6 +299,7 @@ namespace TentsNTrails.Controllers
         }
 
         // GET: Review/Delete/5
+        [Authorize]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -335,6 +317,7 @@ namespace TentsNTrails.Controllers
         // POST: Review/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public ActionResult DeleteConfirmed(int id)
         {
             Review review = db.Reviews.Find(id);
