@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics; // For the stopwatch
 using System.Threading.Tasks; // For the Parallel
 
@@ -37,17 +37,19 @@ namespace Lab3
         {
             // Array address is the number, content is its status as a prime
 
-            // Loop over the numbers (for prime searching)
-            for (int i = 2; i < intArray.Length; i++)
+            // End the first loop's array
+            int iEnd = (int) Math.Sqrt(intArray.Length);
+
+            // Prime search loop
+            for (int i = 2; i < iEnd; i++)
             {
                 // Don't bother looking if we already know the number is not a prime
-                if (intArray[i] != 0)
+                if (intArray[i] == 1)
                 {
-                    // Look at the rest of the array to see if it is a 
-                    // multiple of the number we are looking at
-                    for (int j = i + 1; j < intArray.Length; j++)
+                    // Look at the rest of the array to see if it is a multiple of the number we are looking at
+                    for (int j = i * i; j < intArray.Length; j++)
                     {
-                        // Check if multiple
+                        // Is prime?
                         if (j % i == 0)
                         {
                             // Is a multiple, mark it as such
